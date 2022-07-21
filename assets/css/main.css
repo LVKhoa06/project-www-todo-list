@@ -1,0 +1,107 @@
+:root {
+    --app-color-1: #333;
+    --app-color-2: #3ec6f7;
+    --app-color-3: #f0f8ff;
+    --app-color-4: #c0bebe;
+    --text-color-1: #444;
+    --text-color-2: #555;
+    --text-color-3: #666;
+    --text-color-4: #888;
+    --color-white-1: #fff;
+    --color-white-2: #f0eeee;
+}
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.center-y {
+    display: flex;
+    justify-content: center;
+}
+
+.center-x {
+    display: flex;
+    align-items: center;
+}
+
+.center-all {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+html {
+    font-family: sans-serif;
+}
+
+body {
+    background-color: var(--app-color-4);
+}
+
+app {
+    display: block;
+    margin: 30px auto;
+    width: 60%;
+    min-height: 515px;
+    background-color: var(--app-color-3);
+    border-radius: 10px;
+    border: 1.6px var(--app-color-2) solid;
+    min-width: 500px;
+}
+
+add-note {
+    width: 100%;
+    margin-top: 25px;
+
+}
+
+.input-note {
+    width: 80%;
+    height: 40px;
+    outline: none;
+    border: 1.6px solid var(--app-color-2);
+    border-radius: 15px;
+    padding-left: 12px;
+    font-size: 16px;
+    color: var(--text-color-1);
+}
+
+.input-note::placeholder {
+    color: var(--text-color-4);
+    font-size: 15px;
+}
+
+.btn-add {
+    height: 40px;
+    width: 50px;
+    border: 1.4px solid var(--app-color-2);
+    border-radius: 15px;
+    margin-left: 6px;
+    background-color: var(--app-color-2);
+    border: 1.5px solid var(--text-color-4);
+}
+
+list-note {
+    flex-direction: column;
+    margin: 10px 35px 0 30px;
+}
+
+.item-note {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1.5px solid var(--app-color-2);
+    border-radius: 6px;
+    margin-bottom: 5px;
+    padding: 10px 0 10px 10px;
+}
+
+.btn-delete {
+    min-width: 30px;
+    height: 20px;
+    background-color: transparent;
+    border: none;
+}
