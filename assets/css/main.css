@@ -41,6 +41,15 @@ body {
     background-color: var(--app-color-4);
 }
 
+li{
+    list-style: none;
+}
+
+.strikethrough {
+    text-decoration: line-through;
+    background-color: var(--color-white-2);
+}
+
 app {
     display: block;
     margin: 30px auto;
@@ -55,7 +64,6 @@ app {
 add-note {
     width: 100%;
     margin-top: 25px;
-
 }
 
 .input-note {
@@ -82,26 +90,75 @@ add-note {
     margin-left: 6px;
     background-color: var(--app-color-2);
     border: 1.5px solid var(--text-color-4);
+    color: var(--text-color-1);
 }
 
 list-note {
     flex-direction: column;
-    margin: 10px 35px 0 30px;
+    margin: 10px 35px 20px 30px;
+    display: block;
 }
 
 .item-note {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    position: relative;
     border: 1.5px solid var(--app-color-2);
     border-radius: 6px;
     margin-bottom: 5px;
-    padding: 10px 0 10px 10px;
+    padding: 10px 30px 10px 10px;
+    color: var(--text-color-1);
 }
 
 .btn-delete {
+    position: absolute;
     min-width: 30px;
+    right: 0;
     height: 20px;
     background-color: transparent;
     border: none;
+    font-size: 20px;
+    line-height: 0;
+    color: var(--text-color-2);
+}
+
+
+.item-note:hover {
+    background-color: rgba(62, 198, 247, .1);
+}
+
+.item-text {
+    width: 100%;
+}
+
+
+.item-text:focus {
+    outline: none;
+}
+
+
+.checkbox-complete {
+    width: 15px;
+    height: 15px;
+    margin-right: 6px;
+    border: 1.6px solid var(--app-color-2);
+    border-radius: 3px;
+}
+
+.checkbox-hide:checked+.checkbox-complete {
+    background-color: rgba(62, 198, 247, .3);
+}
+
+.checkbox-hide:checked+.checkbox-complete:before {
+    content: '\2714';
+    position: absolute;
+    top: 9px;
+    font-size: 14px;
+    color: var(--text-color-3);
+}
+
+.checkbox-hide {
+    opacity: 0;
+    position: absolute;
+    z-index: 10;
 }
