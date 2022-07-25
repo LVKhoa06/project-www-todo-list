@@ -41,13 +41,13 @@ body {
     background-color: var(--app-color-4);
 }
 
-li{
+li {
     list-style: none;
 }
 
 .strikethrough {
     text-decoration: line-through;
-    background-color: var(--color-white-2);
+    background-color: var(--color-white-2) !important;
 }
 
 app {
@@ -99,6 +99,11 @@ list-note {
     display: block;
 }
 
+list-pin {
+    display: flex;
+    justify-content: center;
+}
+
 .item-note {
     display: flex;
     align-items: center;
@@ -120,22 +125,25 @@ list-note {
     font-size: 20px;
     line-height: 0;
     color: var(--text-color-2);
+    opacity: 0;
+    transition: .3s cubic-bezier(0.4, 0, 1, 1);
 }
-
 
 .item-note:hover {
     background-color: rgba(62, 198, 247, .1);
+}
+
+.item-note:hover .btn-delete {
+    opacity: 1;
 }
 
 .item-text {
     width: 100%;
 }
 
-
 .item-text:focus {
     outline: none;
 }
-
 
 .checkbox-complete {
     width: 15px;
@@ -162,3 +170,101 @@ list-note {
     position: absolute;
     z-index: 10;
 }
+
+.focus-item {
+    background-color: rgba(62, 198, 247, .3) !important;
+}
+
+.icon-save {
+    display: none;
+}
+
+.icon-save::after {
+    font-size: 17px;
+    content: '\2714';
+}
+
+.show {
+    display: flex !important;
+}
+
+.hide {
+    display: none !important;
+}
+
+
+
+
+
+
+
+
+
+
+full {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+}
+
+foo {
+    display: flex;
+    flex-direction: column;
+    width: 600px;
+    background-color: var(--app-color-2);
+    border-radius: 10px;
+    border: 1.5px solid var(--app-color-3);
+    box-shadow: 0px 0px 3px 0px var(--app-color-3);
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 40px;
+    width: 100%;
+    background-color: var(--app-color-4);
+    border-top-left-radius: 9px;
+    border-top-right-radius: 9px;
+}
+
+.icon {
+    margin-right: 10px;
+}
+
+content {
+    min-height: 50px;
+    padding: 5px;
+    background-color: chartreuse;
+}
+
+content:focus {
+    outline: none;
+}
+
+time {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    height: 20px;
+    padding: 5px;
+}
+
+footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 40px;
+    background-color: #888;
+    border-bottom-left-radius: 9px;
+    border-bottom-right-radius: 9px;
+}
+
+seting {}
+
+close {}
