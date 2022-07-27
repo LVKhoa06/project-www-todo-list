@@ -34,7 +34,7 @@ const appOOP = {
             <li class="item-note" data-index="${item.id}">
                 <input class="checkbox-hide" type="checkbox">
                 <span class="checkbox-complete"></span>
-                <span class="item-text" contenteditable="true">${item.text}</span>
+                <span class="item-text" >${item.text}</span>
                 <button class="btn-delete">x</button>
                 <i class="icon-save"></i>
             </li>
@@ -70,7 +70,6 @@ const appOOP = {
         checkboxHide.className = 'checkbox-hide';
         checkboxShow.className = 'checkbox-complete';
         icon.className = 'icon-save';
-        itemText.setAttribute("contenteditable", "true");
         checkboxHide.setAttribute("type", "checkbox");
         item.setAttribute("data-index", id);
 
@@ -97,10 +96,11 @@ const appOOP = {
         btn.onclick = this.deleteTodo;
         checkboxHide.onclick = this.strikethroughItem;
         icon.onclick = this.updateTodo;
-        itemText.onfocus = this.focusItem;
-        //itemText.onblur = this.focusOutItem;
+        icon.onclick = this.clickIcon;
+        itemText.onclick = this.clickItem;
 
         this.addTodo(id, itemText.innerText);
+
     }, // function createNote
 
     localSet: function () {
@@ -170,49 +170,45 @@ const appOOP = {
         }
     }, // strikethroughItem
 
-    focusItem: function (e) {
+    clickItem: function (e) {
+        // const textItem = e.target.parentNode.querySelector('.item-text')
+        const btnDelete = e.target.parentNode.querySelector('.btn-delete');
+        const btnSave = e.target.parentNode.querySelector('.icon-save');
+
         if (this.onEdit)
             return;
 
         this.onEdit = true;
+
         inputNote.setAttribute('disabled', true);
         btnAddNote.setAttribute('disabled', true);
+        e.target.setAttribute('contenteditable', true);
 
-        const btnDelete = e.target.parentNode.querySelector('.btn-delete');
-        const btnSave = e.target.parentNode.querySelector('.icon-save');
+        setTimeout(() => {
+            e.target.focus();
+        }, 50)
 
         // e.target.parentNode.classList.remove('strikethrough');
         e.target.parentNode.classList.add('focus-item');
         btnDelete.classList.add('hide');
         btnSave.classList.add('show');
 
-    }, // focus Item
+    }, // clickItem
 
-    // focusOutItem: function (e) {
-    //     const btnDelete = e.target.parentNode.querySelector('.btn-delete');
-    //     const btnSave = e.target.parentNode.querySelector('.icon-save');
+    clickIcon: function (e) {
+        const listElement = e.target.parentNode;
+        const btnDelete = listElement.querySelector('.btn-delete');
+        const itemText = listElement.querySelector('.item-text');
+        const iconSave = listElement.querySelector('.icon-save');
 
-    //     // e.target.parentNode.classList.add('strikethrough');
-    //     e.target.parentNode.classList.remove('focus-item');
-    //     setTimeout(() => {
-    //         btnDelete.classList.remove('hide');
-    //     }, 100);
+        itemText.setAttribute('contenteditable', false);
 
-    //     if (e.target.textContent.trim() == '') {
-    //         alert('Không được để trống');
-    //         setTimeout(() => {
-    //             e.target.focus();
-    //         }, 100);
-    //     } else
-    //         setTimeout(() => {
-    //             btnSave.classList.remove('show');
-    //         }, 80);
+        listElement.classList.remove('focus-item');
+        btnDelete.classList.remove('hide');
 
-    //     const text1 = e.target.textContent;
-    //         c(text1)
-
-
-    // }, // focusOutItem
+        appOOP.updateTodo(e);
+        iconSave.classList.remove('show');
+    },
 
     handleEvents: function () {
         btnAddNote.onclick = () => {
@@ -250,16 +246,11 @@ const appOOP = {
         });
 
         app.querySelectorAll('.item-text').forEach(text => {
-            text.addEventListener('focus', (e) => appOOP.focusItem(e));
-            //text.addEventListener('blur', (e) => appOOP.focusOutItem(e));
+            text.onclick = (e) => appOOP.clickItem(e)
         });
 
         app.querySelectorAll('.icon-save').forEach(icon => {
-            icon.onclick = (e) => {
-                appOOP.updateTodo(e);
-                icon.classList.remove('show');
-            };
-            ;
+            icon.onclick = (e) => appOOP.clickIcon(e);
         });
     }, // handleEvent
 
@@ -277,8 +268,6 @@ appOOP.start();
 
 
 // input rỗng  thì return
-// chỉ update khi click btn save
 // khi save thì mới được làm hành động khác
-//
 
 // func updateOnEdit
