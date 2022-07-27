@@ -103,6 +103,20 @@ const appOOP = {
 
     }, // function createNote
 
+    updateOnEdit: function (boolean) {
+        if (boolean) {
+            appOOP.onEdit = true;
+
+            inputNote.setAttribute('disabled', true);
+            btnAddNote.setAttribute('disabled', true);
+        } else {
+            appOOP.onEdit = false;
+
+            inputNote.removeAttribute('disabled');
+            btnAddNote.removeAttribute('disabled');
+        }
+    },
+
     localSet: function () {
         localStorage.setItem(CONST_LS_KEY, JSON.stringify(appOOP.dataTodos));
     }, // localSet
@@ -132,9 +146,7 @@ const appOOP = {
         if (newText.trim().length < 1)
             return alert('Invalid input');
 
-        this.onEdit = false;
-        inputNote.removeAttribute('disabled');
-        btnAddNote.removeAttribute('disabled');
+        appOOP.updateOnEdit(false);
 
         const id = e.target.parentNode.dataset.index;
         appOOP.dataTodos = appOOP.dataTodos.map((item) => {
@@ -178,10 +190,7 @@ const appOOP = {
         if (this.onEdit)
             return;
 
-        this.onEdit = true;
-
-        inputNote.setAttribute('disabled', true);
-        btnAddNote.setAttribute('disabled', true);
+        appOOP.updateOnEdit(true);
         e.target.setAttribute('contenteditable', true);
 
         setTimeout(() => {
@@ -269,5 +278,3 @@ appOOP.start();
 
 // input rỗng  thì return
 // khi save thì mới được làm hành động khác
-
-// func updateOnEdit
