@@ -1,5 +1,5 @@
 const c = console.log;
-
+const clickMe = document.querySelector('.click-me');
 //#region declare const 
 const app = document.querySelector('app');
 const listNote = app.querySelector('list-note');
@@ -28,17 +28,15 @@ const appOOP = {
     //#endregion declare
 
     render: function () {
-
         const htmls = this.dataTodos.map((item, index) => {
             return `
             <li class="item-note" data-index="${item.id}">
                 <input class="checkbox-hide" type="checkbox">
                 <span class="checkbox-complete"></span>
-                <span class="item-text" >${item.text}</span>
+                <span class="item-text">${item.text}</span>
                 <button class="btn-delete">x</button>
                 <i class="icon-save"></i>
             </li>
-            
                 `;
             // <i class="fa-solid fa-ellipsis-vertical"></i>
         });
@@ -136,7 +134,6 @@ const appOOP = {
             status: CONST_TODO_STATUS.DOING
         })
         c('Add');
-
         appOOP.localSet();
     }, // addTodo
 
@@ -180,10 +177,31 @@ const appOOP = {
             e.target.parentNode.classList.add('strikethrough');
             e.target.setAttribute('checked', '');
         }
+        appOOP.todoStatus(e);
     }, // strikethroughItem
 
+    todoStatus: function (e) {
+        const id = e.target.parentNode.dataset.index;
+        let listChildrenNode = listNote.children;
+
+        Array.from(listChildrenNode).forEach((item) => {
+            let input = item.querySelector('.checkbox-hide');
+            if (input.hasAttribute('checked')) {
+                appOOP.dataTodos = appOOP.dataTodos.map((item) => {
+                    if (item.id != id) {
+                        return item
+                    }
+                    return {
+                        ...item,
+                        status: CONST_TODO_STATUS.COMPLETED
+                    }
+                })
+            }
+        })
+        this.localSet();
+    },
+
     clickItem: function (e) {
-        // const textItem = e.target.parentNode.querySelector('.item-text')
         const btnDelete = e.target.parentNode.querySelector('.btn-delete');
         const btnSave = e.target.parentNode.querySelector('.icon-save');
 
@@ -191,6 +209,7 @@ const appOOP = {
             return;
 
         appOOP.updateOnEdit(true);
+
         e.target.setAttribute('contenteditable', true);
 
         setTimeout(() => {
@@ -210,13 +229,15 @@ const appOOP = {
         const itemText = listElement.querySelector('.item-text');
         const iconSave = listElement.querySelector('.icon-save');
 
-        itemText.setAttribute('contenteditable', false);
+        itemText.removeAttribute('contenteditable');
 
         listElement.classList.remove('focus-item');
         btnDelete.classList.remove('hide');
 
         appOOP.updateTodo(e);
         iconSave.classList.remove('show');
+
+        appOOP.onEdit = false;
     },
 
     handleEvents: function () {
@@ -243,6 +264,10 @@ const appOOP = {
 
         clearBtn.onclick = function () {
             localStorage.clear();
+        }
+
+        clickMe.onclick = function () {
+
         }
 
         // Add events for buttons
