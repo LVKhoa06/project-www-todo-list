@@ -138,10 +138,16 @@ const appOOP = {
     }, // addTodo
 
     updateTodo: function (e) {
-        const newText = e.target.parentNode.querySelector('.item-text').textContent;
+        const ElmText = e.target.parentNode.querySelector('.item-text')
+        const newText = ElmText.textContent;
 
-        if (newText.trim().length < 1)
-            return alert('Invalid input');
+
+        if (newText.trim().length < 1) {
+            alert('Không được để note trống');
+            // setTimeout(() => { 
+            //     ElmText.click();
+            // },100)
+        }
 
         appOOP.updateOnEdit(false);
 
@@ -178,15 +184,16 @@ const appOOP = {
             e.target.setAttribute('checked', '');
         }
         appOOP.todoStatus(e);
+        appOOP.localSet();
     }, // strikethroughItem
 
     todoStatus: function (e) {
         const id = e.target.parentNode.dataset.index;
         let listChildrenNode = listNote.children;
+        const hasAtr = e.target.parentNode.querySelector('.checkbox-hide').hasAttribute('checked');
 
         Array.from(listChildrenNode).forEach((item) => {
-            let input = item.querySelector('.checkbox-hide');
-            if (input.hasAttribute('checked')) {
+            if (hasAtr) {
                 appOOP.dataTodos = appOOP.dataTodos.map((item) => {
                     if (item.id != id) {
                         return item
@@ -196,9 +203,20 @@ const appOOP = {
                         status: CONST_TODO_STATUS.COMPLETED
                     }
                 })
+            } else {
+                appOOP.dataTodos = appOOP.dataTodos.map((item) => {
+                    if (item.id != id) {
+                        return item
+                    }
+                    return {
+                        ...item,
+                        status: CONST_TODO_STATUS.DOING
+                    }
+                })
             }
-        })
-        this.localSet();
+        });
+        appOOP.localSet();
+
     },
 
     clickItem: function (e) {
