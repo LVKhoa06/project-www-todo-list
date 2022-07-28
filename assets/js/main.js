@@ -30,8 +30,8 @@ const appOOP = {
     render: function () {
         const htmls = this.dataTodos.map((item, index) => {
             return `
-            <li class="item-note" data-index="${item.id}">
-                <input class="checkbox-hide" type="checkbox">
+            <li class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
+                <input class="checkbox-hide" type="checkbox" ${item.status == 2 ? 'checked' : ''}>
                 <span class="checkbox-complete"></span>
                 <span class="item-text">${item.text}</span>
                 <button class="btn-delete">x</button>
@@ -342,6 +342,3 @@ const appOOP = {
 } // appOOP
 
 appOOP.start();
-
-
-// input rỗng  thì return
