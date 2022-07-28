@@ -18,6 +18,7 @@
             <button class="btn-add">Add</button>
         </add-note>
         <list-pin>
+            <button style="display:none;" class="click-me btn">Click me</button>
             <button id="arr-btn" class=" btn">Array</button>
             <button id="local-btn" class=" btn">Local</button>
             <button id="clear-btn" class=" btn">Clear</button>
@@ -26,27 +27,28 @@
         </list-note>
     </app>
     <full>
-        <foo>
+        <advanced-edit>
             <header>
-                <i class="icon"> icon </i>
+                <i class="fa-solid fa-thumbtack icon-pin"></i>
             </header>
-            <content contenteditable="true">
-                Content
+            <content>
+
             </content>
             <time>
                 DD/MM/YYYY
             </time>
             <footer>
                 <seting>
-                    <i>i1</i>
-                    <i>i2</i>
-
+                    <i class="icon-setting fa-solid fa-palette"></i>
+                    <i class="icon-setting fa-solid fa-copy"></i>
+                    <i class="icon-setting fa-solid fa-trash-can"></i>
+                    <!-- <i class="icon-setting fa-solid fa-ellipsis-vertical"></i> -->
                 </seting>
                 <close>
                     Close
                 </close>
             </footer>
-        </foo>
+        </advanced-edit>
     </full>
 </body>
 <script src="./assets/js/main.js"></script>

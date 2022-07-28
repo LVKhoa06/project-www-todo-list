@@ -11,6 +11,28 @@
     --color-white-2: #f0eeee;
 }
 
+@keyframes growth {
+    from {
+        transform: scale(var(--growth-from));
+    }
+
+    to {
+        transform: scale(var(--growth-to));
+    }
+}
+
+@keyframes sideIn {
+    from {
+        opacity: 0;
+        transform: scale();
+    }
+
+    to {
+        opacity: 1;
+        transform: scale();
+    }
+}
+
 * {
     padding: 0;
     margin: 0;
@@ -140,6 +162,7 @@ list-pin {
 
 .item-text {
     width: 95.3%;
+    min-height: 18px;
 }
 
 .item-text:focus {
@@ -159,7 +182,7 @@ list-pin {
     background-color: rgba(62, 198, 247, .3);
 }
 
-.checkbox-hide:checked+.checkbox-complete:before {
+.checkbox-hide:checked+.checkbox-complete::before {
     content: '\2714';
     position: absolute;
     top: -4px;
@@ -199,14 +222,10 @@ list-pin {
     display: none !important;
 }
 
-
-
-
-
-
-
-
-
+.lock-checkbox {
+    background-color: var(--app-color-3);
+    z-index: 100;
+}
 
 full {
     position: absolute;
@@ -216,17 +235,22 @@ full {
     top: 0;
     width: 100%;
     height: 100%;
-    display: none;
+    background: radial-gradient(black, transparent);
+    animation: sideIn cubic-bezier(0.01, 0.02, 1, 1.01) 0.5s;
 }
 
-foo {
+advanced-edit {
+    --growth-from: 0.4;
+    --growth-to: 1;
     display: flex;
     flex-direction: column;
-    width: 600px;
+    width: 616px;
+    max-width: 98%;
     background-color: var(--app-color-2);
     border-radius: 10px;
     border: 1.5px solid var(--app-color-3);
     box-shadow: 0px 0px 3px 0px var(--app-color-3);
+    animation: growth cubic-bezier(0.43, 0.35, 0.61, 0.75) 0.3s;
 }
 
 header {
@@ -242,6 +266,28 @@ header {
 
 .icon {
     margin-right: 10px;
+}
+
+.icon-pin {
+    margin: 3px 5px 0 0;
+    font-size: 20px;
+    -webkit-text-stroke: 1px rgba(102, 102, 102);
+    color: var(--color-white-1);
+    cursor: pointer;
+    padding: 8px;
+}
+
+seting {
+    width: 140px;
+    display: flex;
+    justify-content: space-evenly;
+
+}
+
+.icon-setting {
+    cursor: pointer;
+    padding: 6px;
+    color: var(--text-color-4);
 }
 
 content {
@@ -267,7 +313,13 @@ footer {
     justify-content: space-between;
     align-items: center;
     height: 40px;
-    background-color: #888;
+    background-color: var(--app-color-3);
     border-bottom-left-radius: 9px;
     border-bottom-right-radius: 9px;
+}
+
+close {
+    color: var(--text-color-3);
+    padding: 10px;
+    cursor: pointer;
 }
