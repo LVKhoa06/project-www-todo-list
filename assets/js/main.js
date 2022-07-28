@@ -113,7 +113,7 @@ const appOOP = {
             inputNote.removeAttribute('disabled');
             btnAddNote.removeAttribute('disabled');
         }
-    },
+    }, // updateOnEdit
 
     localSet: function () {
         localStorage.setItem(CONST_LS_KEY, JSON.stringify(appOOP.dataTodos));
@@ -144,9 +144,9 @@ const appOOP = {
 
         if (newText.trim().length < 1) {
             alert('Không được để note trống');
-            // setTimeout(() => { 
-            //     ElmText.click();
-            // },100)
+            return setTimeout(() => {
+                ElmText.click(); // trigger
+            }, 100);
         }
 
         appOOP.updateOnEdit(false);
@@ -166,6 +166,10 @@ const appOOP = {
     }, // updateTodo
 
     deleteTodo: function (e) {
+
+        if (appOOP.onEdit)
+            return;
+
         const listElement = e.target.parentNode;
         const idDelete = listElement.dataset.index;
         e.target.parentNode.parentNode.removeChild(listElement);
@@ -176,6 +180,7 @@ const appOOP = {
     }, // deleteTodo
 
     strikethroughItem: function (e) {
+
         if (e.target.hasAttribute('checked')) {
             e.target.parentNode.classList.remove('strikethrough');
             e.target.removeAttribute('checked');
@@ -189,42 +194,50 @@ const appOOP = {
 
     todoStatus: function (e) {
         const id = e.target.parentNode.dataset.index;
-        let listChildrenNode = listNote.children;
         const hasAtr = e.target.parentNode.querySelector('.checkbox-hide').hasAttribute('checked');
 
-        Array.from(listChildrenNode).forEach((item) => {
-            if (hasAtr) {
-                appOOP.dataTodos = appOOP.dataTodos.map((item) => {
-                    if (item.id != id) {
-                        return item
-                    }
-                    return {
-                        ...item,
-                        status: CONST_TODO_STATUS.COMPLETED
-                    }
-                })
-            } else {
-                appOOP.dataTodos = appOOP.dataTodos.map((item) => {
-                    if (item.id != id) {
-                        return item
-                    }
-                    return {
-                        ...item,
-                        status: CONST_TODO_STATUS.DOING
-                    }
-                })
-            }
-        });
+        if (hasAtr) {
+            appOOP.dataTodos = appOOP.dataTodos.map((item) => {
+                if (item.id != id) {
+                    return item
+                }
+                return {
+                    ...item,
+                    status: CONST_TODO_STATUS.COMPLETED
+                }
+            })
+        } else {
+            appOOP.dataTodos = appOOP.dataTodos.map((item) => {
+                if (item.id != id) {
+                    return item
+                }
+                return {
+                    ...item,
+                    status: CONST_TODO_STATUS.DOING
+                }
+            })
+        }
         appOOP.localSet();
-
-    },
+    }, // todoStatus
 
     clickItem: function (e) {
         const btnDelete = e.target.parentNode.querySelector('.btn-delete');
         const btnSave = e.target.parentNode.querySelector('.icon-save');
+        const idOuter = e.target.parentNode.dataset.index;
 
-        if (this.onEdit)
+        if (appOOP.onEdit)
             return;
+
+        Array.from(listNote.children).forEach((item) => {
+            const btnDelete = item.querySelector('.btn-delete');
+            const tick = item.querySelector('.checkbox-complete');
+            const idInner = item.dataset.index;
+
+            if (idInner !== idOuter) {
+                tick.classList.add('lock-checkbox');
+                btnDelete.classList.add('hide');
+            }
+        })
 
         appOOP.updateOnEdit(true);
 
@@ -232,7 +245,7 @@ const appOOP = {
 
         setTimeout(() => {
             e.target.focus();
-        }, 50)
+        }, 50);
 
         // e.target.parentNode.classList.remove('strikethrough');
         e.target.parentNode.classList.add('focus-item');
@@ -243,6 +256,7 @@ const appOOP = {
 
     clickIcon: function (e) {
         const listElement = e.target.parentNode;
+        const idOuter = e.target.parentNode.dataset.index;
         const btnDelete = listElement.querySelector('.btn-delete');
         const itemText = listElement.querySelector('.item-text');
         const iconSave = listElement.querySelector('.icon-save');
@@ -255,8 +269,19 @@ const appOOP = {
         appOOP.updateTodo(e);
         iconSave.classList.remove('show');
 
+        Array.from(listNote.children).forEach((item) => {
+            const btnDelete = item.querySelector('.btn-delete');
+            const checkboxShow = item.querySelector('.checkbox-complete');
+            const idInner = item.dataset.index;
+
+            if (idInner !== idOuter) {
+                checkboxShow.classList.remove('lock-checkbox');
+                btnDelete.classList.remove('hide');
+            }
+        })
+
         appOOP.onEdit = false;
-    },
+    }, // clickIcon
 
     handleEvents: function () {
         btnAddNote.onclick = () => {
@@ -320,4 +345,3 @@ appOOP.start();
 
 
 // input rỗng  thì return
-// khi save thì mới được làm hành động khác
