@@ -9,7 +9,8 @@ const listNote = app.querySelector('list-note');
 const inputNote = app.querySelector('.input-note');
 const btnAddNote = app.querySelector('.btn-add');
 const fullSettingContent = fullSetting.querySelector('content');
-const timeItem = fullSetting.querySelector('time');
+const iconPin = fullSetting.querySelector('.icon-pin');
+const timeNote = fullSetting.querySelector('time');
 const fullSettingClose = fullSetting.querySelector('close');
 const iconRecycleBin = fullSetting.querySelector('.icon-recycle-bin');
 const iconListColor = fullSetting.querySelector('.icon-list-color');
@@ -62,7 +63,7 @@ const appOOP = {
                     <i class="show icon-save" id="icon-save-inner" data-id="${id}" onclick="appOOP.updateTodo2(this)"></i>
                 </li>
                 `;
-        timeItem.innerText = todo.date
+        timeNote.innerText = todo.date
         fullSettingContent.innerHTML = htmlContent;
     },
 
@@ -434,6 +435,18 @@ const appOOP = {
                     item.remove();
                 }
             })
+        } // iconRecycleBin
+
+        iconPin.onclick = (e) => {
+            const id = e.target.parentNode.parentNode.querySelector('.item-note').dataset.index;
+            const pinElm = appOOP.dataTodos.find(item => item.id === id);
+
+            appOOP.dataTodos = appOOP.dataTodos.filter(item => item.id !== id);
+            appOOP.dataTodos.unshift(pinElm);
+
+            appOOP.render();
+            appOOP.handleEvents();
+            appOOP.localSet();
         }
 
         arrBtn.onclick = function () {
