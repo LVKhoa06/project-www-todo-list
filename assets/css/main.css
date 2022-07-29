@@ -135,6 +135,7 @@ list-pin {
     margin-bottom: 5px;
     padding: 10px 30px 10px 10px;
     color: var(--text-color-1);
+    width: 100%;
 }
 
 .btn-delete {
@@ -214,13 +215,7 @@ list-pin {
     content: '\2714';
 }
 
-.show {
-    display: flex !important;
-}
 
-.hide {
-    display: none !important;
-}
 
 .lock-checkbox {
     background-color: var(--app-color-3);
@@ -245,14 +240,14 @@ advanced-edit {
     flex-direction: column;
     width: 616px;
     max-width: 98%;
-    background-color: var(--app-color-2);
+    background-color: var(--color-white-1);
     border-radius: 10px;
     border: 1.5px solid var(--app-color-3);
     box-shadow: 0px 0px 3px 0px var(--app-color-3);
     z-index: 10000;
     --growth-from: 0.4;
     --growth-to: 1;
-    animation: growth cubic-bezier(0.43, 0.35, 0.61, 0.75) 0.3s;
+    animation: growth cubic-bezier(0.43, 0.35, 0.61, 0.75) 0.2s;
 }
 
 header {
@@ -279,6 +274,10 @@ header {
     padding: 8px;
 }
 
+time {
+    font-size: 15px;
+}
+
 seting {
     width: 140px;
     display: flex;
@@ -292,14 +291,8 @@ seting {
     color: var(--text-color-4);
 }
 
-content {
-    min-height: 50px;
-    padding: 5px;
-    background-color: chartreuse;
-}
-
-content:focus {
-    outline: none;
+.icon-setting:hover {
+    color: var(--app-color-4);
 }
 
 time {
@@ -308,6 +301,7 @@ time {
     align-items: center;
     height: 20px;
     padding: 5px;
+    box-shadow: 0 0px 2px 0px var(--text-color-4);
 }
 
 footer {
@@ -318,10 +312,43 @@ footer {
     background-color: var(--app-color-3);
     border-bottom-left-radius: 9px;
     border-bottom-right-radius: 9px;
+    box-shadow: 0 0px 2px 0px var(--text-color-4);
 }
 
 close {
-    color: var(--text-color-3);
+    color: var(--text-color-2);
     padding: 10px;
     cursor: pointer;
+}
+
+close:hover {
+    color: var(--text-color-4);
+}
+
+#icon-full {
+    position: absolute;
+    right: -35px;
+    display: none;
+    padding: 10px;
+    text-align: end;
+    align-items: center;
+    justify-content: center;
+}
+
+.item-note:hover #icon-full {
+    display: block;
+}
+
+.show {
+    display: flex;
+}
+
+.hide {
+    display: none !important;
+}
+
+.bla {
+    border: none;
+    border-radius: 0px;
+    margin: 0;
 }
