@@ -2,16 +2,18 @@
 // Priority: Medium
 
 const c = console.log;
-const clickMe = document.querySelector('.click-me');
 //#region declare const 
 const app = document.querySelector('app');
+const fullSetting = document.querySelector('full');
 const listNote = app.querySelector('list-note');
 const inputNote = app.querySelector('.input-note');
 const btnAddNote = app.querySelector('.btn-add');
-const fullSetting = document.querySelector('full');
 const fullSettingContent = fullSetting.querySelector('content');
 const timeItem = fullSetting.querySelector('time');
 const fullSettingClose = fullSetting.querySelector('close');
+const iconRecycleBin = fullSetting.querySelector('.icon-recycle-bin');
+const iconListColor = fullSetting.querySelector('.icon-list-color');
+const iconCopy = fullSetting.querySelector('.icon-copy');
 
 const CONST_LS_KEY = 'TODO-LIST';
 
@@ -35,7 +37,6 @@ const appOOP = {
     render: function () {
         const htmls = this.dataTodos.map((item, index) => {
             return `
-
             <li class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
                 <input class="checkbox-hide" type="checkbox" ${item.status == 2 ? 'checked' : ''}>
                 <span class="checkbox-complete"></span>
@@ -418,6 +419,21 @@ const appOOP = {
 
         fullSettingClose.onclick = () => {
             fullSetting.classList.add('hide');
+        } // fullSettingClose.
+
+        iconRecycleBin.onclick = (e) => {
+            const id = e.target.parentNode.parentNode.parentNode.querySelector('.item-note').dataset.index;
+
+            appOOP.dataTodos = appOOP.dataTodos.filter((item) => item.id !== id);
+            appOOP.localSet();
+
+            fullSetting.classList.add('hide');
+
+            Array.from(listNote.children).forEach((item) => {
+                if (item.dataset.index === id) {
+                    item.remove();
+                }
+            })
         }
 
         arrBtn.onclick = function () {
