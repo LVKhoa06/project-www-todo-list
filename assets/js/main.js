@@ -55,7 +55,7 @@ const appOOP = {
 
         const htmlContent = `
                 <li class="item-note bla ${todo.status == 2 ? 'strikethrough' : ''}" data-index="${todo.id}" >
-                    <input class="checkbox-hide" type="checkbox" ${todo.status == 2 ? 'checked' : ''}>
+                    <input class="checkbox-hide" type="checkbox" onclick="appOOP.strikethroughItem2(this)" ${todo.status == 2 ? 'checked' : ''}>
                     <span class="checkbox-complete"></span>
                     <span contenteditable="true" class="item-text">${todo.text}</span>
                     <i class="show icon-save" id="icon-save-inner" data-id="${id}" onclick="appOOP.updateTodo2(this)"></i>
@@ -255,6 +255,19 @@ const appOOP = {
         appOOP.localSet();
     }, // strikethroughItem
 
+    strikethroughItem2: function (elm) {
+
+        if (elm.hasAttribute('checked')) {
+            elm.parentNode.classList.remove('strikethrough');
+            elm.removeAttribute('checked');
+        } else {
+            elm.parentNode.classList.add('strikethrough');
+            elm.setAttribute('checked', '');
+        }
+        appOOP.todoStatus2(elm);
+        appOOP.localSet();
+    }, // strikethroughItem
+
     todoStatus: function (e) {
         const id = e.target.parentNode.dataset.index;
         const hasAtr = e.target.parentNode.querySelector('.checkbox-hide').hasAttribute('checked');
@@ -280,6 +293,35 @@ const appOOP = {
                 }
             })
         }
+        appOOP.localSet();
+    }, // todoStatus
+
+    todoStatus2: function (elm) {
+        const id = elm.parentNode.dataset.index;
+        const hasAtr = elm.parentNode.querySelector('.checkbox-hide').hasAttribute('checked');
+
+        if (hasAtr) {
+            appOOP.dataTodos = appOOP.dataTodos.map((item) => {
+                if (item.id != id) {
+                    return item
+                }
+                return {
+                    ...item,
+                    status: CONST_TODO_STATUS.COMPLETED
+                }
+            })
+        } else {
+            appOOP.dataTodos = appOOP.dataTodos.map((item) => {
+                if (item.id != id) {
+                    return item
+                }
+                return {
+                    ...item,
+                    status: CONST_TODO_STATUS.DOING
+                }
+            })
+        }
+        appOOP.updateTodo2(elm);
         appOOP.localSet();
     }, // todoStatus
 
