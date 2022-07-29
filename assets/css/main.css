@@ -237,11 +237,10 @@ full {
     height: 100%;
     background: radial-gradient(black, transparent);
     animation: sideIn cubic-bezier(0.01, 0.02, 1, 1.01) 0.5s;
+    z-index: 100;
 }
 
 advanced-edit {
-    --growth-from: 0.4;
-    --growth-to: 1;
     display: flex;
     flex-direction: column;
     width: 616px;
@@ -250,6 +249,9 @@ advanced-edit {
     border-radius: 10px;
     border: 1.5px solid var(--app-color-3);
     box-shadow: 0px 0px 3px 0px var(--app-color-3);
+    z-index: 10000;
+    --growth-from: 0.4;
+    --growth-to: 1;
     animation: growth cubic-bezier(0.43, 0.35, 0.61, 0.75) 0.3s;
 }
 

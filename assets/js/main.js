@@ -5,7 +5,10 @@ const app = document.querySelector('app');
 const listNote = app.querySelector('list-note');
 const inputNote = app.querySelector('.input-note');
 const btnAddNote = app.querySelector('.btn-add');
-const btnDeleteTodo = app.querySelector('.btn-delete');
+const fullSetting = document.querySelector('full');
+const fullSettingClose = fullSetting.querySelector('close');
+const fullSettingContent = fullSetting.querySelector('content');
+const timeItem = fullSetting.querySelector('time');
 
 const CONST_LS_KEY = 'TODO-LIST';
 
@@ -38,7 +41,6 @@ const appOOP = {
                 <i class="icon-save"></i>
             </li>
                 `;
-            // <i class="fa-solid fa-ellipsis-vertical"></i>
         });
         listNote.innerHTML = htmls.join('');
     },
@@ -128,12 +130,27 @@ const appOOP = {
     }, // localGet
 
     addTodo: function (id, todoText) {
+        function getTime(time) {
+            return time < 10 ? `0${time}` : time;
+        }
+
+        const newTime = new Date();
+        const minutes = newTime.getMinutes();
+        const hours = newTime.getHours();
+        const date = newTime.getDate();
+        const month = newTime.getMonth() + 1;
+        const year = newTime.getFullYear();
+        const dateCreate = `${getTime(hours)}:${getTime(minutes)}.${getTime(date)}/${getTime(month)}/${year}`
+
+
         appOOP.dataTodos.push({
             id,
             text: todoText,
-            status: CONST_TODO_STATUS.DOING
+            date: dateCreate,
+            status: CONST_TODO_STATUS.DOING,
         })
         c('Add');
+
         appOOP.localSet();
     }, // addTodo
 
@@ -252,6 +269,15 @@ const appOOP = {
         btnDelete.classList.add('hide');
         btnSave.classList.add('show');
 
+        fullSetting.classList.remove('hide');
+        fullSettingContent.setAttribute('data-index', idOuter)
+        fullSettingContent.innerHTML = e.target.parentNode.innerHTML;
+
+        appOOP.dataTodos.map((item) => {
+            if (item.id == idOuter) {
+                timeItem.innerText = item.date;
+            }
+        })
     }, // clickItem
 
     clickIcon: function (e) {
@@ -297,6 +323,11 @@ const appOOP = {
             }
         } // enterKey
 
+        fullSettingClose.onclick = () => {
+            fullSetting.classList.add('hide');
+            document.body.click();
+        }
+
         arrBtn.onclick = function () {
             c(appOOP.dataTodos);
         }
@@ -313,7 +344,6 @@ const appOOP = {
 
         }
 
-        // Add events for buttons
         app.querySelectorAll('.btn-delete').forEach(btn => {
             btn.onclick = (e) => appOOP.deleteTodo(e);
         });
