@@ -401,11 +401,23 @@ const appOOP = {
                 id: `${Date.now()}`,
                 date: appOOP.getTime()
             }
-
             appOOP.dataTodos.push(dataCopy);
+
+            const dataCopyId = dataCopy.id;
+
+            fullSetting.classList.add('hide');
             appOOP.localSet();
             appOOP.render();
             appOOP.handleEvents();
+
+            Array.from(listNote.children).forEach((item) => {
+                const textItem = item.querySelector('.item-text');
+
+                if (dataCopyId == item.dataset.index) {
+                    textItem.click();
+                }
+            })
+
         } // iconCopy
 
         clearBtn.onclick = function () {
