@@ -451,6 +451,18 @@ const appOOP = {
 
         arrBtn.onclick = function () {
             c(appOOP.dataTodos);
+        } // iconPin
+
+        iconCopy.onclick = (e) => {
+            const id = e.target.parentNode.parentNode.parentNode.querySelector('.item-note').dataset.index;
+            const dataCopy = appOOP.dataTodos.find(item => item.id === id);
+
+            dataCopy.id = `${Date.now()}`;
+
+            appOOP.dataTodos.push(dataCopy);
+            appOOP.localSet();
+            appOOP.render();
+            appOOP.handleEvents();
         }
 
         clearBtn.onclick = function () {
