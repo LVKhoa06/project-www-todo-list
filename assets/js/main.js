@@ -1,5 +1,3 @@
-// Refactor: Gộp hàm updateTodo ... 
-// Priority: Medium
 
 // Deadline todos : https://help.evernote.com/hc/en-us/articles/1500003792201-Set-a-due-date-for-a-task
 
@@ -54,15 +52,15 @@ const appOOP = {
     },
 
     testRender: function (e) {
-        const id = e.target.parentNode.dataset.index;
-        const todo = this.dataTodos.find(entry => entry.id === id);
+        const outerId = e.target.parentNode.dataset.index;
+        const todo = this.dataTodos.find(entry => entry.id === outerId);
 
         const htmlContent = `
-                <li class="item-note bla ${todo.status == 2 ? 'strikethrough' : ''}" data-index="${todo.id}" >
-                    <input class="checkbox-hide" type="checkbox" onclick="appOOP.strikethroughItem2(this)" ${todo.status == 2 ? 'checked' : ''}>
+                <li class="item-note bla ${todo.status == 2 ? 'strikethrough' : ''}" data-index="${outerId}" >
+                    <input class="checkbox-hide" type="checkbox" onclick="appOOP.strikethroughItem(this)" ${todo.status == 2 ? 'checked' : ''}>
                     <span class="checkbox-complete"></span>
                     <span contenteditable="true" class="item-text">${todo.text}</span>
-                    <i class="show icon-save" id="icon-save-inner" data-id="${id}" onclick="appOOP.updateTodo2(this)"></i>
+                    <i class="show icon-save" id="icon-save-inner" onclick="appOOP.updateTodo(this)"></i>
                 </li>
                 `;
         timeNote.innerText = todo.date
@@ -71,7 +69,7 @@ const appOOP = {
 
     inputValueLength: function () {
         return inputNote.value.length;
-    },
+    }, // inputValueLength
 
     createNote: function () {
         const id = `${Date.now()}`;
@@ -119,14 +117,14 @@ const appOOP = {
         inputNote.value = "";
 
         btn.onclick = this.deleteTodo;
-        checkboxHide.onclick = this.strikethroughItem;
-        icon.onclick = this.updateTodo;
+        checkboxHide.onclick = (e) => appOOP.strikethroughItem(e.target);
+        icon.onclick = (e) => appOOP.updateTodo(e.target);
         icon.onclick = this.clickIconTick;
         itemText.onclick = this.clickItem;
         fullIcon.onclick = this.clickIconFull;
         this.addTodo(id, itemText.innerText);
 
-    }, // function createNote
+    }, // createNote
 
     updateOnEdit: function (boolean) {
         if (boolean) {
@@ -167,7 +165,7 @@ const appOOP = {
         }
 
         return `${editTime(hours)}:${editTime(minutes)}.${editTime(date)}/${editTime(month)}/${year}`;
-    },
+    }, // getTime
 
     addTodo: function (id, todoText) {
 
@@ -182,34 +180,10 @@ const appOOP = {
         appOOP.localSet();
     }, // addTodo
 
-    updateTodo2: function (btnSave) {
-        const id = btnSave.dataset.id;
-        const parent = btnSave.parentNode;
-        const newText = parent.querySelector('.item-text').innerText;
-
-        if (newText.trim().length < 1)
-            return alert('Không được để note trống');
-
-        // appOOP.updateOnEdit(false);
-
-        appOOP.dataTodos = appOOP.dataTodos.map((item) => {
-            if (item.id != id)
-                return item;
-            else
-                return {
-                    ...item,
-                    text: newText
-                } // return
-        }) // map
-        c('Update2');
-        appOOP.render();
-        appOOP.handleEvents();
-        appOOP.localSet();
-    }, // updateTodo
-
-    updateTodo: function (e) {
-        const ElmText = e.target.parentNode.querySelector('.item-text')
+    updateTodo: function (elm) {
+        const ElmText = elm.parentNode.querySelector('.item-text')
         const newText = ElmText.textContent;
+        const id = elm.parentNode.dataset.index;
 
 
         if (newText.trim().length < 1) {
@@ -221,7 +195,6 @@ const appOOP = {
 
         appOOP.updateOnEdit(false);
 
-        const id = e.target.parentNode.dataset.index;
         appOOP.dataTodos = appOOP.dataTodos.map((item) => {
             if (item.id != id)
                 return item;
@@ -232,6 +205,8 @@ const appOOP = {
                 } // return
         }) // map
         c('Update');
+        appOOP.render();
+        appOOP.handleEvents();
         appOOP.localSet();
     }, // updateTodo
 
@@ -249,20 +224,7 @@ const appOOP = {
         c(`Delete`);
     }, // deleteTodo
 
-    strikethroughItem: function (e) {
-
-        if (e.target.hasAttribute('checked')) {
-            e.target.parentNode.classList.remove('strikethrough');
-            e.target.removeAttribute('checked');
-        } else {
-            e.target.parentNode.classList.add('strikethrough');
-            e.target.setAttribute('checked', '');
-        }
-        appOOP.todoStatus(e);
-        appOOP.localSet();
-    }, // strikethroughItem
-
-    strikethroughItem2: function (elm) {
+    strikethroughItem: function (elm) {
 
         if (elm.hasAttribute('checked')) {
             elm.parentNode.classList.remove('strikethrough');
@@ -271,39 +233,11 @@ const appOOP = {
             elm.parentNode.classList.add('strikethrough');
             elm.setAttribute('checked', '');
         }
-        appOOP.todoStatus2(elm);
+        appOOP.todoStatus(elm);
         appOOP.localSet();
     }, // strikethroughItem
 
-    todoStatus: function (e) {
-        const id = e.target.parentNode.dataset.index;
-        const hasAtr = e.target.parentNode.querySelector('.checkbox-hide').hasAttribute('checked');
-
-        if (hasAtr) {
-            appOOP.dataTodos = appOOP.dataTodos.map((item) => {
-                if (item.id != id) {
-                    return item
-                }
-                return {
-                    ...item,
-                    status: CONST_TODO_STATUS.COMPLETED
-                }
-            })
-        } else {
-            appOOP.dataTodos = appOOP.dataTodos.map((item) => {
-                if (item.id != id) {
-                    return item
-                }
-                return {
-                    ...item,
-                    status: CONST_TODO_STATUS.DOING
-                }
-            })
-        }
-        appOOP.localSet();
-    }, // todoStatus
-
-    todoStatus2: function (elm) {
+    todoStatus: function (elm) {
         const id = elm.parentNode.dataset.index;
         const hasAtr = elm.parentNode.querySelector('.checkbox-hide').hasAttribute('checked');
 
@@ -328,7 +262,7 @@ const appOOP = {
                 }
             })
         }
-        appOOP.updateTodo2(elm);
+        appOOP.updateTodo(elm);
         appOOP.localSet();
     }, // todoStatus
 
@@ -380,7 +314,7 @@ const appOOP = {
         listElement.classList.remove('focus-item');
         btnDelete.classList.remove('hide');
 
-        appOOP.updateTodo(e);
+        appOOP.updateTodo(e.target);
         iconSave.classList.remove('show');
 
         Array.from(listNote.children).forEach((item) => {
@@ -402,12 +336,12 @@ const appOOP = {
     clickIconFull: function (e) {
         const note = e.target.parentNode
         const id = note.dataset.index;
-        appOOP.updateTodo(e);
+        appOOP.updateTodo(e.target);
         appOOP.testRender(e);
 
         fullSetting.classList.remove('hide');
 
-    },
+    }, // clickIconFull
 
     handleEvents: function () {
         btnAddNote.onclick = () => {
@@ -452,7 +386,7 @@ const appOOP = {
             appOOP.render();
             appOOP.handleEvents();
             appOOP.localSet();
-        }
+        } // iconPin
 
         arrBtn.onclick = function () {
             c(appOOP.dataTodos);
@@ -467,23 +401,23 @@ const appOOP = {
                 id: `${Date.now()}`,
                 date: appOOP.getTime()
             }
-            
+
             appOOP.dataTodos.push(dataCopy);
             appOOP.localSet();
             appOOP.render();
             appOOP.handleEvents();
-        }
+        } // iconCopy
 
         clearBtn.onclick = function () {
             localStorage.clear();
-        }
+        } // clearBtn
 
         app.querySelectorAll('.btn-delete').forEach(btn => {
             btn.onclick = (e) => appOOP.deleteTodo(e);
         });
 
         app.querySelectorAll('.checkbox-hide').forEach(checkbox => {
-            checkbox.onclick = (e) => appOOP.strikethroughItem(e);
+            checkbox.onclick = (e) => appOOP.strikethroughItem(e.target);
         });
 
         app.querySelectorAll('.item-text').forEach(text => {
@@ -497,7 +431,7 @@ const appOOP = {
         app.querySelectorAll('#icon-full').forEach(icon => {
             icon.onclick = (e) => appOOP.clickIconFull(e);
         })
-    }, // handleEvent
+    }, // handleEvents
 
     start() {
         this.dataTodos = this.localGet();
