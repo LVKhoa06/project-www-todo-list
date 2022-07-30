@@ -1,5 +1,7 @@
-// Refactor: Gộp hàm updateTodo 
+// Refactor: Gộp hàm updateTodo ... 
 // Priority: Medium
+
+// Deadline todos : https://help.evernote.com/hc/en-us/articles/1500003792201-Set-a-due-date-for-a-task
 
 const c = console.log;
 //#region declare const 
@@ -152,24 +154,27 @@ const appOOP = {
         return [];
     }, // localGet
 
-    addTodo: function (id, todoText) {
-        function getTime(time) {
-            return time < 10 ? `0${time}` : time;
-        }
-
+    getTime: function () {
         const newTime = new Date();
         const minutes = newTime.getMinutes();
         const hours = newTime.getHours();
         const date = newTime.getDate();
         const month = newTime.getMonth() + 1;
         const year = newTime.getFullYear();
-        const dateCreate = `${getTime(hours)}:${getTime(minutes)}.${getTime(date)}/${getTime(month)}/${year}`
 
+        function editTime(time) {
+            return time < 10 ? `0${time}` : time;
+        }
+
+        return `${editTime(hours)}:${editTime(minutes)}.${editTime(date)}/${editTime(month)}/${year}`;
+    },
+
+    addTodo: function (id, todoText) {
 
         appOOP.dataTodos.push({
             id,
             text: todoText,
-            date: dateCreate,
+            date: appOOP.getTime(),
             status: CONST_TODO_STATUS.DOING,
         })
         c('Add');
@@ -455,10 +460,14 @@ const appOOP = {
 
         iconCopy.onclick = (e) => {
             const id = e.target.parentNode.parentNode.parentNode.querySelector('.item-note').dataset.index;
-            const dataCopy = appOOP.dataTodos.find(item => item.id === id);
+            let dataCopy = appOOP.dataTodos.find(item => item.id === id);
 
-            dataCopy.id = `${Date.now()}`;
-
+            dataCopy = {
+                ...dataCopy,
+                id: `${Date.now()}`,
+                date: appOOP.getTime()
+            }
+            
             appOOP.dataTodos.push(dataCopy);
             appOOP.localSet();
             appOOP.render();
