@@ -1,4 +1,3 @@
-// pin indicactor & list
 // color
 // dead line => day difference: 1 days, 2 days.... tomorrrow, next month, 1n & 2 days....
 // 2022.07.30 - 2022.09.01
@@ -51,19 +50,45 @@ const appOOP = {
     //#endregion declare
 
     render: function () {
-        const htmls = this.dataTodos.map((item, index) => {
-            return `
-            <li class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
-                <input class="checkbox-hide" type="checkbox" ${item.status == 2 ? 'checked' : ''}>
-                <span class="checkbox-complete"></span>
-                <span class="item-text">${item.text}</span>
-                <button class="btn-delete">x</button>
-                <i class="icon-save"></i>
-                <i id="icon-full" class="fa-solid fa-expand"></i>
-            </li>
-                `;
-        });
-        listNote.innerHTML = htmls.join('');
+        const htmlsTodos = this.dataTodos.map((item, index) => {
+            if (item.pin == false) {
+                return `
+                <li class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
+                    <input class="checkbox-hide" type="checkbox" ${item.status == 2 ? 'checked' : ''}>
+                    <span class="checkbox-complete"></span>
+                    <span class="item-text">${item.text}</span>
+                    <button class="btn-delete">x</button>
+                    <i class="icon-save"></i>
+                    <i id="icon-full" class="fa-solid fa-expand"></i>
+                </li>
+                    `;
+            }
+        }).join('');
+
+        const htmlPin = this.dataTodos.map((item, index) => {
+            if (item.pin == true) {
+                return `
+                <li class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
+                    <input class="checkbox-hide" type="checkbox" ${item.status == 2 ? 'checked' : ''}>
+                    <span class="checkbox-complete"></span>
+                    <span class="item-text">${item.text}</span>
+                    <button class="btn-delete">x</button>
+                    <i class="icon-save"></i>
+                    <i id="icon-full" class="fa-solid fa-expand"></i>
+                </li>
+                    `;
+            }
+        }).join('');
+        listPin.innerHTML = `
+            <h3 class="title-pin">List Pin Note</h3>
+        ${htmlPin}
+        `;
+        if (listPin.children.length < 2) {
+            listPin.classList.add('hide');
+        } else {
+            listPin.classList.remove('hide');
+        }
+        listNote.innerHTML = htmlsTodos;
     },
 
     testRender: function (e) {
@@ -78,7 +103,7 @@ const appOOP = {
                     <i class="show icon-save" id="icon-save-inner" onclick="appOOP.updateTodo(this)"></i>
                 </li>
                 `;
-        timeNote.innerText = todo.date
+        timeNote.innerText = todo.date;
         fullSettingContent.innerHTML = htmlContent;
     },
 
@@ -237,9 +262,17 @@ const appOOP = {
         const idDelete = listElement.dataset.index;
         e.target.parentNode.parentNode.removeChild(listElement);
 
+        if (listPin.children.length < 2) {
+            listPin.classList.add('hide');
+        } else {
+            listPin.classList.remove('hide');
+        }
+
         appOOP.dataTodos = appOOP.dataTodos.filter(item => item.id !== idDelete);
         appOOP.localSet();
         c(`Delete`);
+
+
     }, // deleteTodo
 
     strikethroughItem: function (elm) {
@@ -354,10 +387,21 @@ const appOOP = {
     clickIconFull: function (e) {
         const note = e.target.parentNode
         const id = note.dataset.index;
-        appOOP.updateTodo(e.target);
-        appOOP.testRender(e);
+        const pinElm = appOOP.dataTodos.find(item => item.id === id);
+
+        appOOP.dataTodos.forEach(item => {
+            if (item.id == id) {
+                if (item.pin == true) {
+                    iconPin.classList.add('pin-item');
+                } else {
+                    iconPin.classList.remove('pin-item');
+                }
+            }
+        })
 
         fullSetting.classList.remove('hide');
+        appOOP.updateTodo(e.target);
+        appOOP.testRender(e);
 
     }, // clickIconFull
 
@@ -399,8 +443,21 @@ const appOOP = {
             const pinElm = appOOP.dataTodos.find(item => item.id === id);
 
             iconPin.classList.toggle('pin-item');
+
             appOOP.dataTodos = appOOP.dataTodos.filter(item => item.id !== id);
-            appOOP.dataTodos.unshift(pinElm);
+            appOOP.dataTodos.push(pinElm);
+
+            appOOP.dataTodos.forEach(item => {
+                if (item.id == id) {
+                    if (item.pin == true) {
+                        c(true)
+                        pinElm.pin = false;
+                    } else {
+                        c(false)
+                        pinElm.pin = true;
+                    }
+                }
+            })
 
             appOOP.render();
             appOOP.handleEvents();

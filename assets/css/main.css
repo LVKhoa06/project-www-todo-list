@@ -122,8 +122,11 @@ list-note {
 }
 
 list-pin {
-    display: flex;
-    justify-content: center;
+    flex-direction: column;
+    margin: 10px 35px 12px 30px;
+    display: block;
+    padding: 0 0 5px 0;
+    border-bottom: 1.5px dashed;
 }
 
 .item-note {
@@ -215,7 +218,11 @@ list-pin {
     content: '\2714';
 }
 
-
+.title-pin {
+    color: var(--text-color-2);
+    margin: 10px 0;
+    text-align: center;
+}
 
 .lock-checkbox {
     background-color: var(--app-color-3);
@@ -351,4 +358,8 @@ close:hover {
     border: none;
     border-radius: 0px;
     margin: 0;
+}
+
+.pin-item {
+    color: var(--text-color-3);
 }
