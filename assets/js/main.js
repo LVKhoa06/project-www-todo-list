@@ -1,11 +1,25 @@
+// pin indicactor & list
+// color
+// dead line => day difference: 1 days, 2 days.... tomorrrow, next month, 1n & 2 days....
+// 2022.07.30 - 2022.09.01
+
 
 // Deadline todos : https://help.evernote.com/hc/en-us/articles/1500003792201-Set-a-due-date-for-a-task
+
+/*
+    const colorDefault = 'blue';
+    todos = [
+        {id: '1659159561706', text: '1', date: '12:39.30/07/2022', status: 1, deadline: '12:39.01/09/2022'}, // color: default by CSS
+        {id: '1659159563534', text: '0', date: '12:39.30/07/2022', status: 1, color: '#ff0000' }
+    ]
+*/
 
 const c = console.log;
 //#region declare const 
 const app = document.querySelector('app');
 const fullSetting = document.querySelector('full');
 const listNote = app.querySelector('list-note');
+const listPin = app.querySelector('list-pin');
 const inputNote = app.querySelector('.input-note');
 const btnAddNote = app.querySelector('.btn-add');
 const fullSettingContent = fullSetting.querySelector('content');
@@ -24,6 +38,7 @@ const CONST_TODO_STATUS = {
     COMPLETED: 2,
     CANCELED: -1
 }
+const colorDefault = 'var(--app-color-2)';
 //#endregion declare const
 
 const arrBtn = app.querySelector('#arr-btn');
@@ -173,6 +188,9 @@ const appOOP = {
             id,
             text: todoText,
             date: appOOP.getTime(),
+            pin: false,
+            deadline: 'DD/MM/YYYY',
+            color: colorDefault,
             status: CONST_TODO_STATUS.DOING,
         })
         c('Add');
@@ -380,6 +398,7 @@ const appOOP = {
             const id = e.target.parentNode.parentNode.querySelector('.item-note').dataset.index;
             const pinElm = appOOP.dataTodos.find(item => item.id === id);
 
+            iconPin.classList.toggle('pin-item');
             appOOP.dataTodos = appOOP.dataTodos.filter(item => item.id !== id);
             appOOP.dataTodos.unshift(pinElm);
 
