@@ -363,3 +363,45 @@ close:hover {
 .pin-item {
     color: var(--text-color-3);
 }
+
+color {
+    position: relative;
+}
+
+.input-color {
+    cursor: pointer;
+    position: absolute;
+    left: 0;
+    width: 28px;
+    opacity: 0;
+}
+
+.input-color::-webkit-color-swatch-wrapper {
+	box-shadow: none;
+}
+
+tab {
+    background-color: var(--app-color-2);
+    position: absolute;
+    width: 233.3px;
+    height: 30px;
+    left: 0;
+    top: 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    z-index: 100;
+    box-shadow: 0 0px 3px -1px;
+    display: none;
+}
+
+.tab-btn {
+    cursor: pointer;
+    width: 40%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

@@ -22,12 +22,17 @@ const listPin = app.querySelector('list-pin');
 const inputNote = app.querySelector('.input-note');
 const btnAddNote = app.querySelector('.btn-add');
 const fullSettingContent = fullSetting.querySelector('content');
+const headerFull = fullSetting.querySelector('header');
 const iconPin = fullSetting.querySelector('.icon-pin');
 const timeNote = fullSetting.querySelector('time');
 const fullSettingClose = fullSetting.querySelector('close');
 const iconRecycleBin = fullSetting.querySelector('.icon-recycle-bin');
 const iconListColor = fullSetting.querySelector('.icon-list-color');
 const iconCopy = fullSetting.querySelector('.icon-copy');
+const inputColor = fullSetting.querySelector('.input-color');
+const tabColor = fullSetting.querySelector('tab');
+const btnCancel = fullSetting.querySelector('.btn-cancel');
+const btnOk = fullSetting.querySelector('.btn-ok');
 
 const CONST_LS_KEY = 'TODO-LIST';
 
@@ -391,6 +396,7 @@ const appOOP = {
 
         appOOP.dataTodos.forEach(item => {
             if (item.id == id) {
+                headerFull.style.backgroundColor = item.color;
                 if (item.pin == true) {
                     iconPin.classList.add('pin-item');
                 } else {
@@ -450,14 +456,12 @@ const appOOP = {
             appOOP.dataTodos.forEach(item => {
                 if (item.id == id) {
                     if (item.pin == true) {
-                        c(true)
                         pinElm.pin = false;
                     } else {
-                        c(false)
                         pinElm.pin = true;
                     }
                 }
-            })
+            }) // forEach
 
             appOOP.render();
             appOOP.handleEvents();
@@ -495,6 +499,38 @@ const appOOP = {
             })
 
         } // iconCopy
+
+        inputColor.onclick = (e) => {
+            e.stopPropagation();
+            tabColor.classList.add('show');
+        } // inputColor
+
+        btnCancel.onclick = (e) => {
+            tabColor.classList.remove('show');
+        } // btnCancel
+
+        btnOk.onclick = (e) => {
+            const id = e.target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector('.item-note').dataset.index;
+
+            appOOP.dataTodos = appOOP.dataTodos.map(item => {
+                if (item.id !== id)
+                    return item;
+                else
+                    return {
+                        ...item,
+                        color: inputColor.value
+                    }
+            })
+
+            headerFull.style.backgroundColor = inputColor.value;
+            tabColor.classList.remove('show');
+
+            appOOP.localSet()
+        } // btnOk
+
+        fullSetting.onclick = (e) => {
+            tabColor.classList.remove('show');
+        } // fullSetting
 
         clearBtn.onclick = function () {
             localStorage.clear();
