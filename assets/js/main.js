@@ -1,17 +1,6 @@
-// color
+// parentNode => closset
 // dead line => day difference: 1 days, 2 days.... tomorrrow, next month, 1n & 2 days....
 // 2022.07.30 - 2022.09.01
-
-
-// Deadline todos : https://help.evernote.com/hc/en-us/articles/1500003792201-Set-a-due-date-for-a-task
-
-/*
-    const colorDefault = 'blue';
-    todos = [
-        {id: '1659159561706', text: '1', date: '12:39.30/07/2022', status: 1, deadline: '12:39.01/09/2022'}, // color: default by CSS
-        {id: '1659159563534', text: '0', date: '12:39.30/07/2022', status: 1, color: '#ff0000' }
-    ]
-*/
 
 const c = console.log;
 //#region declare const 
@@ -33,6 +22,8 @@ const inputColor = fullSetting.querySelector('.input-color');
 const tabColor = fullSetting.querySelector('tab');
 const btnCancel = fullSetting.querySelector('.btn-cancel');
 const btnOk = fullSetting.querySelector('.btn-ok');
+const inputDeadline = fullSetting.querySelector('.input-deadline');
+const tabDeadline = fullSetting.querySelector('tab-deadline');
 
 const CONST_LS_KEY = 'TODO-LIST';
 
@@ -58,9 +49,9 @@ const appOOP = {
         const htmlsTodos = this.dataTodos.map((item, index) => {
             if (item.pin == false) {
                 return `
-                <li class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
+                <li style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
                     <input class="checkbox-hide" type="checkbox" ${item.status == 2 ? 'checked' : ''}>
-                    <span class="checkbox-complete"></span>
+                    <span style="border-color: ${item.color};" class="checkbox-complete"></span>
                     <span class="item-text">${item.text}</span>
                     <button class="btn-delete">x</button>
                     <i class="icon-save"></i>
@@ -73,9 +64,9 @@ const appOOP = {
         const htmlPin = this.dataTodos.map((item, index) => {
             if (item.pin == true) {
                 return `
-                <li class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
+                <li style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
                     <input class="checkbox-hide" type="checkbox" ${item.status == 2 ? 'checked' : ''}>
-                    <span class="checkbox-complete"></span>
+                    <span style="border-color: ${item.color};" class="checkbox-complete"></span>
                     <span class="item-text">${item.text}</span>
                     <button class="btn-delete">x</button>
                     <i class="icon-save"></i>
@@ -96,14 +87,14 @@ const appOOP = {
         listNote.innerHTML = htmlsTodos;
     },
 
-    testRender: function (e) {
+    renderFullTodo: function (e) {
         const outerId = e.target.parentNode.dataset.index;
         const todo = this.dataTodos.find(entry => entry.id === outerId);
 
         const htmlContent = `
                 <li class="item-note bla ${todo.status == 2 ? 'strikethrough' : ''}" data-index="${outerId}" >
                     <input class="checkbox-hide" type="checkbox" onclick="appOOP.strikethroughItem(this)" ${todo.status == 2 ? 'checked' : ''}>
-                    <span class="checkbox-complete"></span>
+                    <span style="border-color: ${todo.color};" class="checkbox-complete"></span>
                     <span contenteditable="true" class="item-text">${todo.text}</span>
                     <i class="show icon-save" id="icon-save-inner" onclick="appOOP.updateTodo(this)"></i>
                 </li>
@@ -407,7 +398,7 @@ const appOOP = {
 
         fullSetting.classList.remove('hide');
         appOOP.updateTodo(e.target);
-        appOOP.testRender(e);
+        appOOP.renderFullTodo(e);
 
     }, // clickIconFull
 
@@ -520,6 +511,15 @@ const appOOP = {
                         ...item,
                         color: inputColor.value
                     }
+            });
+
+            app.querySelectorAll('.item-note').forEach(item => {
+
+                if (item.dataset.index == id) {
+                    item.querySelector('.checkbox-complete').style.borderColor = inputColor.value
+                    item.style.borderColor = inputColor.value;
+                    // item.style.backgroundColor = inputColor.value;
+                }
             })
 
             headerFull.style.backgroundColor = inputColor.value;
@@ -527,7 +527,7 @@ const appOOP = {
 
             appOOP.localSet()
         } // btnOk
-
+        
         fullSetting.onclick = (e) => {
             tabColor.classList.remove('show');
         } // fullSetting
