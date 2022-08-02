@@ -1,6 +1,5 @@
 // parentNode => closset
-// dead line => day difference: 1 days, 2 days.... tomorrrow, next month, 1n & 2 days....
-// 2022.07.30 - 2022.09.01
+// quá deadline chữ đỏ
 
 const c = console.log;
 //#region declare const 
@@ -188,27 +187,14 @@ const appOOP = {
         return [];
     }, // localGet
 
-    getTime: function () {
-        const newTime = new Date();
-        const minutes = newTime.getMinutes();
-        const hours = newTime.getHours();
-        const date = newTime.getDate();
-        const month = newTime.getMonth() + 1;
-        const year = newTime.getFullYear();
 
-        function editTime(time) {
-            return time < 10 ? `0${time}` : time;
-        }
-
-        return `${editTime(hours)}:${editTime(minutes)}.${editTime(date)}/${editTime(month)}/${year}`;
-    }, // getTime
 
     addTodo: function (id, todoText) {
 
         appOOP.dataTodos.push({
             id,
             text: todoText,
-            date: appOOP.getTime(),
+            date: getTime(),
             pin: false,
             deadline: 'DD/MM/YYYY',
             color: colorDefault,
@@ -470,7 +456,7 @@ const appOOP = {
             dataCopy = {
                 ...dataCopy,
                 id: `${Date.now()}`,
-                date: appOOP.getTime()
+                date: getTime()
             }
             appOOP.dataTodos.push(dataCopy);
 
@@ -527,14 +513,19 @@ const appOOP = {
 
             appOOP.localSet()
         } // btnOk
-        
-        fullSetting.onclick = (e) => {
-            tabColor.classList.remove('show');
-        } // fullSetting
+
+        inputDeadline.onchange = (e) => {
+            getDeadline(e);
+        };
+        // inputDeadline
 
         clearBtn.onclick = function () {
             localStorage.clear();
         } // clearBtn
+
+        fullSetting.onclick = (e) => {
+            tabColor.classList.remove('show');
+        }
 
         app.querySelectorAll('.btn-delete').forEach(btn => {
             btn.onclick = (e) => appOOP.deleteTodo(e);
