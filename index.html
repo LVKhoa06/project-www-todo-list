@@ -32,18 +32,28 @@
             <content>
             </content>
             <time>
+                <deadline>
+
+                </deadline>
+                <time-create>
+
+                </time-create>
             </time>
             <footer>
                 <seting>
                     <color>
-                            <i class="icon-list-color icon-setting fa-solid fa-palette"></i>
-                            <input value="#3ec6f7" class="input-color" type="color">
-                            <tab>
-                                <span class="tab-btn btn-cancel">Cancel</span>
-                                <span class="tab-btn btn-ok">Ok</span>
-                            </tab>
+                        <i class="icon-list-color icon-setting fa-solid fa-palette"></i>
+                        <input value="#3ec6f7" class="input-color" type="color">
+                        <tab>
+                            <span class="tab-btn btn-cancel">Cancel</span>
+                            <span class="tab-btn btn-ok">Ok</span>
+                        </tab>
                     </color>
-                    <i class="icon-setting fa-solid fa-hourglass-half"></i>
+                    <deadline>
+                        <i class="icon-deadline icon-setting fa-solid fa-hourglass-half"></i>
+                        <input class="input-deadline" type="date" min="2022-01-01" max="2030-12-30">
+                    </deadline>
+
                     <i class="icon-copy icon-setting fa-solid fa-copy"></i>
                     <i class="icon-recycle-bin icon-setting fa-solid fa-trash-can"></i>
                 </seting>
@@ -55,6 +65,7 @@
     </full>
 </body>
 <script src="./assets/js/main.js"></script>
+<script src="./assets/js/utils.js"></script>
 <style>
     .btn {
         height: 30px;

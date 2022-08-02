@@ -12,7 +12,8 @@ const btnAddNote = app.querySelector('.btn-add');
 const fullSettingContent = fullSetting.querySelector('content');
 const headerFull = fullSetting.querySelector('header');
 const iconPin = fullSetting.querySelector('.icon-pin');
-const timeNote = fullSetting.querySelector('time');
+const timeCreate = fullSetting.querySelector('time-create');
+const timeDeadline = fullSetting.querySelector('deadline');
 const fullSettingClose = fullSetting.querySelector('close');
 const iconRecycleBin = fullSetting.querySelector('.icon-recycle-bin');
 const iconListColor = fullSetting.querySelector('.icon-list-color');
@@ -98,7 +99,8 @@ const appOOP = {
                     <i class="show icon-save" id="icon-save-inner" onclick="appOOP.updateTodo(this)"></i>
                 </li>
                 `;
-        timeNote.innerText = todo.date;
+        timeCreate.innerText = todo.date;
+        timeDeadline.innerText = todo.deadline;
         fullSettingContent.innerHTML = htmlContent;
     },
 
@@ -196,7 +198,7 @@ const appOOP = {
             text: todoText,
             date: getTime(),
             pin: false,
-            deadline: 'DD/MM/YYYY',
+            deadline: '',
             color: colorDefault,
             status: CONST_TODO_STATUS.DOING,
         })
@@ -369,7 +371,6 @@ const appOOP = {
     clickIconFull: function (e) {
         const note = e.target.parentNode
         const id = note.dataset.index;
-        const pinElm = appOOP.dataTodos.find(item => item.id === id);
 
         appOOP.dataTodos.forEach(item => {
             if (item.id == id) {
