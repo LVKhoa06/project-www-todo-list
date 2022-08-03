@@ -1,7 +1,5 @@
-// tomorrow
-// 2-6 days
-// next Wednesday
-// 2022-08-30
+// deadline = ngày hiện tại;
+// switch -> if
 function getTime() {
     const newTime = new Date();
     const minutes = newTime.getMinutes();
@@ -49,9 +47,8 @@ function getDayName() {
 function getDeadline(e) {
     const wrapper = e.target.closest('advanced-edit');
     const id = wrapper.querySelector('.item-note').dataset.index;
-    const todo = appOOP.dataTodos.find(entry => entry.id === id);
+    const todo = appOOP.dataTodos.find(item => item.id == id);
     const monthEven = [1, 3, 5, 7, 8, 10, 12];
-    const monthOdd = [4, 6, 9, 11];
     const monthSpecial = 2;
 
     appOOP.dataTodos = appOOP.dataTodos.map(item => {
@@ -62,125 +59,150 @@ function getDeadline(e) {
                 ...item,
                 deadline: inputDeadline.value.split('-').reverse().toString().replace(/,/g, '-')
             }
-        } // else 
+        } // else
     }) // map
 
     const setDeadlineElm = appOOP.dataTodos.find(item => item.id === id);
     const dateCreate = setDeadlineElm.date.split('.')[1].split('-');
-    const TimeDeadline = setDeadlineElm.deadline.split('-');
+    const dateCreateNumber = [Number(dateCreate[0]), Number(dateCreate[1]), Number(dateCreate[2])];
+    const arrTimeDeadline = setDeadlineElm.deadline.split('-');
+    const arrTimeDeadlineNumber = [Number(arrTimeDeadline[0]), Number(arrTimeDeadline[1]), Number(arrTimeDeadline[2])];
 
     let even = 0;
-    let odd = 0;
     let special = 0;
 
-    if (dateCreate[2] !== TimeDeadline[2]) {
-        for (let iOuter = Number(dateCreate[1]); iOuter < 13; iOuter++) {
-            monthEven.forEach(item => {
+    if (dateCreateNumber[0] !== arrTimeDeadlineNumber[0]) {
+        if (dateCreateNumber[2] !== arrTimeDeadlineNumber[2]) {
 
-                if (iOuter == item)
-                    even += 1;
-            }); // forEach
-
-            monthOdd.forEach(item => {
-
-                if (iOuter == item)
-                    odd += 1;
-            }); // forEach
-
-            if (iOuter == 12) {
-                for (let iInner1 = 1; iInner1 < TimeDeadline[1]; iInner1++) {
+            for (let iOuter = dateCreateNumber[1]; iOuter < 13; iOuter++) {
+                if (dateCreateNumber[1] > arrTimeDeadlineNumber[1]) {
                     monthEven.forEach(item => {
 
-                        if (iInner1 == item)
+                        if (iOuter == item)
                             even += 1;
-
-                        else if (iInner1 == monthSpecial)
-                            special = 1;
                     }); // forEach
 
-                    monthOdd.forEach(item => {
+                    if (iOuter == 12) {
+                        for (let iInner1 = 1; iInner1 < arrTimeDeadlineNumber[1]; iInner1++) {
+                            monthEven.forEach(item => {
 
-                        if (iInner1 == item)
-                            odd += 1;
-                    }); //forEach
-                } // for inner
-            } // if inner
-        } // for outer
-    } else {
-        for (let iOuter = Number(dateCreate[1]); iOuter < Number(TimeDeadline[1]); iOuter++) {
+                                if (iInner1 == item)
+                                    even += 1;
+
+                                else if (iInner1 == monthSpecial)
+                                    special = 1;
+                            }); // forEach
+                        } // for inner
+                    } // if inner
+                }
+            } // for outer
+            if (dateCreateNumber[1] < arrTimeDeadlineNumber[1]) {
+
+                for (let i = dateCreateNumber[1]; i < arrTimeDeadlineNumber[1]; i++) {
+                    monthEven.forEach(item => {
+                        if (i == item)
+                            even += 1;
+
+                        else if (i == monthSpecial)
+                            special = 1;
+                    }); // forEach
+                } // for
+            } // if 
+        } // if
+
+        let years = (arrTimeDeadlineNumber[2] - dateCreateNumber[2]);
+
+        let months;
+        if (arrTimeDeadlineNumber[1] >= (dateCreateNumber[1]))
+            months = arrTimeDeadlineNumber[1] - (dateCreateNumber[1]);
+        else {
+            months = 12 + arrTimeDeadlineNumber[1] - (dateCreateNumber[1]);
+            years -= 1;
+        } // else
+
+        let days = arrTimeDeadlineNumber[0] - (dateCreateNumber[0]);
+        if (arrTimeDeadlineNumber[0] - (dateCreateNumber[0]) > -1) {
+
+            days = arrTimeDeadlineNumber[0] - (dateCreateNumber[0]);
+        } else {
             monthEven.forEach(item => {
+                if (arrTimeDeadlineNumber[1] == item) {
+                    days += 31;
 
-                if (iOuter == item)
-                    even += 1;
+                    if (months <= 0) {
+                        months += 12;
+                        months -= 1;
+                        years -= 1;
+                    } else {
+                        months -= 1;
+                    }
+                    even -= 1;
+                }
+
+                else if (arrTimeDeadlineNumber[1] == monthSpecial) {
+                    days += 28;
+                    months -= 1;
+                    special -= 1;
+                }
             }); // forEach
-
+            const monthOdd = [4, 6, 9, 11];
             monthOdd.forEach(item => {
+                if (arrTimeDeadlineNumber[1] == item) {
+                    days += 30;
+                    months -= 1;
+                }
+            }); //forEach
+        }
 
-                if (iOuter == item)
-                    odd += 1;
-            }); // forEach
-        } // for 
-    } // else
+        function totalDay() {
+            let allDays = 0;
 
-    let years = (Number(TimeDeadline[2]) - Number(dateCreate[2]));
+            allDays = (years * 365) + (months * 30) + even + days - (special * 2);
 
-    let months;
-    if (Number(TimeDeadline[1]) >= (Number(dateCreate[1])))
-        months = Number(TimeDeadline[1]) - (Number(dateCreate[1]));
-    else {
-        months = 12 + Number(TimeDeadline[1]) - (Number(dateCreate[1]));
-        years -= 1;
-    } // else
-    let days = Number(TimeDeadline[0]) - (Number(dateCreate[0]));
-    if (Number(TimeDeadline[0]) - (Number(dateCreate[0])) > 0) {
-        // c('1')
-        days = Number(TimeDeadline[0]) - (Number(dateCreate[0]));
-    } else {
-        // c('2')
-        monthEven.forEach(item => {
+            for (let y = dateCreateNumber[2]; y <= arrTimeDeadlineNumber[2]; y++) {
+                if (y % 4 == 0) {
+                    allDays += 1;
+                }
+            } // for
+            return allDays;
+        }
 
-            if (Number(TimeDeadline[1]) == item) {
-                days += 31;
-                months -= 1;
-                even -= 1;
-            }
+        if (months == 0) {
+            even = 0;
+            special = 0;
+        }
 
-            else if (Number(TimeDeadline[1]) == monthSpecial) {
-                days += 28;
-                months -= 1;
-                special -= 1;
-            }
+        c('even', even, 'special', special);
+        c('year', years, 'month', months, 'day', days, ':', totalDay());
+        c(dateCreateNumber);
+        c(arrTimeDeadlineNumber);
 
-        }); // forEach
+        if (totalDay() < 0) {
+            appOOP.dataTodos.forEach(item => {
+                if (item.id == id) {
+                    item.outOfDate = true;
+                }
+            });
 
-        monthOdd.forEach(item => {
-            if (Number(TimeDeadline[1]) == item) {
-                days += 30;
-                months -= 1;
-                odd -= 1;
-            }
-        }); //forEach
+            Array.from(listNote.children).forEach(item => {
+                if (item.dataset.index == id) {
+                    item.querySelector('.item-text').style.color = 'red';
+                }
+            });
+        } else {
+            appOOP.dataTodos.forEach(item => {
+                if (item.id == id) {
+                    item.outOfDate = false;
+                }
+            });
+
+            Array.from(listNote.children).forEach(item => {
+                if (item.dataset.index == id) {
+                    item.querySelector('.item-text').style.color = 'var(--text-color-1)';
+                }
+            });
+        }
     }
-
-    // not included leap year
-
-    function totalDay() {
-        let allDays = 0;
-
-        allDays = (years * 365) + (even * 31) + (odd * 30) + (special * 28) + days;
-
-        for (let y = Number(dateCreate[2]); y <= Number(TimeDeadline[2]); y++) {
-            if (y % 4 == 0) {
-                allDays += 1;
-            }
-        } // for
-        return allDays;
-    }
-
-    c('even', even, 'odd', odd, 'special', special);
-    c('year', years, 'month', months, 'day', days, ':', totalDay());
-    c(dateCreate);
-    c(TimeDeadline);
 
     switch (totalDay()) {
         case 1: timeDeadline.innerText = 'Tomorrow';
@@ -207,12 +229,10 @@ function getDeadline(e) {
 
             break;
 
-        default: timeDeadline.innerText = todo.deadline;
+        default: timeDeadline.innerText = arrTimeDeadline.toString().replace(/,/g, '-');
     } // switch
+
+    inputDeadline.value = arrTimeDeadline.reverse().toString().replace(/,/g, '-');
 
     appOOP.localSet();
 } // getDeadline 
-
-
-
-

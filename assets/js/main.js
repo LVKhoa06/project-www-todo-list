@@ -52,7 +52,7 @@ const appOOP = {
                 <li style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
                     <input class="checkbox-hide" type="checkbox" ${item.status == 2 ? 'checked' : ''}>
                     <span style="border-color: ${item.color};" class="checkbox-complete"></span>
-                    <span class="item-text">${item.text}</span>
+                    <span ${item.outOfDate == true ? 'style="color:red;"' : ''} class="item-text">${item.text}</span>
                     <button class="btn-delete">x</button>
                     <i class="icon-save"></i>
                     <i id="icon-full" class="fa-solid fa-expand"></i>
@@ -67,7 +67,7 @@ const appOOP = {
                 <li style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
                     <input class="checkbox-hide" type="checkbox" ${item.status == 2 ? 'checked' : ''}>
                     <span style="border-color: ${item.color};" class="checkbox-complete"></span>
-                    <span class="item-text">${item.text}</span>
+                    <span  ${item.outOfDate == true ? 'style="color:red;"' : ''} class="item-text">${item.text}</span>
                     <button class="btn-delete">x</button>
                     <i class="icon-save"></i>
                     <i id="icon-full" class="fa-solid fa-expand"></i>
@@ -95,7 +95,7 @@ const appOOP = {
                 <li class="item-note bla ${todo.status == 2 ? 'strikethrough' : ''}" data-index="${outerId}" >
                     <input class="checkbox-hide" type="checkbox" onclick="appOOP.strikethroughItem(this)" ${todo.status == 2 ? 'checked' : ''}>
                     <span style="border-color: ${todo.color};" class="checkbox-complete"></span>
-                    <span contenteditable="true" class="item-text">${todo.text}</span>
+                    <span contenteditable="true" ${todo.outOfDate == true ? 'style="color:red;"' : ''} class="item-text">${todo.text}</span>
                     <i class="show icon-save" id="icon-save-inner" onclick="appOOP.updateTodo(this)"></i>
                 </li>
                 `;
@@ -200,6 +200,7 @@ const appOOP = {
             pin: false,
             deadline: '',
             color: colorDefault,
+            outOfDate: false,
             status: CONST_TODO_STATUS.DOING,
         })
         c('Add');
@@ -515,9 +516,9 @@ const appOOP = {
             appOOP.localSet()
         } // btnOk
 
-        inputDeadline.onchange = (e) => {
+        inputDeadline.oninput = (e) => {
             getDeadline(e);
-        };
+        }
         // inputDeadline
 
         clearBtn.onclick = function () {
