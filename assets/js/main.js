@@ -516,7 +516,7 @@ const appOOP = {
             appOOP.localSet()
         } // btnOk
 
-        inputDeadline.oninput = (e) => {
+        inputDeadline.onchange = (e) => {
             getDeadline(e);
         }
         // inputDeadline
