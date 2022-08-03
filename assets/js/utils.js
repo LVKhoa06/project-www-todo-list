@@ -16,7 +16,7 @@ function getTime() {
     return `${editTime(hours)}:${editTime(minutes)}.${editTime(date)}-${editTime(month)}-${year}`;
 } // getTime
 
-function getTime2() {
+function getTimeToday() {
     const newTime = new Date();
     const date = newTime.getDate();
     const month = newTime.getMonth() + 1;
@@ -61,10 +61,18 @@ function getDayName() {
 
 function getDeadline(e) {
     const wrapper = e.target.closest('advanced-edit');
+    const textItem = wrapper.querySelector('.item-text');
     const id = wrapper.querySelector('.item-note').dataset.index;
-    const todo = appOOP.dataTodos.find(item => item.id == id);
+
     const monthEven = [1, 3, 5, 7, 8, 10, 12];
     const monthSpecial = 2;
+
+    const setDeadlineElm = appOOP.dataTodos.find(item => item.id === id);
+    const arrTimeDeadline = setDeadlineElm.deadline.split('-');
+    const arrTimeDeadlineNumber = [Number(arrTimeDeadline[0]), Number(arrTimeDeadline[1]), Number(arrTimeDeadline[2])];
+
+    let even = 0;
+    let special = 0;
 
     appOOP.dataTodos = appOOP.dataTodos.map(item => {
         if (item.id !== id) {
@@ -77,20 +85,10 @@ function getDeadline(e) {
         } // else
     }) // map
 
-    const setDeadlineElm = appOOP.dataTodos.find(item => item.id === id);
-    const dateCreate = setDeadlineElm.date.split('.')[1].split('-');
-    const dateCreateNumber = [Number(dateCreate[0]), Number(dateCreate[1]), Number(dateCreate[2])];
-    const arrTimeDeadline = setDeadlineElm.deadline.split('-');
-    const arrTimeDeadlineNumber = [Number(arrTimeDeadline[0]), Number(arrTimeDeadline[1]), Number(arrTimeDeadline[2])];
-
-    let even = 0;
-    let special = 0;
-
-    if (getTime2()[0] !== arrTimeDeadlineNumber[0]) {
-        if (getTime2()[2] !== arrTimeDeadlineNumber[2]) {
-
-            for (let iOuter = getTime2()[1]; iOuter < 13; iOuter++) {
-                if (getTime2()[1] > arrTimeDeadlineNumber[1]) {
+    if (getTimeToday()[0] !== arrTimeDeadlineNumber[0]) {
+        if (getTimeToday()[2] !== arrTimeDeadlineNumber[2]) {
+            for (let iOuter = getTimeToday()[1]; iOuter < 13; iOuter++) {
+                if (getTimeToday()[1] > arrTimeDeadlineNumber[1]) {
                     monthEven.forEach(item => {
 
                         if (iOuter == item)
@@ -111,9 +109,8 @@ function getDeadline(e) {
                     } // if inner
                 }
             } // for outer
-            if (getTime2()[1] < arrTimeDeadlineNumber[1]) {
-
-                for (let i = getTime2()[1]; i < arrTimeDeadlineNumber[1]; i++) {
+            if (getTimeToday()[1] < arrTimeDeadlineNumber[1]) {
+                for (let i = getTimeToday()[1]; i < arrTimeDeadlineNumber[1]; i++) {
                     monthEven.forEach(item => {
                         if (i == item)
                             even += 1;
@@ -125,20 +122,21 @@ function getDeadline(e) {
             } // if 
         } // if
 
-        let years = (arrTimeDeadlineNumber[2] - getTime2()[2]);
+        //#region count year, month, day.
+        let years = (arrTimeDeadlineNumber[2] - getTimeToday()[2]);
 
         let months;
-        if (arrTimeDeadlineNumber[1] >= (getTime2()[1]))
-            months = arrTimeDeadlineNumber[1] - (getTime2()[1]);
+        if (arrTimeDeadlineNumber[1] >= (getTimeToday()[1]))
+            months = arrTimeDeadlineNumber[1] - (getTimeToday()[1]);
         else {
-            months = 12 + arrTimeDeadlineNumber[1] - (getTime2()[1]);
+            months = 12 + arrTimeDeadlineNumber[1] - (getTimeToday()[1]);
             years -= 1;
         } // else
 
-        let days = arrTimeDeadlineNumber[0] - (getTime2()[0]);
-        if (arrTimeDeadlineNumber[0] - (getTime2()[0]) > -1) {
+        let days = arrTimeDeadlineNumber[0] - (getTimeToday()[0]);
+        if (arrTimeDeadlineNumber[0] - (getTimeToday()[0]) > -1) {
 
-            days = arrTimeDeadlineNumber[0] - (getTime2()[0]);
+            days = arrTimeDeadlineNumber[0] - (getTimeToday()[0]);
         } else {
             monthEven.forEach(item => {
                 if (arrTimeDeadlineNumber[1] == item) {
@@ -152,13 +150,11 @@ function getDeadline(e) {
                         months -= 1;
                     }
                     even -= 1;
-                }
-
-                else if (arrTimeDeadlineNumber[1] == monthSpecial) {
+                } else if (arrTimeDeadlineNumber[1] == monthSpecial) {
                     days += 28;
                     months -= 1;
                     special -= 1;
-                }
+                } // else if
             }); // forEach
             const monthOdd = [4, 6, 9, 11];
             monthOdd.forEach(item => {
@@ -168,19 +164,20 @@ function getDeadline(e) {
                 }
             }); //forEach
         }
+        // #endregion count year, month, day.
 
         function totalDay() {
             let allDays = 0;
 
             allDays = (years * 365) + (months * 30) + even + days - (special * 2);
 
-            for (let y = getTime2()[2]; y <= arrTimeDeadlineNumber[2]; y++) {
+            for (let y = getTimeToday()[2]; y <= arrTimeDeadlineNumber[2]; y++) {
                 if (y % 4 == 0) {
                     allDays += 1;
                 }
             } // for
             return allDays;
-        }
+        } // totalDay
 
         if (months == 0) {
             even = 0;
@@ -189,7 +186,7 @@ function getDeadline(e) {
 
         c('even', even, 'special', special);
         c('year', years, 'month', months, 'day', days, ':', totalDay());
-        c(getTime2());
+        c(getTimeToday());
         c(arrTimeDeadlineNumber);
 
         if (totalDay() < 0) {
@@ -197,28 +194,31 @@ function getDeadline(e) {
                 if (item.id == id) {
                     item.outOfDate = true;
                 }
-            });
+            }); // forEach
+
+            textItem.style.color = 'red';
 
             Array.from(listNote.children).forEach(item => {
                 if (item.dataset.index == id) {
                     item.querySelector('.item-text').style.color = 'red';
                 }
-            });
+            }); // Array.from
         } else {
             appOOP.dataTodos.forEach(item => {
                 if (item.id == id) {
                     item.outOfDate = false;
                 }
-            });
+            }); // forEach
+
+            textItem.style.color = 'var(--text-color-1)';
 
             Array.from(listNote.children).forEach(item => {
                 if (item.dataset.index == id) {
                     item.querySelector('.item-text').style.color = 'var(--text-color-1)';
                 }
-            });
-        }
-    }
-
+            }); // Array.from
+        } // else
+    } // if 
 
     if (totalDay() == 1) {
         timeDeadline.innerText = 'Tomorrow';
