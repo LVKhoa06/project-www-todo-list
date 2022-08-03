@@ -203,7 +203,6 @@ const appOOP = {
             outOfDate: false,
             status: CONST_TODO_STATUS.DOING,
         })
-        c('Add');
 
         appOOP.localSet();
     }, // addTodo
@@ -232,7 +231,6 @@ const appOOP = {
                     text: newText
                 } // return
         }) // map
-        c('Update');
         appOOP.render();
         appOOP.handleEvents();
         appOOP.localSet();
@@ -255,9 +253,6 @@ const appOOP = {
 
         appOOP.dataTodos = appOOP.dataTodos.filter(item => item.id !== idDelete);
         appOOP.localSet();
-        c(`Delete`);
-
-
     }, // deleteTodo
 
     strikethroughItem: function (elm) {
@@ -517,7 +512,56 @@ const appOOP = {
         } // btnOk
 
         inputDeadline.onchange = (e) => {
-            getDeadline(e);
+            const wrapper = e.target.closest('advanced-edit');
+            const textItem = wrapper.querySelector('.item-text');
+            const id = wrapper.querySelector('.item-note').dataset.index;
+            const arrDeadline = inputDeadline.value.split('-').reverse();
+            const arrDeadlineNumber = [Number(arrDeadline[0]), Number(arrDeadline[1]), Number(arrDeadline[2])];
+
+            timeDeadline.innerText = getDeadline(arrDeadlineNumber);
+            appOOP.dataTodos = appOOP.dataTodos.map(item => {
+                if (item.id !== id) {
+                    return item
+                } else {
+                    return {
+                        ...item,
+                        deadline: inputDeadline.value.split('-').reverse().toString().replace(/,/g, '-')
+                    }
+                } // else
+            }) // map
+
+            if (totalDay(arrDeadlineNumber.reverse().toString()) < 0) {
+                appOOP.dataTodos.forEach(item => {
+                    if (item.id == id) {
+                        item.outOfDate = true;
+                    }
+                }); // forEach
+
+                textItem.style.color = 'red';
+
+                Array.from(listNote.children).forEach(item => {
+                    if (item.dataset.index == id) {
+                        item.querySelector('.item-text').style.color = 'red';
+                    }
+                }); // Array.from
+            } else {
+                appOOP.dataTodos.forEach(item => {
+                    if (item.id == id) {
+                        item.outOfDate = false;
+                    }
+                }); // forEach
+
+                textItem.style.color = 'var(--text-color-1)';
+
+                Array.from(listNote.children).forEach(item => {
+                    if (item.dataset.index == id) {
+                        item.querySelector('.item-text').style.color = 'var(--text-color-1)';
+                    }
+                }); // Array.from
+            } // else
+
+            inputDeadline.value = arrDeadline.reverse().toString().replace(/,/g, '-');
+            appOOP.localSet();
         }
         // inputDeadline
 
