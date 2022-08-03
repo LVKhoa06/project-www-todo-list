@@ -35,6 +35,10 @@ function getTimeToday() {
     ];
 } // getTime2
 
+let years;
+let months;
+let days;
+
 function getDayName() {
     let dayName;
     const newDate = new Date;
@@ -137,9 +141,9 @@ function getDeadline(e) {
     } // if
 
     //#region count year, month, day.
-    let years = (arrTimeDeadlineNumber[2] - getTimeToday()[2]);
+    years = (arrTimeDeadlineNumber[2] - getTimeToday()[2]);
 
-    let months;
+    months;
     if (arrTimeDeadlineNumber[1] >= (getTimeToday()[1]))
         months = arrTimeDeadlineNumber[1] - (getTimeToday()[1]);
     else {
@@ -147,7 +151,7 @@ function getDeadline(e) {
         years -= 1;
     } // else
 
-    let days = arrTimeDeadlineNumber[0] - (getTimeToday()[0]);
+    days = arrTimeDeadlineNumber[0] - (getTimeToday()[0]);
     if (arrTimeDeadlineNumber[0] - (getTimeToday()[0]) < 0 && arrTimeDeadlineNumber[1] == (getTimeToday()[1])) {
         years -= 1;
         months += 12;
@@ -177,7 +181,7 @@ function getDeadline(e) {
         days = arrTimeDeadlineNumber[0] - (getTimeToday()[0]);
     } else {
         monthM31.forEach(item => {
-            if (arrTimeDeadlineNumber[1] == item) {
+            if (getTimeToday()[1] == item) {
                 days += 31;
 
                 if (months <= 0) {
@@ -188,7 +192,7 @@ function getDeadline(e) {
                     months -= 1;
                 }
                 m31 -= 1;
-            } else if (arrTimeDeadlineNumber[1] == monthSpecial) {
+            } else if (getTimeToday()[1] == monthSpecial) {
                 days += 28;
                 months -= 1;
                 special -= 1;
@@ -196,7 +200,7 @@ function getDeadline(e) {
         }); // forEach
         const monthOdd = [4, 6, 9, 11];
         monthOdd.forEach(item => {
-            if (arrTimeDeadlineNumber[1] == item) {
+            if (getTimeToday()[1] == item) {
                 days += 30;
                 months -= 1;
             }
@@ -268,12 +272,26 @@ function getDeadline(e) {
     } else if (totalDay() == 7) {
         timeDeadline.innerText = `Next ${getDayName()}`;
     } else {
-        timeDeadline.innerText = arrTimeDeadline.toString().replace(/,/g, '-');
+        timeDeadline.innerText = `${years <= 0 ? '' : `${years} year`} ${months <= 0 ? '' : `${months} month`} ${days <= 0 ? '' : `${days} day`}`;
     }
 
     inputDeadline.value = arrTimeDeadline.reverse().toString().replace(/,/g, '-');
     //#endregion display
+    let test = `${years <= 0 ? '' : `${years} year`} ${months <= 0 ? '' : `${months} month`} ${days <= 0 ? '' : `${days} day`}`
 
 
     appOOP.localSet();
+
+
+
 } // getDeadline 
+
+
+// const deadlineInDays = (dateString) => {
+//     const secondsInADay = 24 * 60 * 60;
+//     const stampOfToday = (new Date()).getTime();
+//     const stampOfInput = (new Date(dateString)).getTime();
+//     const deltaInSeconds = (stampOfInput - stampOfToday) / 1000;
+
+//     return Math.ceil(deltaInSeconds / secondsInADay);
+// } // deadlineInDays
