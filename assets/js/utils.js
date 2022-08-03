@@ -1,5 +1,10 @@
 // deadline = ngày hiện tại;
 // switch -> if
+
+function editTime(time) {
+    return time < 10 ? `0${time}` : time;
+}
+
 function getTime() {
     const newTime = new Date();
     const minutes = newTime.getMinutes();
@@ -8,11 +13,21 @@ function getTime() {
     const month = newTime.getMonth() + 1;
     const year = newTime.getFullYear();
 
-    function editTime(time) {
-        return time < 10 ? `0${time}` : time;
-    }
     return `${editTime(hours)}:${editTime(minutes)}.${editTime(date)}-${editTime(month)}-${year}`;
 } // getTime
+
+function getTime2() {
+    const newTime = new Date();
+    const date = newTime.getDate();
+    const month = newTime.getMonth() + 1;
+    const year = newTime.getFullYear();
+
+    return [
+        Number(editTime(date)),
+        Number(editTime(month)),
+        year
+    ];
+} // getTime2
 
 function getDayName() {
     let dayName;
@@ -71,11 +86,11 @@ function getDeadline(e) {
     let even = 0;
     let special = 0;
 
-    if (dateCreateNumber[0] !== arrTimeDeadlineNumber[0]) {
-        if (dateCreateNumber[2] !== arrTimeDeadlineNumber[2]) {
+    if (getTime2()[0] !== arrTimeDeadlineNumber[0]) {
+        if (getTime2()[2] !== arrTimeDeadlineNumber[2]) {
 
-            for (let iOuter = dateCreateNumber[1]; iOuter < 13; iOuter++) {
-                if (dateCreateNumber[1] > arrTimeDeadlineNumber[1]) {
+            for (let iOuter = getTime2()[1]; iOuter < 13; iOuter++) {
+                if (getTime2()[1] > arrTimeDeadlineNumber[1]) {
                     monthEven.forEach(item => {
 
                         if (iOuter == item)
@@ -96,9 +111,9 @@ function getDeadline(e) {
                     } // if inner
                 }
             } // for outer
-            if (dateCreateNumber[1] < arrTimeDeadlineNumber[1]) {
+            if (getTime2()[1] < arrTimeDeadlineNumber[1]) {
 
-                for (let i = dateCreateNumber[1]; i < arrTimeDeadlineNumber[1]; i++) {
+                for (let i = getTime2()[1]; i < arrTimeDeadlineNumber[1]; i++) {
                     monthEven.forEach(item => {
                         if (i == item)
                             even += 1;
@@ -110,20 +125,20 @@ function getDeadline(e) {
             } // if 
         } // if
 
-        let years = (arrTimeDeadlineNumber[2] - dateCreateNumber[2]);
+        let years = (arrTimeDeadlineNumber[2] - getTime2()[2]);
 
         let months;
-        if (arrTimeDeadlineNumber[1] >= (dateCreateNumber[1]))
-            months = arrTimeDeadlineNumber[1] - (dateCreateNumber[1]);
+        if (arrTimeDeadlineNumber[1] >= (getTime2()[1]))
+            months = arrTimeDeadlineNumber[1] - (getTime2()[1]);
         else {
-            months = 12 + arrTimeDeadlineNumber[1] - (dateCreateNumber[1]);
+            months = 12 + arrTimeDeadlineNumber[1] - (getTime2()[1]);
             years -= 1;
         } // else
 
-        let days = arrTimeDeadlineNumber[0] - (dateCreateNumber[0]);
-        if (arrTimeDeadlineNumber[0] - (dateCreateNumber[0]) > -1) {
+        let days = arrTimeDeadlineNumber[0] - (getTime2()[0]);
+        if (arrTimeDeadlineNumber[0] - (getTime2()[0]) > -1) {
 
-            days = arrTimeDeadlineNumber[0] - (dateCreateNumber[0]);
+            days = arrTimeDeadlineNumber[0] - (getTime2()[0]);
         } else {
             monthEven.forEach(item => {
                 if (arrTimeDeadlineNumber[1] == item) {
@@ -159,7 +174,7 @@ function getDeadline(e) {
 
             allDays = (years * 365) + (months * 30) + even + days - (special * 2);
 
-            for (let y = dateCreateNumber[2]; y <= arrTimeDeadlineNumber[2]; y++) {
+            for (let y = getTime2()[2]; y <= arrTimeDeadlineNumber[2]; y++) {
                 if (y % 4 == 0) {
                     allDays += 1;
                 }
@@ -174,7 +189,7 @@ function getDeadline(e) {
 
         c('even', even, 'special', special);
         c('year', years, 'month', months, 'day', days, ':', totalDay());
-        c(dateCreateNumber);
+        c(getTime2());
         c(arrTimeDeadlineNumber);
 
         if (totalDay() < 0) {
@@ -204,33 +219,16 @@ function getDeadline(e) {
         }
     }
 
-    switch (totalDay()) {
-        case 1: timeDeadline.innerText = 'Tomorrow';
 
-            break;
-        case 2: timeDeadline.innerText = `${totalDay()} day`;
-
-            break;
-        case 3: timeDeadline.innerText = `${totalDay()} day`;
-
-            break;
-        case 4: timeDeadline.innerText = `${totalDay()} day`;
-
-            break;
-
-        case 5: timeDeadline.innerText = `${totalDay()} day`;
-
-            break;
-        case 6: timeDeadline.innerText = `${totalDay()} day`;
-
-            break;
-
-        case 7: timeDeadline.innerText = `Next ${getDayName()}`;
-
-            break;
-
-        default: timeDeadline.innerText = arrTimeDeadline.toString().replace(/,/g, '-');
-    } // switch
+    if (totalDay() == 1) {
+        timeDeadline.innerText = 'Tomorrow';
+    } else if (totalDay() <= 6) {
+        timeDeadline.innerText = `${totalDay()} day`;
+    } else if (totalDay() == 7) {
+        timeDeadline.innerText = `Next ${getDayName()}`;
+    } else {
+        timeDeadline.innerText = arrTimeDeadline.toString().replace(/,/g, '-');
+    }
 
     inputDeadline.value = arrTimeDeadline.reverse().toString().replace(/,/g, '-');
 
