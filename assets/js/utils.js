@@ -151,18 +151,18 @@ function getDeadline(arrTime) {
     const totalDays = totalDay(dayStrings);
 
     const text = 
-        totalDays == -1 ?
-        'Yesterday' :
-        totalDays == 0 ?
-        '' :
-        totalDays == 1 ?
-        'Tomorrow' :
-        totalDays <= 6 ?
-        `${totalDay(dayStrings)} day` :
-        totalDays == 7 ?
-        `Next ${getDayName()}` :
-        `${years <= 0 ? '' : `${years} year`} ${months <= 0 ? '' : `${months} month`} ${days <= 0 ? '' : `${days} day`}`
-   
+    totalDays == -1 ?
+    'Yesterday' :
+    totalDays == 0 ?
+    '' :
+    totalDays == 1 ?
+    'Tomorrow' :
+    totalDays <= 6 ?
+    `${totalDay(dayStrings)} day` :
+    totalDays == 7 ?
+    `Next ${getDayName()}` :
+    `${years <= 0 ? '' : `${years} year`} ${months <= 0 ? '' : `${months} month`} ${days <= 0 ? '' : `${days} day`}`
+
     return {
         totalDays,
         text

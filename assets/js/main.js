@@ -95,6 +95,8 @@ const appOOP = {
     renderFullTodo: function (e) {
         const outerId = e.target.parentNode.dataset.index;
         const todo = this.dataTodos.find(entry => entry.id === outerId);
+        const arrDeadline = todo.deadline.split('-');
+        const arrDeadlineNumber = [Number(arrDeadline[0]), Number(arrDeadline[1]), Number(arrDeadline[2])];
 
         const htmlContent = `
                 <li class="item-note bla ${todo.status == 2 ? 'strikethrough' : ''}" data-index="${outerId}" >
@@ -105,7 +107,8 @@ const appOOP = {
                 </li>
                 `;
         timeCreate.innerText = todo.date;
-        timeDeadline.innerText = todo.deadline == '' ? '' : getDeadline(todo.deadline.split('-'));
+        timeDeadline.innerText = todo.deadline == '' ? '' : getDeadline(arrDeadlineNumber).text;
+
         fullSettingContent.innerHTML = htmlContent;
     },
 
@@ -565,8 +568,10 @@ const appOOP = {
             const id = wrapper.querySelector('.item-note').dataset.index;
             const arrDeadline = inputDeadline.value.split('-').reverse();
             const arrDeadlineNumber = [Number(arrDeadline[0]), Number(arrDeadline[1]), Number(arrDeadline[2])];
-            const { totalDays, text } = getDeadline(arrDeadlineNumber)
+            const { totalDays, text } = getDeadline(arrDeadlineNumber);
+
             timeDeadline.innerText = text;
+
             appOOP.dataTodos = appOOP.dataTodos.map(item => {
                 if (item.id !== id) {
                     return item
