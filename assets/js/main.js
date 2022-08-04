@@ -1,6 +1,10 @@
 // parentNode => closset
-// quá deadline chữ đỏ
 
+// getter, setter
+// 2022-08-01 >
+// 2022-07-25
+// <i class="fa-solid fa-caret-up"></i>
+// <i class="fa-solid fa-sort-down"></i>
 const c = console.log;
 //#region declare const 
 const app = document.querySelector('app');
@@ -43,6 +47,7 @@ const appOOP = {
     //#region declare
     onEdit: false, // Flag
     dataTodos: [],
+    arrTest: [],
     //#endregion declare
 
     render: function () {
@@ -100,7 +105,7 @@ const appOOP = {
                 </li>
                 `;
         timeCreate.innerText = todo.date;
-        timeDeadline.innerText = todo.deadline;
+        timeDeadline.innerText = todo.deadline == '' ? '' : getDeadline(todo.deadline.split('-'));
         fullSettingContent.innerHTML = htmlContent;
     },
 
@@ -188,8 +193,6 @@ const appOOP = {
 
         return [];
     }, // localGet
-
-
 
     addTodo: function (id, todoText) {
 
@@ -385,6 +388,51 @@ const appOOP = {
 
     }, // clickIconFull
 
+    sortData: function () {
+
+        let time = getTimeToday();
+
+        time = [
+            editTime(time[0]),
+            editTime(time[1]),
+            time[2]
+        ];
+
+        const todayTxt = time.reverse().toString().replace(/,/g, '-');
+
+        // primative: int, string <> object
+        // helping func.
+        function compareDate(a, b) {
+            const deadlineProcessedA = a.deadline.split('-').reverse().join('-');
+            const deadlineProcessedB = b.deadline.split('-').reverse().join('-');
+
+            return (
+                deadlineProcessedA < deadlineProcessedB ?
+                    -1 :
+                    deadlineProcessedA > deadlineProcessedB ?
+                        1 :
+                        0
+            )
+        } // compare
+
+        let expiredTodos = [], notExpiredTodos = [];
+
+        appOOP.dataTodos.forEach(item => {
+            const deadlineProcessed = item.deadline.split('-').reverse();
+
+            if (item.deadline == '' || deadlineProcessed.join('-') >= todayTxt) notExpiredTodos.push(item);
+            else expiredTodos.push(item);
+        }); // forEach
+
+        const expiredTodosSorted = expiredTodos.sort(compareDate);
+
+        appOOP.dataTodos = [...expiredTodosSorted, ...notExpiredTodos]; // [a1, a2, b1, b2, b3] 
+
+        appOOP.render();
+        appOOP.handleEvents();
+        appOOP.localSet();
+    }, // sortData
+
     handleEvents: function () {
         btnAddNote.onclick = () => {
 
@@ -517,8 +565,8 @@ const appOOP = {
             const id = wrapper.querySelector('.item-note').dataset.index;
             const arrDeadline = inputDeadline.value.split('-').reverse();
             const arrDeadlineNumber = [Number(arrDeadline[0]), Number(arrDeadline[1]), Number(arrDeadline[2])];
-
-            timeDeadline.innerText = getDeadline(arrDeadlineNumber);
+            const { totalDays, text } = getDeadline(arrDeadlineNumber)
+            timeDeadline.innerText = text;
             appOOP.dataTodos = appOOP.dataTodos.map(item => {
                 if (item.id !== id) {
                     return item
@@ -530,7 +578,8 @@ const appOOP = {
                 } // else
             }) // map
 
-            if (totalDay(arrDeadlineNumber.reverse().toString()) < 0) {
+
+            if (totalDay(arrDeadlineNumber.toString()) < 0) {
                 appOOP.dataTodos.forEach(item => {
                     if (item.id == id) {
                         item.outOfDate = true;
@@ -561,6 +610,9 @@ const appOOP = {
             } // else
 
             inputDeadline.value = arrDeadline.reverse().toString().replace(/,/g, '-');
+            if (totalDays < 0)
+                appOOP.sortData();
+
             appOOP.localSet();
         }
         // inputDeadline

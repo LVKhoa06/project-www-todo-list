@@ -1,11 +1,19 @@
 
 const monthM31 = [1, 3, 5, 7, 8, 10, 12];
 const monthSpecial = 2;
-
 let years;
 let months;
 let days;
 
+// formatDate('YYYY-MM-dd')
+// formatDate('dd/MM/YY') // 04/08/2022
+// formatDate('dd-MM-YY') // 04-08-22
+function formatDate(format, input = today) {
+    if (input == null)
+        input = new Date();
+
+    return 1;
+}
 function editTime(time) {
     return time < 10 ? `0${time}` : time;
 } // editTime
@@ -140,13 +148,24 @@ function getDeadline(arrTime) {
     } // if     
 
     const dayStrings = arrTime.reverse().toString().replace(/,/g, '-');
+    const totalDays = totalDay(dayStrings);
 
-    if (totalDay(dayStrings) == 1) return 'Tomorrow';
-
-    if (totalDay(dayStrings) <= 6) return `${totalDay(dayStrings)} day`;
-
-    if (totalDay(dayStrings) == 7) return `Next ${getDayName()}`;
-    
-    return `${years <= 0 ? '' : `${years} year`} ${months <= 0 ? '' : `${months} month`} ${days <= 0 ? '' : `${days} day`}`;
+    const text = 
+        totalDays == -1 ?
+        'Yesterday' :
+        totalDays == 0 ?
+        '' :
+        totalDays == 1 ?
+        'Tomorrow' :
+        totalDays <= 6 ?
+        `${totalDay(dayStrings)} day` :
+        totalDays == 7 ?
+        `Next ${getDayName()}` :
+        `${years <= 0 ? '' : `${years} year`} ${months <= 0 ? '' : `${months} month`} ${days <= 0 ? '' : `${days} day`}`
+   
+    return {
+        totalDays,
+        text
+    }
     // .trim().replace(/r? n/g, '')
 } // getDeadline 
