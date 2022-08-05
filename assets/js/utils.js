@@ -1,3 +1,5 @@
+//sử lý data -> render
+//todo đi theo drag drop
 
 const monthM31 = [1, 3, 5, 7, 8, 10, 12];
 const monthSpecial = 2;

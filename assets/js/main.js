@@ -48,7 +48,7 @@ const appOOP = {
         const htmlsTodos = this.dataTodos.map((item, index) => {
             if (item.pin == false) {
                 return `
-                <li style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
+                <li draggable="true" style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
                     <up-down>
                         <i class="icon-up-down icon-up fa-solid fa-caret-up"></i>
                         <i class="icon-up-down icon-down fa-solid fa-sort-down"></i>
@@ -68,6 +68,10 @@ const appOOP = {
             if (item.pin == true) {
                 return `
                 <li style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
+                    <up-down>
+                        <i class="icon-up-down icon-up fa-solid fa-caret-up"></i>
+                        <i class="icon-up-down icon-down fa-solid fa-sort-down"></i>
+                    </up-down>  
                     <input class="checkbox-hide" type="checkbox" ${item.status == 2 ? 'checked' : ''}>
                     <span style="border-color: ${item.color};" class="checkbox-complete"></span>
                     <span  ${item.outOfDate == true ? 'style="color:red;"' : ''} class="item-text">${item.text}</span>
@@ -663,6 +667,16 @@ const appOOP = {
             tabColor.classList.remove('show');
         } // fullSetting
 
+        app.querySelectorAll('.item-note').forEach(item => {
+            item.onmousedown = (e) => c('From', appOOP.getFrom_To(e));
+
+            item.ondragenter = (e) => c('To', appOOP.getFrom_To(e));
+
+            item.ondragend = (e) => {
+                c('End')
+            }
+        });
+
         app.querySelectorAll('.btn-delete').forEach(btn => {
             btn.onclick = (e) => appOOP.deleteTodo(e);
         });
@@ -688,12 +702,23 @@ const appOOP = {
                 appOOP.moveNote(e, 'UP');
             }
         });
+
         app.querySelectorAll('.icon-down').forEach(icon => {
             icon.onclick = (e) => {
                 appOOP.moveNote(e, 'DOWN');
             }
         });
     }, // handleEvents
+
+    getFrom_To: function (e) {
+        const id = e.target.closest('.item-note').dataset.index;
+        const todo = appOOP.dataTodos.find(item => {
+            return item.id === id;
+        });
+        const indexTodo = appOOP.dataTodos.indexOf(todo);
+
+        return indexTodo;
+    },
 
     start() {
         this.dataTodos = this.localGet();
