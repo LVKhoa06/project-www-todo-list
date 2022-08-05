@@ -1,5 +1,12 @@
 // parentNode => closset
 
+//get this index từ this index đến index mới +
+
+//sử lý data -> render +
+
+//todo đi theo drag drop
+
+
 const c = console.log;
 //#region declare const 
 const app = document.querySelector('app');
@@ -42,6 +49,7 @@ const appOOP = {
     onEdit: false, // Flag
     dataTodos: [],
     arrTest: [],
+    toIndex: 0,
     //#endregion declare
 
     render: function () {
@@ -668,14 +676,31 @@ const appOOP = {
         } // fullSetting
 
         app.querySelectorAll('.item-note').forEach(item => {
-            item.onmousedown = (e) => c('From', appOOP.getFrom_To(e));
+            let id;
+            let todo;
 
-            item.ondragenter = (e) => c('To', appOOP.getFrom_To(e));
+            item.onmousedown = (e) => {
+                id = e.target.closest('.item-note').dataset.index;
+                todo = appOOP.dataTodos.find(item => {
+                    return item.id === id;
+                });
+            };
 
-            item.ondragend = (e) => {
-                c('End')
+            // get to index
+            item.ondragenter = (e) => {
+                toIndex = appOOP.getIndexTo(e);
             }
-        });
+
+            item.ondragend = () => {
+                appOOP.dataTodos = appOOP.dataTodos.filter(item => {
+                    return item.id !== id;
+                });
+
+                appOOP.dataTodos.splice(toIndex, 0, todo);
+
+                appOOP.reRender;
+            } // ondragend
+        }); // forEach
 
         app.querySelectorAll('.btn-delete').forEach(btn => {
             btn.onclick = (e) => appOOP.deleteTodo(e);
@@ -710,7 +735,7 @@ const appOOP = {
         });
     }, // handleEvents
 
-    getFrom_To: function (e) {
+    getIndexTo: function (e) {
         const id = e.target.closest('.item-note').dataset.index;
         const todo = appOOP.dataTodos.find(item => {
             return item.id === id;
