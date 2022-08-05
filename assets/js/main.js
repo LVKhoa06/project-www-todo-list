@@ -1,10 +1,5 @@
 // parentNode => closset
 
-// getter, setter
-// 2022-08-01 >
-// 2022-07-25
-// <i class="fa-solid fa-caret-up"></i>
-// <i class="fa-solid fa-sort-down"></i>
 const c = console.log;
 //#region declare const 
 const app = document.querySelector('app');
@@ -27,7 +22,6 @@ const tabColor = fullSetting.querySelector('tab');
 const btnCancel = fullSetting.querySelector('.btn-cancel');
 const btnOk = fullSetting.querySelector('.btn-ok');
 const inputDeadline = fullSetting.querySelector('.input-deadline');
-const tabDeadline = fullSetting.querySelector('tab-deadline');
 
 const CONST_LS_KEY = 'TODO-LIST';
 
@@ -55,6 +49,10 @@ const appOOP = {
             if (item.pin == false) {
                 return `
                 <li style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
+                    <up-down>
+                        <i class="icon-up-down icon-up fa-solid fa-caret-up"></i>
+                        <i class="icon-up-down icon-down fa-solid fa-sort-down"></i>
+                    </up-down>
                     <input class="checkbox-hide" type="checkbox" ${item.status == 2 ? 'checked' : ''}>
                     <span style="border-color: ${item.color};" class="checkbox-complete"></span>
                     <span ${item.outOfDate == true ? 'style="color:red;"' : ''} class="item-text">${item.text}</span>
@@ -118,7 +116,7 @@ const appOOP = {
 
     createNote: function () {
         const id = `${Date.now()}`;
-        let item, itemText, checkboxHide, checkboxShow, btn, icon, fullIcon;
+        let item, itemText, checkboxHide, checkboxShow, btn, icon, fullIcon, upDown, upIcon, downIcon;
 
         // Create item
         item = document.createElement("li");
@@ -128,7 +126,9 @@ const appOOP = {
         checkboxShow = document.createElement("span");
         btn = document.createElement("button");
         icon = document.createElement('i');
-
+        upDown = document.createElement('up-down');
+        upIcon = document.createElement('i');
+        downIcon = document.createElement('i');
         // Add attribute
         item.className = 'item-note';
         fullIcon.className = 'fa-solid fa-expand';
@@ -140,6 +140,8 @@ const appOOP = {
         checkboxHide.setAttribute("type", "checkbox");
         item.setAttribute("data-index", id);
         fullIcon.setAttribute('id', 'icon-full')
+        upIcon.setAttribute('class', 'icon-up-down icon-up fa-solid fa-caret-up')
+        downIcon.setAttribute('class', 'icon-up-down icon-down fa-solid fa-sort-down')
 
         // Assign checkbox to item
         item.appendChild(checkboxHide);
@@ -151,9 +153,13 @@ const appOOP = {
         btn.appendChild(document.createTextNode("x"));
 
         // Assign element to item
+        item.appendChild(upDown);
         item.appendChild(itemText);
         item.appendChild(btn);
         item.appendChild(icon);
+
+        upDown.appendChild(upIcon);
+        upDown.appendChild(downIcon);
 
         // Add item to list
         listNote.appendChild(item);
@@ -167,8 +173,11 @@ const appOOP = {
         icon.onclick = this.clickIconTick;
         itemText.onclick = this.clickItem;
         fullIcon.onclick = this.clickIconFull;
-        this.addTodo(id, itemText.innerText);
 
+        upIcon.onclick = (e) => appOOP.moveNote(e, 'UP');
+        downIcon.onclick = (e) => appOOP.moveNote(e, 'DOWN');
+
+        this.addTodo(id, itemText.innerText);
     }, // createNote
 
     updateOnEdit: function (boolean) {
@@ -237,9 +246,7 @@ const appOOP = {
                     text: newText
                 } // return
         }) // map
-        appOOP.render();
-        appOOP.handleEvents();
-        appOOP.localSet();
+        appOOP.reRender;
     }, // updateTodo
 
     deleteTodo: function (e) {
@@ -316,11 +323,13 @@ const appOOP = {
             const tick = item.querySelector('.checkbox-complete');
             const idInner = item.dataset.index;
             const fullIcon = item.querySelector('#icon-full');
+            const upDown = item.querySelector('up-down');
 
             if (idInner !== idOuter) {
                 tick.classList.add('lock-checkbox');
                 btnDelete.classList.add('hide');
                 fullIcon.classList.add('hide');
+                upDown.classList.add('hide');
             }
         })
 
@@ -431,10 +440,39 @@ const appOOP = {
 
         appOOP.dataTodos = [...expiredTodosSorted, ...notExpiredTodos]; // [a1, a2, b1, b2, b3] 
 
+        appOOP.reRender;
+    }, // sortData
+
+    moveNote: function (e, direction) { // direction = 'UP' || 'DOWN'
+        const id = e.target.closest('.item-note').dataset.index;
+        const dataTodosLength = appOOP.dataTodos.length;
+        const todo = appOOP.dataTodos.find(item => {
+            return item.id === id;
+        });
+
+        const indexTodo = appOOP.dataTodos.indexOf(todo);
+
+        if (direction === 'UP' && indexTodo === 0)
+            return;
+        if (direction === 'DOWN' && indexTodo === dataTodosLength - 1)
+            return;
+
+        appOOP.dataTodos = appOOP.dataTodos.filter(item => {
+            return item.id !== id;
+        }); // filter
+
+        let newIndex = direction === 'UP' ? indexTodo - 1 : indexTodo + 1;
+
+        appOOP.dataTodos.splice(newIndex, 0, todo);
+
+        appOOP.reRender;
+    }, // moveNote 
+
+    get reRender() {
         appOOP.render();
         appOOP.handleEvents();
         appOOP.localSet();
-    }, // sortData
+    }, // reRender
 
     handleEvents: function () {
         btnAddNote.onclick = () => {
@@ -488,9 +526,7 @@ const appOOP = {
                 }
             }) // forEach
 
-            appOOP.render();
-            appOOP.handleEvents();
-            appOOP.localSet();
+            appOOP.reRender;
         } // iconPin
 
         arrBtn.onclick = function () {
@@ -511,10 +547,7 @@ const appOOP = {
             const dataCopyId = dataCopy.id;
 
             fullSetting.classList.add('hide');
-            appOOP.localSet();
-            appOOP.render();
-            appOOP.handleEvents();
-
+            appOOP.reRender;
             Array.from(listNote.children).forEach((item) => {
                 const textItem = item.querySelector('.item-text');
 
@@ -628,7 +661,7 @@ const appOOP = {
 
         fullSetting.onclick = (e) => {
             tabColor.classList.remove('show');
-        }
+        } // fullSetting
 
         app.querySelectorAll('.btn-delete').forEach(btn => {
             btn.onclick = (e) => appOOP.deleteTodo(e);
@@ -648,7 +681,18 @@ const appOOP = {
 
         app.querySelectorAll('#icon-full').forEach(icon => {
             icon.onclick = (e) => appOOP.clickIconFull(e);
-        })
+        });
+
+        app.querySelectorAll('.icon-up').forEach(icon => {
+            icon.onclick = (e) => {
+                appOOP.moveNote(e, 'UP');
+            }
+        });
+        app.querySelectorAll('.icon-down').forEach(icon => {
+            icon.onclick = (e) => {
+                appOOP.moveNote(e, 'DOWN');
+            }
+        });
     }, // handleEvents
 
     start() {

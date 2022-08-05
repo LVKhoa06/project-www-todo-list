@@ -14,6 +14,7 @@ function formatDate(format, input = today) {
 
     return 1;
 }
+
 function editTime(time) {
     return time < 10 ? `0${time}` : time;
 } // editTime
@@ -150,22 +151,21 @@ function getDeadline(arrTime) {
     const dayStrings = arrTime.reverse().toString().replace(/,/g, '-');
     const totalDays = totalDay(dayStrings);
 
-    const text = 
-    totalDays == -1 ?
-    'Yesterday' :
-    totalDays == 0 ?
-    '' :
-    totalDays == 1 ?
-    'Tomorrow' :
-    totalDays <= 6 ?
-    `${totalDay(dayStrings)} day` :
-    totalDays == 7 ?
-    `Next ${getDayName()}` :
-    `${years <= 0 ? '' : `${years} year`} ${months <= 0 ? '' : `${months} month`} ${days <= 0 ? '' : `${days} day`}`
+    const text =
+        totalDays == -1 ?
+            'Yesterday' :
+            totalDays == 0 ?
+                '' :
+                totalDays == 1 ?
+                    'Tomorrow' :
+                    totalDays <= 6 ?
+                        `${totalDay(dayStrings)} day` :
+                        totalDays == 7 ?
+                            `Next ${getDayName()}` :
+                            `${years <= 0 ? '' : `${years} year`} ${months <= 0 ? '' : `${months} month`} ${days <= 0 ? '' : `${days} day`}`
 
     return {
         totalDays,
         text
     }
-    // .trim().replace(/r? n/g, '')
 } // getDeadline 

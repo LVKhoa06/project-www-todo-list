@@ -423,3 +423,41 @@ deadline {
     left: -5px;
     opacity: 0;
 }
+
+up-down {
+    position: absolute;
+    z-index: 1000;
+    left: -28px;
+    top: 5px;
+    height: 32px;
+    width: 23px;
+    display: flex;
+    justify-content: center;
+}
+
+.icon-up-down {
+    opacity: 0;
+    text-align: center;
+    font-size: 19px;
+    width: 20px;
+    position: absolute;
+    color: var(--text-color-4);
+    cursor: pointer;
+}
+
+.item-note:hover .icon-up-down {
+    opacity: 1;
+    color: var(--text-color-2);
+}
+
+.icon-up {
+    top: -5px;
+}
+
+.icon-down {
+    top: 10px;
+}
+
+.lock {
+    pointer-events: none;
+}
