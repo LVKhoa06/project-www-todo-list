@@ -272,7 +272,7 @@ const appOOP = {
 
         const listElement = e.target.parentNode;
         const idDelete = listElement.dataset.index;
-        e.target.parentNode.parentNode.removeChild(listElement);
+        listElement.parentNode.removeChild(listElement);
 
         if (listPin.children.length < 2) {
             listPin.classList.add('hide');
@@ -357,7 +357,6 @@ const appOOP = {
             e.target.focus();
         }, 50);
 
-        // e.target.parentNode.classList.remove('strikethrough');
         e.target.parentNode.classList.add('focus-item');
         btnDelete.classList.add('hide');
         btnSave.classList.add('show');
@@ -454,7 +453,7 @@ const appOOP = {
 
         const expiredTodosSorted = expiredTodos.sort(compareDate);
 
-        appOOP.dataTodos = [...expiredTodosSorted, ...notExpiredTodos]; // [a1, a2, b1, b2, b3] 
+        appOOP.dataTodos = [...expiredTodosSorted, ...notExpiredTodos]; 
 
         appOOP.reRender;
     }, // sortData
@@ -538,7 +537,7 @@ const appOOP = {
         } // fullSettingClose.
 
         iconRecycleBin.onclick = (e) => {
-            const id = e.target.parentNode.parentNode.parentNode.querySelector('.item-note').dataset.index;
+            const id = e.target.closest('advanced-edit').querySelector('.item-note').dataset.index;
 
             appOOP.dataTodos = appOOP.dataTodos.filter((item) => item.id !== id);
             appOOP.localSet();
@@ -549,11 +548,11 @@ const appOOP = {
                 if (item.dataset.index === id) {
                     item.remove();
                 }
-            })
+            });
         } // iconRecycleBin
 
         iconPin.onclick = (e) => {
-            const id = e.target.parentNode.parentNode.querySelector('.item-note').dataset.index;
+            const id = e.target.closest('advanced-edit').querySelector('.item-note').dataset.index;
             const pinElm = appOOP.dataTodos.find(item => item.id === id);
 
             iconPin.classList.toggle('pin-item');
@@ -579,7 +578,8 @@ const appOOP = {
         } // iconPin
 
         iconCopy.onclick = (e) => {
-            const id = e.target.parentNode.parentNode.parentNode.querySelector('.item-note').dataset.index;
+            const id = e.target.closest('advanced-edit').querySelector('.item-note').dataset.index;
+
             let dataCopy = appOOP.dataTodos.find(item => item.id === id);
 
             dataCopy = {
@@ -613,7 +613,7 @@ const appOOP = {
         } // btnCancel
 
         btnOk.onclick = (e) => {
-            const id = e.target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector('.item-note').dataset.index;
+            const id = e.target.closest('advanced-edit').querySelector('.item-note').dataset.index;
 
             appOOP.dataTodos = appOOP.dataTodos.map(item => {
                 if (item.id !== id)
@@ -626,13 +626,11 @@ const appOOP = {
             });
 
             app.querySelectorAll('.item-note').forEach(item => {
-
                 if (item.dataset.index == id) {
                     item.querySelector('.checkbox-complete').style.borderColor = inputColor.value
                     item.style.borderColor = inputColor.value;
-                    // item.style.backgroundColor = inputColor.value;
                 }
-            })
+            });
 
             headerFull.style.backgroundColor = inputColor.value;
             tabColor.classList.remove('show');

@@ -424,7 +424,6 @@ deadline {
 
 up-down {
     position: absolute;
-    z-index: 1000;
     left: -28px;
     top: 5px;
     height: 32px;
