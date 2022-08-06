@@ -6,7 +6,6 @@
 
 //todo đi theo drag drop
 
-
 const c = console.log;
 //#region declare const 
 const app = document.querySelector('app');
@@ -36,7 +35,9 @@ const CONST_TODO_STATUS = {
     PENDING: 0,
     DOING: 1,
     COMPLETED: 2,
-    CANCELED: -1
+    CANCELED: -1,
+    todo: '',
+
 }
 const colorDefault = 'var(--app-color-2)';
 //#endregion declare const
@@ -149,6 +150,7 @@ const appOOP = {
         checkboxHide.className = 'checkbox-hide';
         checkboxShow.className = 'checkbox-complete';
         icon.className = 'icon-save';
+        item.setAttribute("draggable", "true");
         checkboxHide.setAttribute("type", "checkbox");
         item.setAttribute("data-index", id);
         fullIcon.setAttribute('id', 'icon-full')
@@ -179,15 +181,19 @@ const appOOP = {
         // After creating item then delete input value
         inputNote.value = "";
 
+        item.onmousedown = (e) => this.todo = this.getElm(e);
+        item.ondragenter = (e) => this.toIndex = this.getIndexTo(e);
+        item.ondragend = (e) => this.dropElm(e);
+
         btn.onclick = this.deleteTodo;
-        checkboxHide.onclick = (e) => appOOP.strikethroughItem(e.target);
-        icon.onclick = (e) => appOOP.updateTodo(e.target);
+        checkboxHide.onclick = (e) => this.strikethroughItem(e.target);
+        icon.onclick = (e) => this.updateTodo(e.target);
         icon.onclick = this.clickIconTick;
         itemText.onclick = this.clickItem;
         fullIcon.onclick = this.clickIconFull;
 
-        upIcon.onclick = (e) => appOOP.moveNote(e, 'UP');
-        downIcon.onclick = (e) => appOOP.moveNote(e, 'DOWN');
+        upIcon.onclick = (e) => this.moveNote(e, 'UP');
+        downIcon.onclick = (e) => this.moveNote(e, 'DOWN');
 
         this.addTodo(id, itemText.innerText);
     }, // createNote
@@ -229,8 +235,7 @@ const appOOP = {
             color: colorDefault,
             outOfDate: false,
             status: CONST_TODO_STATUS.DOING,
-        })
-
+        });
         appOOP.localSet();
     }, // addTodo
 
@@ -238,7 +243,6 @@ const appOOP = {
         const ElmText = elm.parentNode.querySelector('.item-text')
         const newText = ElmText.textContent;
         const id = elm.parentNode.dataset.index;
-
 
         if (newText.trim().length < 1) {
             alert('Không được để note trống');
@@ -486,6 +490,35 @@ const appOOP = {
         appOOP.localSet();
     }, // reRender
 
+    getElm: function (e) {
+        const id = e.target.closest('.item-note').dataset.index;
+        const todo = appOOP.dataTodos.find(item => {
+            return item.id === id;
+        });
+        return todo;
+    },
+
+    getIndexTo: function (e) {
+        const id = e.target.closest('.item-note').dataset.index;
+        const todo = appOOP.dataTodos.find(item => {
+            return item.id === id;
+        });
+        const indexTodo = appOOP.dataTodos.indexOf(todo);
+
+        return indexTodo;
+    },
+
+    dropElm: function (e) {
+        const id = e.target.closest('.item-note').dataset.index;
+        appOOP.dataTodos = appOOP.dataTodos.filter(item => {
+            return item.id !== id;
+        });
+
+        appOOP.dataTodos.splice(appOOP.toIndex, 0, appOOP.todo);
+
+        appOOP.reRender;
+    },
+
     handleEvents: function () {
         btnAddNote.onclick = () => {
 
@@ -628,7 +661,6 @@ const appOOP = {
                 } // else
             }) // map
 
-
             if (totalDay(arrDeadlineNumber.toString()) < 0) {
                 appOOP.dataTodos.forEach(item => {
                     if (item.id == id) {
@@ -676,30 +708,13 @@ const appOOP = {
         } // fullSetting
 
         app.querySelectorAll('.item-note').forEach(item => {
-            let id;
-            let todo;
 
-            item.onmousedown = (e) => {
-                id = e.target.closest('.item-note').dataset.index;
-                todo = appOOP.dataTodos.find(item => {
-                    return item.id === id;
-                });
-            };
+            item.onmousedown = (e) => appOOP.todo = appOOP.getElm(e);
 
-            // get to index
-            item.ondragenter = (e) => {
-                toIndex = appOOP.getIndexTo(e);
-            }
+            item.ondragenter = (e) => appOOP.toIndex = appOOP.getIndexTo(e);
 
-            item.ondragend = () => {
-                appOOP.dataTodos = appOOP.dataTodos.filter(item => {
-                    return item.id !== id;
-                });
+            item.ondragend = (e) => appOOP.dropElm(e)
 
-                appOOP.dataTodos.splice(toIndex, 0, todo);
-
-                appOOP.reRender;
-            } // ondragend
         }); // forEach
 
         app.querySelectorAll('.btn-delete').forEach(btn => {
@@ -735,15 +750,7 @@ const appOOP = {
         });
     }, // handleEvents
 
-    getIndexTo: function (e) {
-        const id = e.target.closest('.item-note').dataset.index;
-        const todo = appOOP.dataTodos.find(item => {
-            return item.id === id;
-        });
-        const indexTodo = appOOP.dataTodos.indexOf(todo);
 
-        return indexTodo;
-    },
 
     start() {
         this.dataTodos = this.localGet();
