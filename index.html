@@ -13,6 +13,11 @@
 
 <body>
     <app>
+        <!-- #f0f8ff
+        <li class="item-drag item-note"> 
+            <span class="checkbox-drag checkbox-complete"></span>
+            <span class="text-drag"></span>
+        </li> -->
         <add-note class="center-y">
             <input class="input-note" placeholder="Write note" type="text">
             <button class="btn-add">Add</button>
@@ -21,8 +26,10 @@
         <button id="clear-btn" class=" btn">Clear</button>
         <list-pin>
         </list-pin>
+        <div id="foo"></div>
         <list-note>
         </list-note>
+
     </app>
     <full class="hide">
         <advanced-edit>
@@ -63,7 +70,19 @@
             </footer>
         </advanced-edit>
     </full>
+
+    <style>
+        #foo {
+            background-color: blanchedalmond;
+            width: 86%;
+            height: 7px;
+            left: 32px;
+            position: absolute;
+            top: 128px;
+        }
+    </style>
 </body>
+
 <script src="./assets/js/main.js"></script>
 <script src="./assets/js/utils.js"></script>
 <style>
@@ -72,5 +91,6 @@
         margin: 20px 10px 10px 10px;
     }
 </style>
+
 
 </html>

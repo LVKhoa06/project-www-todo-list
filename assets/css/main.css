@@ -74,6 +74,7 @@ li {
 
 app {
     display: block;
+    position: relative;
     margin: 30px auto;
     width: 60%;
     min-height: 515px;
@@ -139,6 +140,7 @@ list-pin {
     padding: 10px 30px 10px 10px;
     color: var(--text-color-1);
     width: 100%;
+    min-height: 42px;
 }
 
 .btn-delete {

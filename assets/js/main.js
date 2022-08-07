@@ -1,10 +1,8 @@
-// parentNode => closset
-
-//get this index từ this index đến index mới +
-
-//sử lý data -> render +
+// indicator drag drop
 
 //todo đi theo drag drop
+
+// func move note + drag drop 
 
 const c = console.log;
 //#region declare const 
@@ -28,6 +26,7 @@ const tabColor = fullSetting.querySelector('tab');
 const btnCancel = fullSetting.querySelector('.btn-cancel');
 const btnOk = fullSetting.querySelector('.btn-ok');
 const inputDeadline = fullSetting.querySelector('.input-deadline');
+const foo = app.querySelector('#foo');
 
 const CONST_LS_KEY = 'TODO-LIST';
 
@@ -453,7 +452,7 @@ const appOOP = {
 
         const expiredTodosSorted = expiredTodos.sort(compareDate);
 
-        appOOP.dataTodos = [...expiredTodosSorted, ...notExpiredTodos]; 
+        appOOP.dataTodos = [...expiredTodosSorted, ...notExpiredTodos];
 
         appOOP.reRender;
     }, // sortData
@@ -488,21 +487,29 @@ const appOOP = {
         appOOP.handleEvents();
         appOOP.localSet();
     }, // reRender
-
+    clientY: 0,
     getElm: function (e) {
         const id = e.target.closest('.item-note').dataset.index;
         const todo = appOOP.dataTodos.find(item => {
             return item.id === id;
         });
+        foo.style.display = 'block';
+        appOOP.clientY = e.clientY;
         return todo;
     },
 
     getIndexTo: function (e) {
-        const id = e.target.closest('.item-note').dataset.index;
+        const item = e.target.closest('.item-note');
+        const id = item.dataset.index;
+        const marginBottomItem = Number(getComputedStyle(item).marginBottom.replace('px', ''));
         const todo = appOOP.dataTodos.find(item => {
             return item.id === id;
         });
         const indexTodo = appOOP.dataTodos.indexOf(todo);
+
+        if (e.clientY > appOOP.clientY)
+            foo.style.top = 129 + (indexTodo * (item.offsetHeight + marginBottomItem));
+      
 
         return indexTodo;
     },
@@ -514,6 +521,7 @@ const appOOP = {
         });
 
         appOOP.dataTodos.splice(appOOP.toIndex, 0, appOOP.todo);
+        foo.style.display = 'none';
 
         appOOP.reRender;
     },
