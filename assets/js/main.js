@@ -507,9 +507,13 @@ const appOOP = {
         });
         const indexTodo = appOOP.dataTodos.indexOf(todo);
 
-        if (e.clientY > appOOP.clientY)
+        if (e.clientY < appOOP.clientY)
+            // Up
             foo.style.top = 129 + (indexTodo * (item.offsetHeight + marginBottomItem));
-      
+        else {
+            // Down
+            foo.style.top = 129 + ((indexTodo + 1) * (item.offsetHeight + marginBottomItem));
+        }
 
         return indexTodo;
     },
