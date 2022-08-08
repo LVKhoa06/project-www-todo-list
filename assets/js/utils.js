@@ -8,11 +8,27 @@ let days;
 // formatDate('YYYY-MM-dd')
 // formatDate('dd/MM/YY') // 04/08/2022
 // formatDate('dd-MM-YY') // 04-08-22
-function formatDate(format, input = today) {
-    if (input == null)
-        input = new Date();
+// function formatDate(format, input = today) {
+//     if (input == null)
+//         input = new Date();
 
-    return 1;
+//     return 1;
+// }
+
+function CheckOperatingSystem() {
+    let NameOperatingSystem = '';
+    if (navigator.userAgent.indexOf("Win") != -1) NameOperatingSystem =
+        "Windows";
+    if (navigator.userAgent.indexOf("Mac") != -1) NameOperatingSystem =
+        "Mac";
+    if (navigator.userAgent.indexOf("Linux") != -1) NameOperatingSystem =
+        "Linux";
+    if (navigator.userAgent.indexOf("like Mac") != -1) NameOperatingSystem =
+        "iOS";
+    if (navigator.userAgent.indexOf("Android") != -1) Name =
+        "Android";
+
+    return NameOperatingSystem;
 }
 
 function editTime(time) {
