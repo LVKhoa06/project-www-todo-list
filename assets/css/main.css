@@ -460,3 +460,16 @@ up-down {
 .lock {
     pointer-events: none;
 }
+
+.item-drag {
+    display: flex;
+    align-items: center;
+    border: 1.5px solid var(--app-color-2);
+    border-radius: 6px;
+    padding: 10px 30px 10px 10px;
+    color: var(--text-color-1);
+    width: 432px;
+    height: 42px;
+    margin-left: 30px;
+    background-color: #f0f8ff;
+}

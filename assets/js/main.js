@@ -1,5 +1,3 @@
-// indicator drag drop
-
 //todo đi theo drag drop
 
 // func move note + drag drop 
@@ -7,6 +5,7 @@
 const c = console.log;
 //#region declare const 
 const app = document.querySelector('app');
+const addNote = app.querySelector('add-note');
 const fullSetting = document.querySelector('full');
 const listNote = app.querySelector('list-note');
 const listPin = app.querySelector('list-pin');
@@ -41,9 +40,6 @@ const CONST_TODO_STATUS = {
 const colorDefault = 'var(--app-color-2)';
 //#endregion declare const
 
-const arrBtn = app.querySelector('#arr-btn');
-const clearBtn = app.querySelector('#clear-btn');
-
 const appOOP = {
     //#region declare
     onEdit: false, // Flag
@@ -55,7 +51,7 @@ const appOOP = {
     render: function () {
         const htmlsTodos = this.dataTodos.map((item, index) => {
             if (item.pin == false) {
-                return `
+                return `                
                 <li draggable="true" style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
                     <up-down>
                         <i class="icon-up-down icon-up fa-solid fa-caret-up"></i>
@@ -75,7 +71,7 @@ const appOOP = {
         const htmlPin = this.dataTodos.map((item, index) => {
             if (item.pin == true) {
                 return `
-                <li style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
+                <li draggable="true" style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
                     <up-down>
                         <i class="icon-up-down icon-up fa-solid fa-caret-up"></i>
                         <i class="icon-up-down icon-down fa-solid fa-sort-down"></i>
@@ -505,14 +501,41 @@ const appOOP = {
         const todo = appOOP.dataTodos.find(item => {
             return item.id === id;
         });
+        const listPinLength = listPin.childElementCount
         const indexTodo = appOOP.dataTodos.indexOf(todo);
+        const computedAddNote = addNote.offsetHeight + Number(getComputedStyle(addNote).marginTop.replace('px', '')) + Number(getComputedStyle(listNote).marginTop.replace('px', '')) - foo.offsetHeight;
+        const computedPin = listPin.offsetHeight + Number(getComputedStyle(listPin).marginTop.replace('px', '')) + Number(getComputedStyle(listPin).marginBottom.replace('px', ''));
 
-        if (e.clientY < appOOP.clientY)
-            // Up
-            foo.style.top = 129 + (indexTodo * (item.offsetHeight + marginBottomItem));
-        else {
-            // Down
-            foo.style.top = 129 + ((indexTodo + 1) * (item.offsetHeight + marginBottomItem));
+        let browserName = (function (agent) {
+            switch (true) {
+                // case agent.indexOf("edge") > -1: return "MS Edge";
+                case agent.indexOf("edg/") > -1: return "Edge";
+                case agent.indexOf("opr") > -1 && !!window.opr: return "Opera";
+                case agent.indexOf("chrome") > -1 && !!window.chrome: return "Chrome";
+                // case agent.indexOf("trident") > -1: return "MS IE";
+                // case agent.indexOf("firefox") > -1: return "Mozilla Firefox";
+                case agent.indexOf("safari") > -1: return "Safari";
+                default: return "other";
+            }
+        })(window.navigator.userAgent.toLowerCase());
+        const Num = browserName == "Edge" || CheckOperatingSystem() == 'Mac' ? 2 : 1;
+        c(Num)
+        if (listPin.classList.contains('hide')) {
+            if (e.clientY < appOOP.clientY) {
+
+                foo.style.top = computedAddNote + (indexTodo * (item.offsetHeight + marginBottomItem));
+            } else {
+
+                foo.style.top = computedAddNote + ((indexTodo + 1) * (item.offsetHeight + marginBottomItem));
+            }
+        } else {
+
+            if (e.clientY < appOOP.clientY) {
+                foo.style.top = computedPin - Number(getComputedStyle(listNote).marginTop.replace('px', '')) + computedAddNote + ((indexTodo - (listPinLength - 2)) * (item.offsetHeight + marginBottomItem));
+            }
+            else {
+                foo.style.top = computedPin - Number(getComputedStyle(listNote).marginTop.replace('px', '')) + computedAddNote + ((indexTodo - (listPinLength - 1) + 1) * (item.offsetHeight + marginBottomItem));
+            }
         }
 
         return indexTodo;
@@ -526,7 +549,7 @@ const appOOP = {
 
         appOOP.dataTodos.splice(appOOP.toIndex, 0, appOOP.todo);
         foo.style.display = 'none';
-
+        foo.style.top = -1000;
         appOOP.reRender;
     },
 
@@ -583,10 +606,6 @@ const appOOP = {
             }) // forEach
 
             appOOP.reRender;
-        } // iconPin
-
-        arrBtn.onclick = function () {
-            c(appOOP.dataTodos);
         } // iconPin
 
         iconCopy.onclick = (e) => {
@@ -709,10 +728,6 @@ const appOOP = {
         }
         // inputDeadline
 
-        clearBtn.onclick = function () {
-            localStorage.clear();
-        } // clearBtn
-
         fullSetting.onclick = (e) => {
             tabColor.classList.remove('show');
         } // fullSetting
@@ -760,8 +775,6 @@ const appOOP = {
         });
     }, // handleEvents
 
-
-
     start() {
         this.dataTodos = this.localGet();
 
@@ -773,3 +786,4 @@ const appOOP = {
 } // appOOP
 
 appOOP.start();
+
