@@ -176,7 +176,7 @@ const appOOP = {
         // After creating item then delete input value
         inputNote.value = "";
 
-        item.onmousedown = (e) => this.todo = this.getElm(e);
+        item.ondragstart = (e) => this.todo = this.getElm(e);
         item.ondragenter = (e) => this.toIndex = this.getIndexTo(e);
         item.ondragend = (e) => this.dropElm(e);
 
@@ -506,26 +506,24 @@ const appOOP = {
         const computedAddNote = addNote.offsetHeight + Number(getComputedStyle(addNote).marginTop.replace('px', '')) + Number(getComputedStyle(listNote).marginTop.replace('px', '')) - foo.offsetHeight;
         const computedPin = listPin.offsetHeight + Number(getComputedStyle(listPin).marginTop.replace('px', '')) + Number(getComputedStyle(listPin).marginBottom.replace('px', ''));
 
-        let browserName = (function (agent) {
-            switch (true) {
-                // case agent.indexOf("edge") > -1: return "MS Edge";
-                case agent.indexOf("edg/") > -1: return "Edge";
-                case agent.indexOf("opr") > -1 && !!window.opr: return "Opera";
-                case agent.indexOf("chrome") > -1 && !!window.chrome: return "Chrome";
-                // case agent.indexOf("trident") > -1: return "MS IE";
-                // case agent.indexOf("firefox") > -1: return "Mozilla Firefox";
-                case agent.indexOf("safari") > -1: return "Safari";
-                default: return "other";
-            }
-        })(window.navigator.userAgent.toLowerCase());
-        const Num = browserName == "Edge" || CheckOperatingSystem() == 'Mac' ? 2 : 1;
-        c(Num)
+        // let browserName = (function (agent) {
+        //     switch (true) {
+        //         // case agent.indexOf("edge") > -1: return "MS Edge";
+        //         case agent.indexOf("edg/") > -1: return "Edge";
+        //         case agent.indexOf("opr") > -1 && !!window.opr: return "Opera";
+        //         case agent.indexOf("chrome") > -1 && !!window.chrome: return "Chrome";
+        //         // case agent.indexOf("trident") > -1: return "MS IE";
+        //         // case agent.indexOf("firefox") > -1: return "Mozilla Firefox";
+        //         case agent.indexOf("safari") > -1: return "Safari";
+        //         default: return "other";
+        //     }
+        // })(window.navigator.userAgent.toLowerCase());
+        // const Num = browserName == "Edge" || CheckOperatingSystem() == 'Mac' ? 2 : 1;
+
         if (listPin.classList.contains('hide')) {
             if (e.clientY < appOOP.clientY) {
-
                 foo.style.top = computedAddNote + (indexTodo * (item.offsetHeight + marginBottomItem));
             } else {
-
                 foo.style.top = computedAddNote + ((indexTodo + 1) * (item.offsetHeight + marginBottomItem));
             }
         } else {
@@ -534,10 +532,9 @@ const appOOP = {
                 foo.style.top = computedPin - Number(getComputedStyle(listNote).marginTop.replace('px', '')) + computedAddNote + ((indexTodo - (listPinLength - 2)) * (item.offsetHeight + marginBottomItem));
             }
             else {
-                foo.style.top = computedPin - Number(getComputedStyle(listNote).marginTop.replace('px', '')) + computedAddNote + ((indexTodo - (listPinLength - 1) + 1) * (item.offsetHeight + marginBottomItem));
+                foo.style.top = computedPin - Number(getComputedStyle(listNote).marginTop.replace('px', '')) + computedAddNote + ((indexTodo - (listPinLength - 2) + 1) * (item.offsetHeight + marginBottomItem));
             }
         }
-
         return indexTodo;
     },
 
@@ -734,7 +731,7 @@ const appOOP = {
 
         app.querySelectorAll('.item-note').forEach(item => {
 
-            item.onmousedown = (e) => appOOP.todo = appOOP.getElm(e);
+            item.ondragstart = (e) => appOOP.todo = appOOP.getElm(e);
 
             item.ondragenter = (e) => appOOP.toIndex = appOOP.getIndexTo(e);
 
