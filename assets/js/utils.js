@@ -186,7 +186,6 @@ function getDeadline(arrTime) {
     }
 } // getDeadline 
 
-
 function dragElm(elm) {
     var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
 
@@ -228,3 +227,14 @@ function dragElm(elm) {
         document.onmousemove = null;
     }
 } // drag elm
+
+function moveItem(arr, fromIndex, toIndex) {
+    const item = arr.at(fromIndex);
+
+    // remove item from current location
+    arr.splice(fromIndex, 1);
+    // insert toIndex
+    arr.splice(toIndex, 0, item);
+
+    return arr;
+}
