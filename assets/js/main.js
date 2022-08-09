@@ -484,57 +484,74 @@ const appOOP = {
         appOOP.localSet();
     }, // reRender
     clientY: 0,
+    hasChildListNote: false,
     getElm: function (e) {
-        const id = e.target.closest('.item-note').dataset.index;
+        const item = e.target.closest('.item-note');
+        const id = item.dataset.index;
         const todo = appOOP.dataTodos.find(item => {
             return item.id === id;
         });
         foo.style.display = 'block';
         appOOP.clientY = e.clientY;
+        appOOP.hasChildListNote = listNote.contains(item);
+
         return todo;
     },
 
     getIndexTo: function (e) {
+
+        const arrTodo = appOOP.dataTodos.filter(elm => {
+            return elm.pin == false;
+        });
+        const arrPin = appOOP.dataTodos.filter(elm => {
+            return elm.pin == true;
+        });
+        const titlePin = document.querySelector('h3.title-pin');
         const item = e.target.closest('.item-note');
         const id = item.dataset.index;
         const marginBottomItem = Number(getComputedStyle(item).marginBottom.replace('px', ''));
-        const todo = appOOP.dataTodos.find(item => {
+        const heightItem = item.offsetHeight;
+        const listNoteMarginTop = Number(getComputedStyle(listNote).marginTop.replace('px', ''));
+        const computedAddNote = addNote.offsetHeight + Number(getComputedStyle(addNote).marginTop.replace('px', '')) - foo.offsetHeight;
+        const computedPin = listPin.offsetHeight + Number(getComputedStyle(listPin).marginTop.replace('px', '')) + Number(getComputedStyle(listPin).marginBottom.replace('px', ''));
+        const computedTitlePin = titlePin.offsetHeight + Number(getComputedStyle(titlePin).marginTop.replace('px', '')) + Number(getComputedStyle(titlePin).marginBottom.replace('px', '')) - foo.offsetHeight;
+
+        const todoListNote = arrTodo.find(item => {
             return item.id === id;
         });
-        const listPinLength = listPin.childElementCount
-        const indexTodo = appOOP.dataTodos.indexOf(todo);
-        const computedAddNote = addNote.offsetHeight + Number(getComputedStyle(addNote).marginTop.replace('px', '')) + Number(getComputedStyle(listNote).marginTop.replace('px', '')) - foo.offsetHeight;
-        const computedPin = listPin.offsetHeight + Number(getComputedStyle(listPin).marginTop.replace('px', '')) + Number(getComputedStyle(listPin).marginBottom.replace('px', ''));
+        const indexTodo = arrTodo.indexOf(todoListNote);
+        //  
+        const todoListPin = arrPin.find(item => {
+            return item.id === id;
+        });
+        const indexPinTodo = arrPin.indexOf(todoListPin);
 
-        // let browserName = (function (agent) {
-        //     switch (true) {
-        //         // case agent.indexOf("edge") > -1: return "MS Edge";
-        //         case agent.indexOf("edg/") > -1: return "Edge";
-        //         case agent.indexOf("opr") > -1 && !!window.opr: return "Opera";
-        //         case agent.indexOf("chrome") > -1 && !!window.chrome: return "Chrome";
-        //         // case agent.indexOf("trident") > -1: return "MS IE";
-        //         // case agent.indexOf("firefox") > -1: return "Mozilla Firefox";
-        //         case agent.indexOf("safari") > -1: return "Safari";
-        //         default: return "other";
-        //     }
-        // })(window.navigator.userAgent.toLowerCase());
-        // const Num = browserName == "Edge" || CheckOperatingSystem() == 'Mac' ? 2 : 1;
-
-        if (listPin.classList.contains('hide')) {
-            if (e.clientY < appOOP.clientY) {
-                foo.style.top = computedAddNote + (indexTodo * (item.offsetHeight + marginBottomItem));
+        // List notes unpinned
+        if (appOOP.hasChildListNote) {
+            if (listPin.classList.contains('hide')) {
+                if (e.clientY < appOOP.clientY) {
+                    foo.style.top = computedAddNote + listNoteMarginTop + (indexTodo * (heightItem + marginBottomItem));
+                } else {
+                    foo.style.top = computedAddNote + listNoteMarginTop + ((indexTodo + 1) * (heightItem + marginBottomItem));
+                }
             } else {
-                foo.style.top = computedAddNote + ((indexTodo + 1) * (item.offsetHeight + marginBottomItem));
+                if (e.clientY < appOOP.clientY) {
+                    foo.style.top = computedPin - listNoteMarginTop + computedAddNote + listNoteMarginTop + ((indexTodo) * (heightItem + marginBottomItem));
+                }
+                else {
+                    foo.style.top = computedPin - listNoteMarginTop + computedAddNote + listNoteMarginTop + ((indexTodo + 1) * (heightItem + marginBottomItem));
+                }
             }
+            // List notes pinned
         } else {
-
             if (e.clientY < appOOP.clientY) {
-                foo.style.top = computedPin - Number(getComputedStyle(listNote).marginTop.replace('px', '')) + computedAddNote + ((indexTodo - (listPinLength - 2)) * (item.offsetHeight + marginBottomItem));
+                foo.style.top = (computedAddNote + foo.offsetHeight) + computedTitlePin + indexPinTodo * (heightItem + marginBottomItem);
+            } else {
+                foo.style.top = (computedAddNote + foo.offsetHeight) + computedTitlePin + (indexPinTodo + 1) * (heightItem + marginBottomItem);
             }
-            else {
-                foo.style.top = computedPin - Number(getComputedStyle(listNote).marginTop.replace('px', '')) + computedAddNote + ((indexTodo - (listPinLength - 2) + 1) * (item.offsetHeight + marginBottomItem));
-            }
+
         }
+
         return indexTodo;
     },
 
