@@ -1,4 +1,4 @@
-//todo đi theo drag drop
+// todo đi theo drag drop
 
 // func move note + drag drop 
 
@@ -37,7 +37,7 @@ const CONST_TODO_STATUS = {
     COMPLETED: 2,
     CANCELED: -1,
 }
-const colorDefault = 'var(--app-color-2)';
+const COLOR_DEFAULT = 'var(--app-color-2)';
 //#endregion declare const
 
 const appOOP = {
@@ -46,6 +46,7 @@ const appOOP = {
     onEdit: false, // Flag
     dataTodos: [],
     arrTest: [],
+    fromIndex: 0,
     toIndex: 0,
     clientY: 0,
     hasChildListNote: false,
@@ -66,6 +67,7 @@ const appOOP = {
                     <button class="btn-delete">x</button>
                     <i class="icon-save"></i>
                     <i id="icon-full" class="fa-solid fa-expand"></i>
+                    <div class="indicator-drag"></div>
                 </li>
                     `;
             }
@@ -85,6 +87,7 @@ const appOOP = {
                     <button class="btn-delete">x</button>
                     <i class="icon-save"></i>
                     <i id="icon-full" class="fa-solid fa-expand"></i>
+                    <div class="indicator-drag"></div>
                 </li>
                     `;
             }
@@ -99,7 +102,7 @@ const appOOP = {
             listPin.classList.remove('hide');
         }
         listNote.innerHTML = htmlsTodos;
-    },
+    }, // render
 
     renderFullTodo: function (e) {
         const outerId = e.target.parentNode.dataset.index;
@@ -119,7 +122,7 @@ const appOOP = {
         timeDeadline.innerText = todo.deadline == '' ? '' : getDeadline(arrDeadlineNumber).text;
 
         fullSettingContent.innerHTML = htmlContent;
-    },
+    }, // renderFullTodo
 
     inputValueLength: function () {
         return inputNote.value.length;
@@ -127,10 +130,11 @@ const appOOP = {
 
     createNote: function () {
         const id = `${Date.now()}`;
-        let item, itemText, checkboxHide, checkboxShow, btn, icon, fullIcon, upDown, upIcon, downIcon;
+        let item, itemText, checkboxHide, checkboxShow, btn, icon, fullIcon, upDown, upIcon, downIcon, indicatorDrag;
 
         // Create item
         item = document.createElement("li");
+        indicatorDrag = document.createElement("div");
         fullIcon = document.createElement("i");
         itemText = document.createElement("span");
         checkboxHide = document.createElement("input");
@@ -142,6 +146,7 @@ const appOOP = {
         downIcon = document.createElement('i');
         // Add attribute
         item.className = 'item-note';
+        indicatorDrag.className = 'indicator-drag'
         fullIcon.className = 'fa-solid fa-expand';
         itemText.className = 'item-text';
         btn.className = 'btn-delete';
@@ -155,16 +160,15 @@ const appOOP = {
         upIcon.setAttribute('class', 'icon-up-down icon-up fa-solid fa-caret-up');
         downIcon.setAttribute('class', 'icon-up-down icon-down fa-solid fa-sort-down');
 
-        // Assign checkbox to item
-        item.appendChild(checkboxHide);
-        item.appendChild(checkboxShow);
-        item.appendChild(fullIcon);
-
         // Add text
         itemText.innerText = inputNote.value;
         btn.appendChild(document.createTextNode("x"));
 
         // Assign element to item
+        item.appendChild(checkboxHide);
+        item.appendChild(checkboxShow);
+        item.appendChild(fullIcon);
+        item.appendChild(indicatorDrag);
         item.appendChild(upDown);
         item.appendChild(itemText);
         item.appendChild(btn);
@@ -190,8 +194,8 @@ const appOOP = {
         itemText.onclick = this.clickItem;
         fullIcon.onclick = this.clickIconFull;
 
-        upIcon.onclick = (e) => this.moveNote(e, 'UP');
-        downIcon.onclick = (e) => this.moveNote(e, 'DOWN');
+        upIcon.onclick = (e) => this.useMoveNote(e, 'UP');
+        downIcon.onclick = (e) => this.useMoveNote(e, 'DOWN');
 
         this.addTodo(id, itemText.innerText);
     }, // createNote
@@ -230,7 +234,7 @@ const appOOP = {
             date: getTime(),
             pin: false,
             deadline: '',
-            color: colorDefault,
+            color: COLOR_DEFAULT,
             outOfDate: false,
             status: CONST_TODO_STATUS.DOING,
         });
@@ -414,7 +418,6 @@ const appOOP = {
     }, // clickIconFull
 
     sortData: function () {
-
         let time = getTimeToday();
 
         time = [
@@ -456,30 +459,18 @@ const appOOP = {
         appOOP.reRender;
     }, // sortData
 
-    moveNote: function (e, direction) { // direction = 'UP' || 'DOWN'
-        const id = e.target.closest('.item-note').dataset.index;
-        const dataTodosLength = appOOP.dataTodos.length;
+    useMoveNote: function (e, direction) { // UP || DOWN
+        const item = e.target.closest('.item-note');
+        const id = item.dataset.index;
         const todo = appOOP.dataTodos.find(item => {
             return item.id === id;
         });
+        appOOP.fromIndex = appOOP.dataTodos.indexOf(todo);
+        const toIndex = direction === 'UP' ? appOOP.fromIndex - 1 : appOOP.fromIndex + 1;
 
-        const indexTodo = appOOP.dataTodos.indexOf(todo);
-
-        if (direction === 'UP' && indexTodo === 0)
-            return;
-        if (direction === 'DOWN' && indexTodo === dataTodosLength - 1)
-            return;
-
-        appOOP.dataTodos = appOOP.dataTodos.filter(item => {
-            return item.id !== id;
-        }); // filter
-
-        let newIndex = direction === 'UP' ? indexTodo - 1 : indexTodo + 1;
-
-        appOOP.dataTodos.splice(newIndex, 0, todo);
-
+        moveItem(appOOP.dataTodos, appOOP.fromIndex, toIndex);
         appOOP.reRender;
-    }, // moveNote 
+    }, // useMoveNote
 
     get reRender() {
         appOOP.render();
@@ -494,93 +485,47 @@ const appOOP = {
             return item.id === id;
         });
 
+        appOOP.fromIndex = appOOP.dataTodos.indexOf(todo);
         elmDrag.classList.remove('hide');
-        elmDrag.style.top = e.clientY;
-        elmDrag.style.left = e.clientX;
-
-        foo.style.display = 'block';
+        // foo.style.display = 'block';
         appOOP.clientY = e.clientY;
         appOOP.hasChildListNote = listNote.contains(item);
         item.classList.add('blur');
+
+        // c('From:', appOOP.fromIndex)
         return todo;
-    },
+    }, // getElm
 
     getIndexTo: function (e) {
-
         const arrTodo = appOOP.dataTodos.filter(elm => {
             return elm.pin == false;
         });
-        const arrPin = appOOP.dataTodos.filter(elm => {
-            return elm.pin == true;
-        });
-        const titlePin = document.querySelector('h3.title-pin');
         const item = e.target.closest('.item-note');
         const id = item.dataset.index;
-        const marginBottomItem = Number(getComputedStyle(item).marginBottom.replace('px', ''));
-        const heightItem = item.offsetHeight;
-        const listNoteMarginTop = Number(getComputedStyle(listNote).marginTop.replace('px', ''));
-        const computedAddNote = addNote.offsetHeight + Number(getComputedStyle(addNote).marginTop.replace('px', '')) - foo.offsetHeight;
-        const computedPin = listPin.offsetHeight + Number(getComputedStyle(listPin).marginTop.replace('px', '')) + Number(getComputedStyle(listPin).marginBottom.replace('px', ''));
-        const computedTitlePin = titlePin.offsetHeight + Number(getComputedStyle(titlePin).marginTop.replace('px', '')) + Number(getComputedStyle(titlePin).marginBottom.replace('px', '')) - foo.offsetHeight;
 
         const todoListNote = arrTodo.find(item => {
             return item.id === id;
         });
         const indexTodo = arrTodo.indexOf(todoListNote);
-        //  
-        const todoListPin = arrPin.find(item => {
-            return item.id === id;
-        });
-        const indexPinTodo = arrPin.indexOf(todoListPin);
-
-        // List notes unpinned
-        if (appOOP.hasChildListNote) {
-            if (listPin.classList.contains('hide')) {
-                if (e.clientY < appOOP.clientY) {
-                    foo.style.top = computedAddNote + listNoteMarginTop + (indexTodo * (heightItem + marginBottomItem));
-                } else {
-                    foo.style.top = computedAddNote + listNoteMarginTop + ((indexTodo + 1) * (heightItem + marginBottomItem));
-                }
-            } else {
-                if (e.clientY < appOOP.clientY) {
-                    foo.style.top = computedPin - listNoteMarginTop + computedAddNote + listNoteMarginTop + ((indexTodo) * (heightItem + marginBottomItem));
-                }
-                else {
-                    foo.style.top = computedPin - listNoteMarginTop + computedAddNote + listNoteMarginTop + ((indexTodo + 1) * (heightItem + marginBottomItem));
-                }
-            }
-            // List notes pinned
-        } else {
-            if (e.clientY < appOOP.clientY) {
-                foo.style.top = (computedAddNote + foo.offsetHeight) + computedTitlePin + indexPinTodo * (heightItem + marginBottomItem);
-            } else {
-                foo.style.top = (computedAddNote + foo.offsetHeight) + computedTitlePin + (indexPinTodo + 1) * (heightItem + marginBottomItem);
-            }
-        }
 
         elmDrag.style.top = e.clientY;
         elmDrag.style.left = e.clientX;
-        // elmDrag.style.top = e.clientY - 20;
-        // elmDrag.style.left = e.clientX - 100;
 
+        // c('To:', appOOP.toIndex)
         return indexTodo;
-    },
+    }, // getIndexTo
 
     dropElm: function (e) {
         const item = e.target.closest('.item-note');
-        const id = e.target.closest('.item-note').dataset.index;
-        appOOP.dataTodos = appOOP.dataTodos.filter(item => {
-            return item.id !== id;
-        });
 
         elmDrag.classList.add('hide');
         item.classList.add('blur');
         foo.style.display = 'none';
-        foo.style.top = -1000;
-        appOOP.dataTodos.splice(appOOP.toIndex, 0, appOOP.todo);
+
+        moveItem(appOOP.dataTodos, appOOP.fromIndex, appOOP.toIndex);
 
         appOOP.reRender;
-    },
+    }, // dropElm
 
     handleEvents: function () {
         btnAddNote.onclick = () => {
@@ -791,11 +736,11 @@ const appOOP = {
         });
 
         app.querySelectorAll('.icon-up').forEach(icon => {
-            icon.onclick = (e) => appOOP.moveNote(e, 'UP');
+            icon.onclick = (e) => appOOP.useMoveNote(e, 'UP');
         });
 
         app.querySelectorAll('.icon-down').forEach(icon => {
-            icon.onclick = (e) => appOOP.moveNote(e, 'DOWN');
+            icon.onclick = (e) => appOOP.useMoveNote(e, 'DOWN');
         });
     }, // handleEvents
 
