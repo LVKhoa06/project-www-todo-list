@@ -23,11 +23,13 @@
         <div id="foo"></div>
         <list-note>
         </list-note>
-        <!-- <li class="item-drag">
-            <span class="checkbox-drag checkbox-complete"></span>
-            <span class="text-drag"></span>
-        </li> -->
     </app>
+    <li class="hide item-drag">
+        <!--strikethrough-->
+        <input class="checkbox-hide" type="checkbox">
+        <span class="checkbox-drag checkbox-complete"></span>
+        <span class="text-drag"></span>
+    </li>
     <full class="hide">
         <advanced-edit>
             <header>
@@ -75,21 +77,5 @@
 
 <script src="./assets/js/main.js"></script>
 <script src="./assets/js/utils.js"></script>
-<style>
-    .btn {
-        height: 30px;
-        margin: 20px 10px 10px 10px;
-    }
-
-    #foo {
-        background-color: red;
-        width: 86%;
-        height: 5px;
-        left: 32px;
-        position: absolute;
-        top: 69px;
-        display: none;
-    }
-</style>
 
 </html>

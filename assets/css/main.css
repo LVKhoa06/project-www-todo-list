@@ -470,6 +470,22 @@ up-down {
     color: var(--text-color-1);
     width: 432px;
     height: 42px;
-    margin-left: 30px;
+    position: absolute;
     background-color: #f0f8ff;
+    cursor: move;
+    z-index: 999999;
+}
+
+#foo {
+    background-color: red;
+    width: 86%;
+    height: 5px;
+    left: 32px;
+    position: absolute;
+    top: 69px;
+    display: none;
+}
+
+.blur {
+    opacity: .4;
 }

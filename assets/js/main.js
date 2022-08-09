@@ -26,6 +26,8 @@ const btnCancel = fullSetting.querySelector('.btn-cancel');
 const btnOk = fullSetting.querySelector('.btn-ok');
 const inputDeadline = fullSetting.querySelector('.input-deadline');
 const foo = app.querySelector('#foo');
+const elmDrag = document.querySelector('.item-drag');
+
 
 const CONST_LS_KEY = 'TODO-LIST';
 
@@ -35,7 +37,6 @@ const CONST_TODO_STATUS = {
     COMPLETED: 2,
     CANCELED: -1,
     todo: '',
-
 }
 const colorDefault = 'var(--app-color-2)';
 //#endregion declare const
@@ -46,6 +47,8 @@ const appOOP = {
     dataTodos: [],
     arrTest: [],
     toIndex: 0,
+    clientY: 0,
+    hasChildListNote: false,
     //#endregion declare
 
     render: function () {
@@ -148,9 +151,9 @@ const appOOP = {
         item.setAttribute("draggable", "true");
         checkboxHide.setAttribute("type", "checkbox");
         item.setAttribute("data-index", id);
-        fullIcon.setAttribute('id', 'icon-full')
-        upIcon.setAttribute('class', 'icon-up-down icon-up fa-solid fa-caret-up')
-        downIcon.setAttribute('class', 'icon-up-down icon-down fa-solid fa-sort-down')
+        fullIcon.setAttribute('id', 'icon-full');
+        upIcon.setAttribute('class', 'icon-up-down icon-up fa-solid fa-caret-up');
+        downIcon.setAttribute('class', 'icon-up-down icon-down fa-solid fa-sort-down');
 
         // Assign checkbox to item
         item.appendChild(checkboxHide);
@@ -299,7 +302,7 @@ const appOOP = {
         if (hasAtr) {
             appOOP.dataTodos = appOOP.dataTodos.map((item) => {
                 if (item.id != id) {
-                    return item
+                    return item;
                 }
                 return {
                     ...item,
@@ -309,7 +312,7 @@ const appOOP = {
         } else {
             appOOP.dataTodos = appOOP.dataTodos.map((item) => {
                 if (item.id != id) {
-                    return item
+                    return item;
                 }
                 return {
                     ...item,
@@ -390,7 +393,7 @@ const appOOP = {
     }, // clickIconTick
 
     clickIconFull: function (e) {
-        const note = e.target.parentNode
+        const note = e.target.parentNode;
         const id = note.dataset.index;
 
         appOOP.dataTodos.forEach(item => {
@@ -483,18 +486,22 @@ const appOOP = {
         appOOP.handleEvents();
         appOOP.localSet();
     }, // reRender
-    clientY: 0,
-    hasChildListNote: false,
+
     getElm: function (e) {
         const item = e.target.closest('.item-note');
         const id = item.dataset.index;
         const todo = appOOP.dataTodos.find(item => {
             return item.id === id;
         });
+
+        elmDrag.classList.remove('hide');
+        elmDrag.style.top = e.clientY;
+        elmDrag.style.left = e.clientX;
+
         foo.style.display = 'block';
         appOOP.clientY = e.clientY;
         appOOP.hasChildListNote = listNote.contains(item);
-
+        item.classList.add('blur');
         return todo;
     },
 
@@ -549,27 +556,34 @@ const appOOP = {
             } else {
                 foo.style.top = (computedAddNote + foo.offsetHeight) + computedTitlePin + (indexPinTodo + 1) * (heightItem + marginBottomItem);
             }
-
         }
+
+        elmDrag.style.top = e.clientY;
+        elmDrag.style.left = e.clientX;
+        // elmDrag.style.top = e.clientY - 20;
+        // elmDrag.style.left = e.clientX - 100;
 
         return indexTodo;
     },
 
     dropElm: function (e) {
+        const item = e.target.closest('.item-note');
         const id = e.target.closest('.item-note').dataset.index;
         appOOP.dataTodos = appOOP.dataTodos.filter(item => {
             return item.id !== id;
         });
 
-        appOOP.dataTodos.splice(appOOP.toIndex, 0, appOOP.todo);
+        elmDrag.classList.add('hide');
+        item.classList.add('blur');
         foo.style.display = 'none';
         foo.style.top = -1000;
+        appOOP.dataTodos.splice(appOOP.toIndex, 0, appOOP.todo);
+
         appOOP.reRender;
     },
 
     handleEvents: function () {
         btnAddNote.onclick = () => {
-
             if (appOOP.inputValueLength() > 0) {
                 appOOP.createNote();
             }
@@ -644,7 +658,7 @@ const appOOP = {
                 if (dataCopyId == item.dataset.index) {
                     textItem.click();
                 }
-            })
+            });
 
         } // iconCopy
 
@@ -672,7 +686,7 @@ const appOOP = {
 
             app.querySelectorAll('.item-note').forEach(item => {
                 if (item.dataset.index == id) {
-                    item.querySelector('.checkbox-complete').style.borderColor = inputColor.value
+                    item.querySelector('.checkbox-complete').style.borderColor = inputColor.value;
                     item.style.borderColor = inputColor.value;
                 }
             });
@@ -680,7 +694,7 @@ const appOOP = {
             headerFull.style.backgroundColor = inputColor.value;
             tabColor.classList.remove('show');
 
-            appOOP.localSet()
+            appOOP.localSet();
         } // btnOk
 
         inputDeadline.onchange = (e) => {
@@ -695,7 +709,7 @@ const appOOP = {
 
             appOOP.dataTodos = appOOP.dataTodos.map(item => {
                 if (item.id !== id) {
-                    return item
+                    return item;
                 } else {
                     return {
                         ...item,
@@ -739,10 +753,10 @@ const appOOP = {
                 appOOP.sortData();
 
             appOOP.localSet();
-        }
-        // inputDeadline
+        } // inputDeadline
 
-        fullSetting.onclick = (e) => {
+
+        fullSetting.onclick = () => {
             tabColor.classList.remove('show');
         } // fullSetting
 
@@ -752,7 +766,7 @@ const appOOP = {
 
             item.ondragenter = (e) => appOOP.toIndex = appOOP.getIndexTo(e);
 
-            item.ondragend = (e) => appOOP.dropElm(e)
+            item.ondragend = (e) => appOOP.dropElm(e);
 
         }); // forEach
 
@@ -765,7 +779,7 @@ const appOOP = {
         });
 
         app.querySelectorAll('.item-text').forEach(text => {
-            text.onclick = (e) => appOOP.clickItem(e)
+            text.onclick = (e) => appOOP.clickItem(e);
         });
 
         app.querySelectorAll('.icon-save').forEach(icon => {
@@ -777,15 +791,11 @@ const appOOP = {
         });
 
         app.querySelectorAll('.icon-up').forEach(icon => {
-            icon.onclick = (e) => {
-                appOOP.moveNote(e, 'UP');
-            }
+            icon.onclick = (e) => appOOP.moveNote(e, 'UP');
         });
 
         app.querySelectorAll('.icon-down').forEach(icon => {
-            icon.onclick = (e) => {
-                appOOP.moveNote(e, 'DOWN');
-            }
+            icon.onclick = (e) => appOOP.moveNote(e, 'DOWN');
         });
     }, // handleEvents
 
