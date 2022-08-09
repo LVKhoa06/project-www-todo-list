@@ -474,6 +474,7 @@ up-down {
     background-color: #f0f8ff;
     cursor: move;
     z-index: 999999;
+    opacity: .8;
 }
 
 #foo {

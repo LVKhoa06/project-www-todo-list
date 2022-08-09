@@ -36,13 +36,13 @@ const CONST_TODO_STATUS = {
     DOING: 1,
     COMPLETED: 2,
     CANCELED: -1,
-    todo: '',
 }
 const colorDefault = 'var(--app-color-2)';
 //#endregion declare const
 
 const appOOP = {
     //#region declare
+    todo: '',
     onEdit: false, // Flag
     dataTodos: [],
     arrTest: [],
@@ -55,8 +55,8 @@ const appOOP = {
         const htmlsTodos = this.dataTodos.map((item, index) => {
             if (item.pin == false) {
                 return `                
-                <li draggable="true" style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
-                    <up-down>
+                <li style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
+                    <up-down draggable="true">
                         <i class="icon-up-down icon-up fa-solid fa-caret-up"></i>
                         <i class="icon-up-down icon-down fa-solid fa-sort-down"></i>
                     </up-down>
@@ -74,8 +74,8 @@ const appOOP = {
         const htmlPin = this.dataTodos.map((item, index) => {
             if (item.pin == true) {
                 return `
-                <li draggable="true" style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
-                    <up-down>
+                <li style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
+                    <up-down draggable="true">
                         <i class="icon-up-down icon-up fa-solid fa-caret-up"></i>
                         <i class="icon-up-down icon-down fa-solid fa-sort-down"></i>
                     </up-down>  
