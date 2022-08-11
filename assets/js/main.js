@@ -28,7 +28,6 @@ const inputDeadline = fullSetting.querySelector('.input-deadline');
 const foo = app.querySelector('#foo');
 const elmDrag = document.querySelector('.item-drag');
 
-
 const CONST_LS_KEY = 'TODO-LIST';
 
 const CONST_TODO_STATUS = {
@@ -514,13 +513,6 @@ const appOOP = {
         appOOP.hasChildListNote = listNote.contains(item);
         item.classList.add('blur');
 
-        const computedAddNote = addNote.offsetHeight + Number(getComputedStyle(addNote).marginTop.replace('px', '')) - foo.offsetHeight;
-        const computedPin = listPin.offsetHeight + Number(getComputedStyle(listPin).marginTop.replace('px', '')) + Number(getComputedStyle(listPin).marginBottom.replace('px', ''));
-        c(computedAddNote)
-        c(computedPin)
-        foo.style.top = computedAddNote + computedPin;
-
-        c('From:', appOOP.fromIndex);
         return todo;
     }, // getElm
 
@@ -531,27 +523,47 @@ const appOOP = {
             return elm.id === id;
         });
         const indexTodo = appOOP.dataTodos.indexOf(todo);
+        const titlePin = app.querySelector('.title-pin');
 
-        Array.from(listNote.children).forEach(elm => {
+        const listNotePin = Array.from(listPin.children);
+        listNotePin.shift();
+        const listNoteUnpin = Array.from(listNote.children);
+        const listAllNote = listNotePin.concat(listNoteUnpin);
+
+        const computedAddNote = addNote.offsetHeight + Number(getComputedStyle(addNote).marginTop.replace('px', '')) - foo.offsetHeight;
+        const computedPin = listPin.offsetHeight + Number(getComputedStyle(listPin).marginTop.replace('px', '')) + Number(getComputedStyle(listPin).marginBottom.replace('px', ''));
+        const computedTitlePin = titlePin.offsetHeight + Number(getComputedStyle(titlePin).marginTop.replace('px', '')) + Number(getComputedStyle(titlePin).marginBottom.replace('px', '')) - foo.offsetHeight;
+
+        if (listPin.className === 'hide') {
+            foo.style.top = computedAddNote + 5;  // foo.offsetHeight ?
+        } else {                        
+            foo.style.top = computedAddNote + computedPin;
+        }
+
+        listAllNote.forEach(elm => {
             try {
-                const nodeIndicator = Array.from(listNote.children)[indexTodo];
-                const nodeIndicator1 = Array.from(listNote.children)[indexTodo - 1];
+                const nodeIndicatorDown = listAllNote[indexTodo];
+                const nodeIndicatorUp = listAllNote[indexTodo - 1];
 
                 if (e.clientY < appOOP.clientY) {
-                    c('?')
                     elm.classList.remove('ondrag');
                     foo.style.display = 'none';
-                    if (elm == nodeIndicator1)
-                        elm.classList.add('ondrag');
-                    else if (nodeIndicator1 == undefined) {
-                        foo.style.display = 'block'
-                    }
 
+                    if (elm == nodeIndicatorUp && indexTodo !== listPin.childElementCount - 1)
+                        elm.classList.add('ondrag');
+
+                    else if (indexTodo == listPin.childElementCount - 1)
+                        foo.style.display = 'block'
+
+                    else if (indexTodo == 0) {
+                        foo.style.display = 'block';
+                        foo.style.top = computedAddNote + computedTitlePin + foo.offsetHeight;
+                    }
                 } else {
-                    c('!')
                     elm.classList.remove('ondrag');
                     foo.style.display = 'none';
-                    if (elm == nodeIndicator)
+
+                    if (elm == nodeIndicatorDown)
                         elm.classList.add('ondrag');
                 }
             } catch { }

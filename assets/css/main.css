@@ -432,6 +432,7 @@ up-down {
     width: 23px;
     display: flex;
     justify-content: center;
+    cursor: move;
 }
 
 .icon-up-down {
@@ -441,7 +442,7 @@ up-down {
     width: 20px;
     position: absolute;
     color: var(--text-color-4);
-    cursor: pointer;
+    /* cursor: pointer; */
 }
 
 .item-note:hover .icon-up-down {
