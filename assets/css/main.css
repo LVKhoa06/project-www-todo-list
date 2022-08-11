@@ -490,3 +490,17 @@ up-down {
 .blur {
     opacity: .4;
 }
+
+.indicator-drag {
+    background-color: rgb(250, 54, 32);
+    width: 100%;
+    height: 4px;
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    display: none;
+}
+
+.item-note.ondrag .indicator-drag {
+    display: block !important;
+}

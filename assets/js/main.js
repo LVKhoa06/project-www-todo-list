@@ -45,12 +45,28 @@ const appOOP = {
     todo: '',
     onEdit: false, // Flag
     dataTodos: [],
+    _data: [], // private property // accessed via GETTER / SETTER
     arrTest: [],
     fromIndex: 0,
     toIndex: 0,
     clientY: 0,
     hasChildListNote: false,
     //#endregion declare
+
+    get data() {
+        return this._data
+    }, // getter
+    // this.data = foo;
+    set data(value) {
+        this._data = value;
+
+        // do stuff
+        // c('this.sort()');
+        // c('this.render()');
+        // c('this.handleEvents()');
+
+        // c('this.localSet()');
+    }, // setter
 
     render: function () {
         const htmlsTodos = this.dataTodos.map((item, index) => {
@@ -185,7 +201,10 @@ const appOOP = {
 
         item.ondragstart = (e) => this.todo = this.getElm(e);
         item.ondragenter = (e) => this.toIndex = this.getIndexTo(e);
-        item.ondragend = (e) => this.dropElm(e);
+        item.ondragend = (e) => {
+            this.dropElm(e);
+            // moveItem(appOOP.dataTodos, appOOP.fromIndex, appOOP.toIndex);
+        }
 
         btn.onclick = this.deleteTodo;
         checkboxHide.onclick = (e) => this.strikethroughItem(e.target);
@@ -241,6 +260,7 @@ const appOOP = {
         appOOP.localSet();
     }, // addTodo
 
+    // updateTodo('property', value)
     updateTodo: function (elm) {
         const ElmText = elm.parentNode.querySelector('.item-text')
         const newText = ElmText.textContent;
@@ -264,6 +284,9 @@ const appOOP = {
                     text: newText
                 } // return
         }) // map
+
+        appOOP.data = [...appOOP.dataTodos]; // test setter
+
         appOOP.reRender;
     }, // updateTodo
 
@@ -417,7 +440,7 @@ const appOOP = {
 
     }, // clickIconFull
 
-    sortData: function () {
+    sortDataDeadline: function () {
         let time = getTimeToday();
 
         time = [
@@ -487,31 +510,57 @@ const appOOP = {
 
         appOOP.fromIndex = appOOP.dataTodos.indexOf(todo);
         elmDrag.classList.remove('hide');
-        // foo.style.display = 'block';
         appOOP.clientY = e.clientY;
         appOOP.hasChildListNote = listNote.contains(item);
         item.classList.add('blur');
 
-        // c('From:', appOOP.fromIndex)
+        const computedAddNote = addNote.offsetHeight + Number(getComputedStyle(addNote).marginTop.replace('px', '')) - foo.offsetHeight;
+        const computedPin = listPin.offsetHeight + Number(getComputedStyle(listPin).marginTop.replace('px', '')) + Number(getComputedStyle(listPin).marginBottom.replace('px', ''));
+        c(computedAddNote)
+        c(computedPin)
+        foo.style.top = computedAddNote + computedPin;
+
+        c('From:', appOOP.fromIndex);
         return todo;
     }, // getElm
 
     getIndexTo: function (e) {
-        const arrTodo = appOOP.dataTodos.filter(elm => {
-            return elm.pin == false;
-        });
         const item = e.target.closest('.item-note');
         const id = item.dataset.index;
-
-        const todoListNote = arrTodo.find(item => {
-            return item.id === id;
+        const todo = appOOP.dataTodos.find(elm => {
+            return elm.id === id;
         });
-        const indexTodo = arrTodo.indexOf(todoListNote);
+        const indexTodo = appOOP.dataTodos.indexOf(todo);
+
+        Array.from(listNote.children).forEach(elm => {
+            try {
+                const nodeIndicator = Array.from(listNote.children)[indexTodo];
+                const nodeIndicator1 = Array.from(listNote.children)[indexTodo - 1];
+
+                if (e.clientY < appOOP.clientY) {
+                    c('?')
+                    elm.classList.remove('ondrag');
+                    foo.style.display = 'none';
+                    if (elm == nodeIndicator1)
+                        elm.classList.add('ondrag');
+                    else if (nodeIndicator1 == undefined) {
+                        foo.style.display = 'block'
+                    }
+
+                } else {
+                    c('!')
+                    elm.classList.remove('ondrag');
+                    foo.style.display = 'none';
+                    if (elm == nodeIndicator)
+                        elm.classList.add('ondrag');
+                }
+            } catch { }
+
+        }); // forEach
 
         elmDrag.style.top = e.clientY;
         elmDrag.style.left = e.clientX;
 
-        // c('To:', appOOP.toIndex)
         return indexTodo;
     }, // getIndexTo
 
@@ -524,8 +573,25 @@ const appOOP = {
 
         moveItem(appOOP.dataTodos, appOOP.fromIndex, appOOP.toIndex);
 
+        c('From:', appOOP.fromIndex, '  To:', appOOP.toIndex);
+
+        appOOP.sortData();
         appOOP.reRender;
     }, // dropElm
+
+    sortData: function () {
+
+        const arrPin = appOOP.dataTodos.filter(elm => {
+            return elm.pin == true;
+        });
+
+        const arrUnpin = appOOP.dataTodos.filter(elm => {
+            return elm.pin == false;
+        });
+
+        appOOP.dataTodos = arrPin.concat(arrUnpin);
+
+    }, // sort
 
     handleEvents: function () {
         btnAddNote.onclick = () => {
@@ -561,51 +627,47 @@ const appOOP = {
 
         iconPin.onclick = (e) => {
             const id = e.target.closest('advanced-edit').querySelector('.item-note').dataset.index;
-            const pinElm = appOOP.dataTodos.find(item => item.id === id);
 
             iconPin.classList.toggle('pin-item');
 
-            appOOP.dataTodos = appOOP.dataTodos.filter(item => item.id !== id);
-            appOOP.dataTodos.push(pinElm);
+            appOOP.dataTodos = appOOP.dataTodos.map(todo => {
+                if (todo.id !== id)
+                    return todo;
+                return {
+                    ...todo,
+                    pin: !todo.pin
+                }
+            }) // map
+            appOOP.sortDataDeadline();
+            appOOP.sortData();
+            appOOP.reRender;
+        }, // iconPin
 
-            appOOP.dataTodos.forEach(item => {
-                if (item.id == id) {
-                    if (item.pin == true) {
-                        pinElm.pin = false;
-                    } else {
-                        pinElm.pin = true;
+            iconCopy.onclick = (e) => {
+                const id = e.target.closest('advanced-edit').querySelector('.item-note').dataset.index;
+
+                let dataCopy = appOOP.dataTodos.find(item => item.id === id);
+
+                dataCopy = {
+                    ...dataCopy,
+                    id: `${Date.now()}`,
+                    date: getTime()
+                }
+                appOOP.dataTodos.push(dataCopy);
+
+                const dataCopyId = dataCopy.id;
+
+                fullSetting.classList.add('hide');
+                appOOP.reRender;
+                Array.from(listNote.children).forEach((item) => {
+                    const textItem = item.querySelector('.item-text');
+
+                    if (dataCopyId == item.dataset.index) {
+                        textItem.click();
                     }
-                }
-            }) // forEach
-
-            appOOP.reRender;
-        } // iconPin
-
-        iconCopy.onclick = (e) => {
-            const id = e.target.closest('advanced-edit').querySelector('.item-note').dataset.index;
-
-            let dataCopy = appOOP.dataTodos.find(item => item.id === id);
-
-            dataCopy = {
-                ...dataCopy,
-                id: `${Date.now()}`,
-                date: getTime()
-            }
-            appOOP.dataTodos.push(dataCopy);
-
-            const dataCopyId = dataCopy.id;
-
-            fullSetting.classList.add('hide');
-            appOOP.reRender;
-            Array.from(listNote.children).forEach((item) => {
-                const textItem = item.querySelector('.item-text');
-
-                if (dataCopyId == item.dataset.index) {
-                    textItem.click();
-                }
-            });
-
-        } // iconCopy
+                });
+                appOOP.sortData();
+            } // iconCopy
 
         inputColor.onclick = (e) => {
             e.stopPropagation();
@@ -684,7 +746,7 @@ const appOOP = {
                     }
                 }); // forEach
 
-                textItem.style.color = 'var(--text-color-1)';
+                textItem.style.color = 'var(--text-color-1)'; // popup
 
                 Array.from(listNote.children).forEach(item => {
                     if (item.dataset.index == id) {
@@ -694,9 +756,11 @@ const appOOP = {
             } // else
 
             inputDeadline.value = arrDeadline.reverse().toString().replace(/,/g, '-');
-            if (totalDays < 0)
-                appOOP.sortData();
 
+            if (totalDays < 0)
+                appOOP.sortDataDeadline();
+
+            appOOP.sortData();
             appOOP.localSet();
         } // inputDeadline
 
@@ -711,7 +775,12 @@ const appOOP = {
 
             item.ondragenter = (e) => appOOP.toIndex = appOOP.getIndexTo(e);
 
-            item.ondragend = (e) => appOOP.dropElm(e);
+            // item.ondragleave = (e) => appOOP.toIndex = appOOP.dragLeave(e);
+
+            item.ondragend = (e) => {
+                appOOP.dropElm(e)
+                // moveItem(appOOP.dataTodos, appOOP.fromIndex, appOOP.toIndex);
+            };
 
         }); // forEach
 
