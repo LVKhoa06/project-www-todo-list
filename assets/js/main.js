@@ -1,7 +1,5 @@
 // todo đi theo drag drop
 
-// func move note + drag drop 
-
 const c = console.log;
 //#region declare const 
 const app = document.querySelector('app');
@@ -502,10 +500,26 @@ const appOOP = {
 
     getElm: function (e) {
         const item = e.target.closest('.item-note');
+        const text = item.querySelector('.item-text').textContent;
         const id = item.dataset.index;
         const todo = appOOP.dataTodos.find(item => {
             return item.id === id;
         });
+        const dragItem = document.querySelector('.item-drag');
+        const dragText = dragItem.querySelector('.text-drag');
+        const checkboxDrag = dragItem.querySelector('.checkbox-hide');
+
+        dragText.innerText = text; 
+        if (todo.status == 2) {
+            dragItem.classList.add('strikethrough');
+            checkboxDrag.setAttribute('checked', '');
+        }
+        else {
+            dragItem.classList.remove('strikethrough');
+            checkboxDrag.removeAttribute('checked');
+        }
+
+
 
         appOOP.fromIndex = appOOP.dataTodos.indexOf(todo);
         elmDrag.classList.remove('hide');
@@ -536,7 +550,7 @@ const appOOP = {
 
         if (listPin.className === 'hide') {
             foo.style.top = computedAddNote + 5;  // foo.offsetHeight ?
-        } else {                        
+        } else {
             foo.style.top = computedAddNote + computedPin;
         }
 
@@ -555,7 +569,7 @@ const appOOP = {
                     else if (indexTodo == listPin.childElementCount - 1)
                         foo.style.display = 'block'
 
-                    else if (indexTodo == 0) {
+                    else if (indexTodo == 0 && listPin.className !== 'hide') {
                         foo.style.display = 'block';
                         foo.style.top = computedAddNote + computedTitlePin + foo.offsetHeight;
                     }
