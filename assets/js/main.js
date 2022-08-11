@@ -35,7 +35,7 @@ const CONST_TODO_STATUS = {
     COMPLETED: 2,
     CANCELED: -1,
 }
-const COLOR_DEFAULT = 'var(--app-color-2)';
+const COLOR_DEFAULT = 'var(--app-color-1)';
 //#endregion declare const
 
 const appOOP = {
@@ -125,7 +125,7 @@ const appOOP = {
         const arrDeadlineNumber = [Number(arrDeadline[0]), Number(arrDeadline[1]), Number(arrDeadline[2])];
 
         const htmlContent = `
-                <li class="item-note bla ${todo.status == 2 ? 'strikethrough' : ''}" data-index="${outerId}" >
+                <li class="item-note bla ${todo.status == 2 ? 'strikethrough2' : ''}" data-index="${outerId}" >
                     <input class="checkbox-hide" type="checkbox" onclick="appOOP.strikethroughItem(this)" ${todo.status == 2 ? 'checked' : ''}>
                     <span style="border-color: ${todo.color};" class="checkbox-complete"></span>
                     <span contenteditable="true" ${todo.outOfDate == true ? 'style="color:red;"' : ''} class="item-text">${todo.text}</span>
@@ -424,7 +424,7 @@ const appOOP = {
 
         appOOP.dataTodos.forEach(item => {
             if (item.id == id) {
-                headerFull.style.backgroundColor = item.color;
+                headerFull.style.background = `linear-gradient(to bottom, ${item.color},  white`;
                 if (item.pin == true) {
                     iconPin.classList.add('pin-item');
                 } else {
@@ -753,7 +753,8 @@ const appOOP = {
                 }
             });
 
-            headerFull.style.backgroundColor = inputColor.value;
+            headerFull.style.background = `linear-gradient(to bottom, ${inputColor.value}, white`;
+            //    background: linear-gradient(to bottom, rgb(86, 171, 200), white);
             tabColor.classList.remove('show');
 
             appOOP.localSet();
@@ -801,11 +802,11 @@ const appOOP = {
                     }
                 }); // forEach
 
-                textItem.style.color = 'var(--text-color-1)'; // popup
+                textItem.style.color = 'var(--color-white-1)'; 
 
                 Array.from(listNote.children).forEach(item => {
                     if (item.dataset.index == id) {
-                        item.querySelector('.item-text').style.color = 'var(--text-color-1)';
+                        item.querySelector('.item-text').style.color = 'var(--color-white-1)';
                     }
                 }); // Array.from
             } // else
