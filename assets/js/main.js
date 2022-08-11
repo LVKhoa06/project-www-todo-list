@@ -1,4 +1,5 @@
-// todo đi theo drag drop
+// e.targetTouches[0].pageX
+
 
 const c = console.log;
 //#region declare const 
@@ -46,7 +47,7 @@ const appOOP = {
     arrTest: [],
     fromIndex: 0,
     toIndex: 0,
-    clientY: 0,
+    mouseDownPageY: 0,
     hasChildListNote: false,
     //#endregion declare
 
@@ -69,7 +70,7 @@ const appOOP = {
         const htmlsTodos = this.dataTodos.map((item, index) => {
             if (item.pin == false) {
                 return `                
-                <li style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
+                <li draggable="false" style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
                     <up-down draggable="true">
                         <i class="icon-up-down icon-up fa-solid fa-caret-up"></i>
                         <i class="icon-up-down icon-down fa-solid fa-sort-down"></i>
@@ -89,7 +90,7 @@ const appOOP = {
         const htmlPin = this.dataTodos.map((item, index) => {
             if (item.pin == true) {
                 return `
-                <li style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
+                <li draggable="false" style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
                     <up-down draggable="true">
                         <i class="icon-up-down icon-up fa-solid fa-caret-up"></i>
                         <i class="icon-up-down icon-down fa-solid fa-sort-down"></i>
@@ -195,13 +196,14 @@ const appOOP = {
 
         // After creating item then delete input value
         inputNote.value = "";
+        // item.ontouchstart = (e) => this.todo = this.getElm(e);
+        // item.ontouchmove = (e) => this.toIndex = this.getIndexTo(e);
+        // item.ontouchend = (e) => this.dropElm(e);
 
         item.ondragstart = (e) => this.todo = this.getElm(e);
         item.ondragenter = (e) => this.toIndex = this.getIndexTo(e);
-        item.ondragend = (e) => {
-            this.dropElm(e);
-            // moveItem(appOOP.dataTodos, appOOP.fromIndex, appOOP.toIndex);
-        }
+        item.ondragend = (e) => this.dropElm(e);
+
 
         btn.onclick = this.deleteTodo;
         checkboxHide.onclick = (e) => this.strikethroughItem(e.target);
@@ -509,7 +511,7 @@ const appOOP = {
         const dragText = dragItem.querySelector('.text-drag');
         const checkboxDrag = dragItem.querySelector('.checkbox-hide');
 
-        dragText.innerText = text; 
+        dragText.innerText = text;
         if (todo.status == 2) {
             dragItem.classList.add('strikethrough');
             checkboxDrag.setAttribute('checked', '');
@@ -519,11 +521,9 @@ const appOOP = {
             checkboxDrag.removeAttribute('checked');
         }
 
-
-
         appOOP.fromIndex = appOOP.dataTodos.indexOf(todo);
         elmDrag.classList.remove('hide');
-        appOOP.clientY = e.clientY;
+        appOOP.mouseDownPageY = e.pageY;
         appOOP.hasChildListNote = listNote.contains(item);
         item.classList.add('blur');
 
@@ -559,7 +559,7 @@ const appOOP = {
                 const nodeIndicatorDown = listAllNote[indexTodo];
                 const nodeIndicatorUp = listAllNote[indexTodo - 1];
 
-                if (e.clientY < appOOP.clientY) {
+                if (e.pageY < appOOP.mouseDownPageY) {
                     elm.classList.remove('ondrag');
                     foo.style.display = 'none';
 
@@ -584,14 +584,17 @@ const appOOP = {
 
         }); // forEach
 
-        elmDrag.style.top = e.clientY;
-        elmDrag.style.left = e.clientX;
+        elmDrag.style.top = e.pageY;
+        elmDrag.style.left = e.pageX;
 
+
+        // c(indexTodo)
         return indexTodo;
     }, // getIndexTo
 
     dropElm: function (e) {
         const item = e.target.closest('.item-note');
+        const id = item.dataset.index;
 
         elmDrag.classList.add('hide');
         item.classList.add('blur');
@@ -599,7 +602,33 @@ const appOOP = {
 
         moveItem(appOOP.dataTodos, appOOP.fromIndex, appOOP.toIndex);
 
-        c('From:', appOOP.fromIndex, '  To:', appOOP.toIndex);
+        // c('From:', appOOP.fromIndex, '  To:', appOOP.toIndex);
+
+        if (appOOP.toIndex <= listPin.childElementCount - 1) {
+            appOOP.dataTodos = appOOP.dataTodos.map(elm => {
+                if (elm.id !== id)
+                    return elm;
+
+                return {
+                    ...elm,
+                    pin: true
+
+                }
+            }) // map
+        }
+
+        if (appOOP.toIndex >= listPin.childElementCount - 1) {
+            appOOP.dataTodos = appOOP.dataTodos.map(elm => {
+                if (elm.id !== id)
+                    return elm;
+
+                return {
+                    ...elm,
+                    pin: false
+
+                }
+            }) // map
+        }
 
         appOOP.sortData();
         appOOP.reRender;
@@ -801,12 +830,15 @@ const appOOP = {
 
             item.ondragenter = (e) => appOOP.toIndex = appOOP.getIndexTo(e);
 
-            // item.ondragleave = (e) => appOOP.toIndex = appOOP.dragLeave(e);
+            item.ondragend = (e) => appOOP.dropElm(e);
 
-            item.ondragend = (e) => {
-                appOOP.dropElm(e)
-                // moveItem(appOOP.dataTodos, appOOP.fromIndex, appOOP.toIndex);
-            };
+            // item.ontouchstart = (e) => appOOP.todo = appOOP.getElm(e);
+
+            // item.ontouchmove = (e) => appOOP.toIndex = appOOP.getIndexTo(e);
+
+            // item.ontouchend = (e) => appOOP.dropElm(e)
+
+
 
         }); // forEach
 
