@@ -82,6 +82,7 @@ app {
     border-radius: 10px;
     border: 1.6px var(--app-color-2) solid;
     min-width: 500px;
+    max-width: 500px;
 }
 
 add-note {
