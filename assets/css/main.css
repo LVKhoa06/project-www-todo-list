@@ -34,6 +34,7 @@
     }
 }
 
+
 * {
     padding: 0;
     margin: 0;
@@ -103,7 +104,6 @@ add-note {
     border-radius: 10px;
     padding-left: 12px;
     font-size: 16px;
-    margin-right: 8px;
     color: var(--color-white-1);
     background: rgba(0, 0, 0, 0);
 }
@@ -115,7 +115,7 @@ add-note {
 
 .btn-add {
     height: 40px;
-    right: 33px;
+    right: 26px;
     position: absolute;
     width: 60px;
     border: 1.4px solid linear-gradient(to right, var(--app-color-1), var(--app-color-2));

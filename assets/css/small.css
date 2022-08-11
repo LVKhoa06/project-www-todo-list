@@ -1,0 +1,60 @@
+app {
+    width: 100%;
+    min-width: 350px;
+}
+
+.btn-delete {
+    opacity: 1;
+}
+
+.icon-up-down {
+    display: none !important;
+}
+
+.btn-add {
+    height: 50px;
+    right: 22px;
+}
+
+.input-note {
+    height: 50px;
+}
+
+.item-note {
+    height: 45px;
+    width: 90%;
+}
+
+.item-note {
+    margin-bottom: 10px;
+}
+
+list-pin {
+    margin: 10px 0 10px 30px;
+    width: 92%;
+    border: none;
+}
+
+list-pin::after {
+    content: '------ End ------';
+    font-size: 18px;
+    color: var(--color-white-1);
+    font-weight: 800;
+    display: flex;
+    justify-content: center;
+    margin-right: 36px;
+}
+
+.title-pin {
+    margin-right: 30px;
+}
+
+list-note {
+    margin: 10px 0 10px 30px;
+    width: 92%;
+}
+
+.bla {
+    width: 100%;
+    margin: 0;
+}
