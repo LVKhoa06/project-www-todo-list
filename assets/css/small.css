@@ -8,7 +8,8 @@ app {
 }
 
 .icon-up-down {
-    display: none !important;
+    /* display: none !important; */
+    opacity: 1;
 }
 
 .btn-add {
@@ -21,11 +22,8 @@ app {
 }
 
 .item-note {
-    height: 45px;
+    min-height: 45px;
     width: 90%;
-}
-
-.item-note {
     margin-bottom: 10px;
 }
 

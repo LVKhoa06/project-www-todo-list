@@ -196,14 +196,16 @@ const appOOP = {
 
         // After creating item then delete input value
         inputNote.value = "";
-        // item.ontouchstart = (e) => this.todo = this.getElm(e);
-        // item.ontouchmove = (e) => this.toIndex = this.getIndexTo(e);
-        // item.ontouchend = (e) => this.dropElm(e);
+        item.ontouchstart = (e) => this.todo = this.getElm(e);
+        item.ontouchmove = (e) => this.toIndex = this.getIndexTo(e);
+        item.ontouchend = (e) => this.dropElm(e);
 
-        item.ondragstart = (e) => this.todo = this.getElm(e);
-        item.ondragenter = (e) => this.toIndex = this.getIndexTo(e);
-        item.ondragend = (e) => this.dropElm(e);
-
+        upDown.ondragstart = (e) => this.todo = this.getElm(e);
+        upDown.ondragenter = (e) => {
+            e.preventDefault();
+            this.toIndex = this.getIndexToMb(e);
+        }
+        upDown.ondragend = (e) => this.dropElm(e);
 
         btn.onclick = this.deleteTodo;
         checkboxHide.onclick = (e) => this.strikethroughItem(e.target);
@@ -510,6 +512,14 @@ const appOOP = {
         const dragItem = document.querySelector('.item-drag');
         const dragText = dragItem.querySelector('.text-drag');
         const checkboxDrag = dragItem.querySelector('.checkbox-hide');
+        const checkboxShowDrag = dragItem.querySelector('.checkbox-complete');
+
+        app.querySelectorAll('.item-note').forEach(item => {
+            if (item.dataset.index == id) {
+                dragItem.style.borderColor = todo.color;
+                checkboxShowDrag.style.borderColor = todo.color;
+            }
+        });
 
         dragText.innerText = text;
         if (todo.status == 2) {
@@ -519,11 +529,10 @@ const appOOP = {
         else {
             dragItem.classList.remove('strikethrough');
             checkboxDrag.removeAttribute('checked');
-        }
-
+        }   
         appOOP.fromIndex = appOOP.dataTodos.indexOf(todo);
         elmDrag.classList.remove('hide');
-        appOOP.mouseDownPageY = e.pageY;
+        appOOP.mouseDownPageY = e.pageY || e.targetTouches[0].pageY;
         appOOP.hasChildListNote = listNote.contains(item);
         item.classList.add('blur');
 
@@ -531,11 +540,13 @@ const appOOP = {
     }, // getElm
 
     getIndexTo: function (e) {
+
         const item = e.target.closest('.item-note');
         const id = item.dataset.index;
         const todo = appOOP.dataTodos.find(elm => {
             return elm.id === id;
         });
+
         const indexTodo = appOOP.dataTodos.indexOf(todo);
         const titlePin = app.querySelector('.title-pin');
 
@@ -543,22 +554,20 @@ const appOOP = {
         listNotePin.shift();
         const listNoteUnpin = Array.from(listNote.children);
         const listAllNote = listNotePin.concat(listNoteUnpin);
-
         const computedAddNote = addNote.offsetHeight + Number(getComputedStyle(addNote).marginTop.replace('px', '')) - foo.offsetHeight;
         const computedPin = listPin.offsetHeight + Number(getComputedStyle(listPin).marginTop.replace('px', '')) + Number(getComputedStyle(listPin).marginBottom.replace('px', ''));
         const computedTitlePin = titlePin.offsetHeight + Number(getComputedStyle(titlePin).marginTop.replace('px', '')) + Number(getComputedStyle(titlePin).marginBottom.replace('px', '')) - foo.offsetHeight;
+
 
         if (listPin.className === 'hide') {
             foo.style.top = computedAddNote + 5;  // foo.offsetHeight ?
         } else {
             foo.style.top = computedAddNote + computedPin;
         }
-
         listAllNote.forEach(elm => {
             try {
                 const nodeIndicatorDown = listAllNote[indexTodo];
                 const nodeIndicatorUp = listAllNote[indexTodo - 1];
-
                 if (e.pageY < appOOP.mouseDownPageY) {
                     elm.classList.remove('ondrag');
                     foo.style.display = 'none';
@@ -587,10 +596,72 @@ const appOOP = {
         elmDrag.style.top = e.pageY;
         elmDrag.style.left = e.pageX;
 
-
-        // c(indexTodo)
         return indexTodo;
     }, // getIndexTo
+
+    getIndexToMb: function (e) {
+        const item = document.elementFromPoint(e.targetTouches[0].pageX, e.targetTouches[0].pageY).closest('.item-note');
+        const id = item.dataset.index;
+
+        const todo = appOOP.dataTodos.find(elm => {
+            return elm.id === id;
+        });
+
+        const indexTodo = appOOP.dataTodos.indexOf(todo);
+        const titlePin = app.querySelector('.title-pin');
+
+        const listNotePin = Array.from(listPin.children);
+        listNotePin.shift();
+        const listNoteUnpin = Array.from(listNote.children);
+        const listAllNote = listNotePin.concat(listNoteUnpin);
+        const computedAddNote = addNote.offsetHeight + Number(getComputedStyle(addNote).marginTop.replace('px', '')) - foo.offsetHeight;
+        const computedPin = listPin.offsetHeight + Number(getComputedStyle(listPin).marginTop.replace('px', '')) + Number(getComputedStyle(listPin).marginBottom.replace('px', ''));
+        const computedTitlePin = titlePin.offsetHeight + Number(getComputedStyle(titlePin).marginTop.replace('px', '')) + Number(getComputedStyle(titlePin).marginBottom.replace('px', '')) - foo.offsetHeight;
+
+
+        if (listPin.className === 'hide') {
+            foo.style.top = computedAddNote + 5;  // foo.offsetHeight ?
+        } else {
+            foo.style.top = computedAddNote + computedPin;
+        }
+        listAllNote.forEach(elm => {
+            try {
+                const nodeIndicatorDown = listAllNote[indexTodo];
+                const nodeIndicatorUp = listAllNote[indexTodo - 1];
+                if (e.targetTouches[0].pageY < appOOP.mouseDownPageY) {
+                    elm.classList.remove('ondrag');
+                    foo.style.display = 'none';
+
+                    if (elm == nodeIndicatorUp && indexTodo !== listPin.childElementCount - 1)
+                        elm.classList.add('ondrag');
+
+                    else if (indexTodo == listPin.childElementCount - 1)
+                        foo.style.display = 'block'
+
+                    else if (indexTodo == 0 && listPin.className !== 'hide') {
+                        foo.style.display = 'block';
+                        foo.style.top = computedAddNote + computedTitlePin + foo.offsetHeight;
+                    }
+                } else {
+                    elm.classList.remove('ondrag');
+                    foo.style.display = 'none';
+
+                    if (elm == nodeIndicatorDown)
+                        elm.classList.add('ondrag');
+                }
+            } catch { }
+
+        }); // forEach
+
+        elmDrag.style.top = e.targetTouches[0].pageY;
+        elmDrag.style.left = e.targetTouches[0].pageX;
+
+        // c(indexTodo);
+
+        return indexTodo;
+    }, // getIndexTo
+
+
 
     dropElm: function (e) {
         const item = e.target.closest('.item-note');
@@ -600,11 +671,10 @@ const appOOP = {
         item.classList.add('blur');
         foo.style.display = 'none';
 
-        moveItem(appOOP.dataTodos, appOOP.fromIndex, appOOP.toIndex);
 
-        // c('From:', appOOP.fromIndex, '  To:', appOOP.toIndex);
+        c('From:', appOOP.fromIndex, '  To:', appOOP.toIndex);
 
-        if (appOOP.toIndex <= listPin.childElementCount - 1) {
+        if (appOOP.toIndex < listPin.childElementCount - 1) {
             appOOP.dataTodos = appOOP.dataTodos.map(elm => {
                 if (elm.id !== id)
                     return elm;
@@ -612,12 +682,9 @@ const appOOP = {
                 return {
                     ...elm,
                     pin: true
-
                 }
             }) // map
-        }
-
-        if (appOOP.toIndex >= listPin.childElementCount - 1) {
+        } else {
             appOOP.dataTodos = appOOP.dataTodos.map(elm => {
                 if (elm.id !== id)
                     return elm;
@@ -625,10 +692,10 @@ const appOOP = {
                 return {
                     ...elm,
                     pin: false
-
                 }
             }) // map
         }
+        moveItem(appOOP.dataTodos, appOOP.fromIndex, appOOP.toIndex);
 
         appOOP.sortData();
         appOOP.reRender;
@@ -802,7 +869,7 @@ const appOOP = {
                     }
                 }); // forEach
 
-                textItem.style.color = 'var(--color-white-1)'; 
+                textItem.style.color = 'var(--color-white-1)';
 
                 Array.from(listNote.children).forEach(item => {
                     if (item.dataset.index == id) {
@@ -826,22 +893,21 @@ const appOOP = {
         } // fullSetting
 
         app.querySelectorAll('.item-note').forEach(item => {
-
             item.ondragstart = (e) => appOOP.todo = appOOP.getElm(e);
-
             item.ondragenter = (e) => appOOP.toIndex = appOOP.getIndexTo(e);
-
             item.ondragend = (e) => appOOP.dropElm(e);
-
-            // item.ontouchstart = (e) => appOOP.todo = appOOP.getElm(e);
-
-            // item.ontouchmove = (e) => appOOP.toIndex = appOOP.getIndexTo(e);
-
-            // item.ontouchend = (e) => appOOP.dropElm(e)
-
-
-
         }); // forEach
+
+        app.querySelectorAll('up-down').forEach(item => {
+            item.ontouchstart = (e) => {
+                appOOP.todo = appOOP.getElm(e)
+            };
+            item.ontouchmove = (e) => {
+                e.preventDefault();
+                appOOP.toIndex = appOOP.getIndexToMb(e);
+            }
+            item.ontouchend = (e) => appOOP.dropElm(e);
+        });
 
         app.querySelectorAll('.btn-delete').forEach(btn => {
             btn.onclick = (e) => appOOP.deleteTodo(e);

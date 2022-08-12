@@ -1,11 +1,3 @@
-// mobile / responsive / drag drop
-// pin / unpin
-// style lung linh
-const monthM31 = [1, 3, 5, 7, 8, 10, 12];
-const monthSpecial = 2;
-let years;
-let months;
-let days;
 
 // formatDate('YYYY-MM-dd')
 // formatDate('dd/MM/YY') // 04/08/2022
@@ -101,6 +93,12 @@ function getDayName() {
 } // getDayName
 
 function getDeadline(arrTime) {
+    const monthM31 = [1, 3, 5, 7, 8, 10, 12];
+    const monthSpecial = 2;
+    let years;
+    let months;
+    let days;
+
     //#region count year, month, day.
     years = (arrTime[2] - getTimeToday()[2]);
 
@@ -171,15 +169,15 @@ function getDeadline(arrTime) {
     const text =
         totalDays == -1 ?
             'Yesterday' :
-        totalDays == 0 ?
-            '' :
-        totalDays == 1 ?
-            'Tomorrow' :
-        totalDays <= 6 ?
-            `${totalDay(dayStrings)} day` :
-        totalDays == 7 ?
-            `Next ${getDayName()}` :
-            `${years <= 0 ? '' : `${years} year`} ${months <= 0 ? '' : `${months} month`} ${days <= 0 ? '' : `${days} day`}`
+            totalDays == 0 ?
+                '' :
+                totalDays == 1 ?
+                    'Tomorrow' :
+                    totalDays <= 6 ?
+                        `${totalDay(dayStrings)} day` :
+                        totalDays == 7 ?
+                            `Next ${getDayName()}` :
+                            `${years <= 0 ? '' : `${years} year`} ${months <= 0 ? '' : `${months} month`} ${days <= 0 ? '' : `${days} day`}`
 
     return {
         totalDays,
