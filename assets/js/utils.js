@@ -195,3 +195,9 @@ function moveItem(arr, fromIndex, toIndex) {
 
     return arr;
 }
+
+function getIndexItem(arr, item) {
+    let index = arr.indexOf(item);
+ 
+    return index;
+}
