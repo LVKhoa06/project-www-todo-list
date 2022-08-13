@@ -58,11 +58,11 @@ const appOOP = {
         this._data = value;
 
         // do stuff
-        // c('this.sort()');
-        // c('this.render()');
-        // c('this.handleEvents()');
+        this.sortData();
+        this.render();
+        this.handleEvents();
 
-        // c('this.localSet()');
+        this.localSet();
     }, // setter
 
     render: function () {
@@ -198,35 +198,13 @@ const appOOP = {
         item.ontouchstart = (e) => this.todo = this.getElm(e);
         item.ontouchmove = (e) => {
             e.preventDefault();
-
-            const item = document.elementFromPoint(e.targetTouches[0].pageX, e.targetTouches[0].pageY).closest('.item-note');
-            const id = item.dataset.index;
-            const todo = this.dataTodos.find(elm => {
-                return elm.id === id;
-            });
-
-            const indexTodo = this.dataTodos.indexOf(todo);;
-            this.indicatorDrag(e, indexTodo, 'MOBILE');
-            this.toIndex = getIndexItem(this.dataTodos, todo);
+            this.useIndicator(e, 'MOBILE');
         }
 
         item.ontouchend = (e) => this.dropElm(e);
 
         upDown.ondragstart = (e) => this.todo = this.getElm(e);
-        upDown.ondragenter = (e) => {
-
-            const item = e.target.closest('.item-note');
-            const id = item.dataset.index;
-            const todo = this.dataTodos.find(elm => {
-                return elm.id === id;
-            });
-
-            const indexTodo = this.dataTodos.indexOf(todo);
-
-            this.indicatorDrag(e, indexTodo, 'PC');
-
-            this.toIndex = getIndexItem(this.dataTodos, todo);
-        }
+        upDown.ondragenter = (e) => this.useIndicator(e, 'PC');
         upDown.ondragend = (e) => this.dropElm(e);
 
         btn.onclick = this.deleteTodo;
@@ -309,8 +287,6 @@ const appOOP = {
         }) // map
 
         appOOP.data = [...appOOP.dataTodos]; // test setter
-
-        appOOP.reRender;
     }, // updateTodo
 
     deleteTodo: function (e) {
@@ -463,48 +439,6 @@ const appOOP = {
 
     }, // clickIconFull
 
-    sortDataDeadline: function () {
-        let time = getTimeToday();
-
-        time = [
-            editTime(time[0]),
-            editTime(time[1]),
-            time[2]
-        ];
-
-        const todayTxt = time.reverse().toString().replace(/,/g, '-');
-
-        // primative: int, string <> object
-        // helping func.
-        function compareDate(a, b) {
-            const deadlineProcessedA = a.deadline.split('-').reverse().join('-');
-            const deadlineProcessedB = b.deadline.split('-').reverse().join('-');
-
-            return (
-                deadlineProcessedA < deadlineProcessedB ?
-                    -1 :
-                    deadlineProcessedA > deadlineProcessedB ?
-                        1 :
-                        0
-            )
-        } // compare
-
-        let expiredTodos = [], notExpiredTodos = [];
-
-        appOOP.dataTodos.forEach(item => {
-            const deadlineProcessed = item.deadline.split('-').reverse();
-
-            if (item.deadline == '' || deadlineProcessed.join('-') >= todayTxt) notExpiredTodos.push(item);
-            else expiredTodos.push(item);
-        }); // forEach
-
-        const expiredTodosSorted = expiredTodos.sort(compareDate);
-
-        appOOP.dataTodos = [...expiredTodosSorted, ...notExpiredTodos];
-
-        appOOP.reRender;
-    }, // sortData
-
     useMoveNote: function (e, direction) { // UP || DOWN
         const item = e.target.closest('.item-note');
         const id = item.dataset.index;
@@ -515,7 +449,8 @@ const appOOP = {
         const toIndex = direction === 'UP' ? appOOP.fromIndex - 1 : appOOP.fromIndex + 1;
 
         moveItem(appOOP.dataTodos, appOOP.fromIndex, toIndex);
-        appOOP.reRender;
+
+        appOOP.data = [...appOOP.dataTodos];
     }, // useMoveNote
 
     get reRender() {
@@ -646,8 +581,7 @@ const appOOP = {
         }
         moveItem(appOOP.dataTodos, appOOP.fromIndex, appOOP.toIndex);
 
-        appOOP.sortData();
-        appOOP.reRender;
+        appOOP.data = [...appOOP.dataTodos];
     }, // dropElm
 
     sortData: function () {
@@ -663,6 +597,76 @@ const appOOP = {
         appOOP.dataTodos = arrPin.concat(arrUnpin);
 
     }, // sort
+
+    sortDataDeadline: function () {
+        let time = getTimeToday();
+
+        time = [
+            editTime(time[0]),
+            editTime(time[1]),
+            time[2]
+        ];
+
+        const todayTxt = time.reverse().toString().replace(/,/g, '-');
+
+        // primative: int, string <> object
+        // helping func.
+        function compareDate(a, b) {
+            const deadlineProcessedA = a.deadline.split('-').reverse().join('-');
+            const deadlineProcessedB = b.deadline.split('-').reverse().join('-');
+
+            return (
+                deadlineProcessedA < deadlineProcessedB ?
+                    -1 :
+                    deadlineProcessedA > deadlineProcessedB ?
+                        1 :
+                        0
+            )
+        } // compare
+
+        let expiredTodos = [], notExpiredTodos = [];
+
+        appOOP.dataTodos.forEach(item => {
+            const deadlineProcessed = item.deadline.split('-').reverse();
+
+            if (item.deadline == '' || deadlineProcessed.join('-') >= todayTxt) notExpiredTodos.push(item);
+            else expiredTodos.push(item);
+        }); // forEach
+
+        const expiredTodosSorted = expiredTodos.sort(compareDate);
+
+        appOOP.dataTodos = [...expiredTodosSorted, ...notExpiredTodos];
+
+        appOOP.data = [...appOOP.dataTodos];
+    }, // sortData
+
+    useIndicator: function (e, device) {
+        // PC
+        if (device === 'PC') {
+            const itemPc = e.target.closest('.item-note');
+            const idPc = itemPc.dataset.index;
+            const todoPc = appOOP.dataTodos.find(elm => {
+                return elm.id === idPc;
+            });
+
+            const indexTodoPc = appOOP.dataTodos.indexOf(todoPc);
+
+            appOOP.indicatorDrag(e, indexTodoPc, 'PC');
+
+            appOOP.toIndex = getIndexItem(appOOP.dataTodos, todoPc);
+        } else {
+            // Mobile
+            const itemMb = document.elementFromPoint(e.targetTouches[0].pageX, e.targetTouches[0].pageY).closest('.item-note');
+            const idMb = itemMb.dataset.index;
+            const todoMb = appOOP.dataTodos.find(elm => {
+                return elm.id === idMb;
+            });
+
+            const indexTodoMb = appOOP.dataTodos.indexOf(todoMb);;
+            appOOP.indicatorDrag(e, indexTodoMb, 'MOBILE');
+            appOOP.toIndex = getIndexItem(appOOP.dataTodos, todoMb);
+        }
+    },
 
     handleEvents: function () {
         btnAddNote.onclick = () => {
@@ -710,8 +714,8 @@ const appOOP = {
                 }
             }) // map
             appOOP.sortDataDeadline();
-            appOOP.sortData();
-            appOOP.reRender;
+
+            appOOP.data = [...appOOP.dataTodos];
         }, // iconPin
 
             iconCopy.onclick = (e) => {
@@ -729,7 +733,8 @@ const appOOP = {
                 const dataCopyId = dataCopy.id;
 
                 fullSetting.classList.add('hide');
-                appOOP.reRender;
+
+                appOOP.data = [...appOOP.dataTodos];
                 Array.from(listNote.children).forEach((item) => {
                     const textItem = item.querySelector('.item-text');
 
@@ -842,39 +847,17 @@ const appOOP = {
 
         app.querySelectorAll('.item-note').forEach(item => {
             item.ondragstart = (e) => appOOP.todo = appOOP.getElm(e);
-            item.ondragenter = (e) => {
-
-                const item = e.target.closest('.item-note');
-                const id = item.dataset.index;
-                const todo = appOOP.dataTodos.find(elm => {
-                    return elm.id === id;
-                });
-
-                const indexTodo = appOOP.dataTodos.indexOf(todo);
-
-                appOOP.indicatorDrag(e, indexTodo, 'PC');
-
-                appOOP.toIndex = getIndexItem(appOOP.dataTodos, todo);
-            }
+            item.ondragenter = (e) => appOOP.useIndicator(e, 'PC');
             item.ondragend = (e) => appOOP.dropElm(e);
         }); // forEach
 
         app.querySelectorAll('up-down').forEach(item => {
             item.ontouchstart = (e) => {
-                appOOP.todo = appOOP.getElm(e)
+                appOOP.todo = appOOP.getElm(e);
             };
             item.ontouchmove = (e) => {
                 e.preventDefault();
-
-                const item = document.elementFromPoint(e.targetTouches[0].pageX, e.targetTouches[0].pageY).closest('.item-note');
-                const id = item.dataset.index;
-                const todo = appOOP.dataTodos.find(elm => {
-                    return elm.id === id;
-                });
-
-                const indexTodo = appOOP.dataTodos.indexOf(todo);;
-                appOOP.indicatorDrag(e, indexTodo, 'MOBILE');
-                appOOP.toIndex = getIndexItem(appOOP.dataTodos, todo);
+                appOOP.useIndicator(e, 'MOBILE')
             }
             item.ontouchend = (e) => appOOP.dropElm(e);
         });
