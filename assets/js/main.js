@@ -1,5 +1,4 @@
-// up down 
-// icon drag
+
 const c = console.log;
 //#region declare const 
 const app = document.querySelector('app');
@@ -71,7 +70,7 @@ const appOOP = {
                 return `                
                 <li  style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
                     <up-down draggable="true">
-                    ${CheckOperatingSystem() === 'Linux' || CheckOperatingSystem() === 'Android' || CheckOperatingSystem() === 'iOS' ? 
+                    ${CheckOperatingSystem() === 'Linux' || CheckOperatingSystem() === 'Android' || CheckOperatingSystem() === 'iOS' ?
                         '<i class="icon-drag fa-solid fa-grip-vertical"></i>' :
                         '<i class="icon-up-down icon-up fa-solid fa-caret-up"></i> <i class="icon-up-down icon-down fa-solid fa-sort-down"></i>'}
                     </up-down>
@@ -92,7 +91,7 @@ const appOOP = {
                 return `
                 <li      style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
                     <up-down draggable="true">
-                        ${CheckOperatingSystem() === 'Linux' || CheckOperatingSystem() === 'Android' || CheckOperatingSystem() === 'iOS' ? 
+                        ${CheckOperatingSystem() === 'Linux' || CheckOperatingSystem() === 'Android' || CheckOperatingSystem() === 'iOS' ?
                         '<i class="icon-drag fa-solid fa-grip-vertical"></i>' :
                         '<i class="icon-up-down icon-up fa-solid fa-caret-up"></i> <i class="icon-up-down icon-down fa-solid fa-sort-down"></i>'}
                     </up-down>  
@@ -145,7 +144,7 @@ const appOOP = {
 
     createNote: function () {
         const id = `${Date.now()}`;
-        let item, itemText, checkboxHide, checkboxShow, btn, icon, fullIcon, upDown, upIcon, downIcon, indicatorDrag;
+        let item, itemText, checkboxHide, checkboxShow, btn, icon, fullIcon, upDown, upIcon, downIcon, dragIcon, indicatorDrag;
 
         // Create item
         item = document.createElement("li");
@@ -157,8 +156,21 @@ const appOOP = {
         btn = document.createElement("button");
         icon = document.createElement('i');
         upDown = document.createElement('up-down');
-        upIcon = document.createElement('i');
-        downIcon = document.createElement('i');
+
+        if (CheckOperatingSystem() === 'Linux' || CheckOperatingSystem() === 'Android' || CheckOperatingSystem() === 'iOS') {
+            dragIcon = document.createElement('i');
+            dragIcon.setAttribute('class', 'icon-drag fa-solid fa-grip-vertical');
+            upDown.appendChild(dragIcon);
+        } else {
+            upIcon = document.createElement('i');
+            downIcon = document.createElement('i');
+            upIcon.setAttribute('class', 'icon-up-down icon-up fa-solid fa-caret-up');
+            downIcon.setAttribute('class', 'icon-up-down icon-down fa-solid fa-sort-down');
+            upDown.appendChild(upIcon);
+            upIcon.onclick = (e) => this.useMoveNote(e, 'UP');
+            downIcon.onclick = (e) => this.useMoveNote(e, 'DOWN'); upDown.appendChild(downIcon);
+        }
+
         // Add attribute
         item.className = 'item-note';
         indicatorDrag.className = 'indicator-drag'
@@ -172,8 +184,6 @@ const appOOP = {
         checkboxHide.setAttribute("type", "checkbox");
         item.setAttribute("data-index", id);
         fullIcon.setAttribute('id', 'icon-full');
-        upIcon.setAttribute('class', 'icon-up-down icon-up fa-solid fa-caret-up');
-        downIcon.setAttribute('class', 'icon-up-down icon-down fa-solid fa-sort-down');
 
         // Add text
         itemText.innerText = inputNote.value;
@@ -189,8 +199,6 @@ const appOOP = {
         item.appendChild(btn);
         item.appendChild(icon);
 
-        upDown.appendChild(upIcon);
-        upDown.appendChild(downIcon);
 
         // Add item to list
         listNote.appendChild(item);
@@ -215,9 +223,6 @@ const appOOP = {
         icon.onclick = this.clickIconTick;
         itemText.onclick = this.clickItem;
         fullIcon.onclick = this.clickIconFull;
-
-        upIcon.onclick = (e) => this.useMoveNote(e, 'UP');
-        downIcon.onclick = (e) => this.useMoveNote(e, 'DOWN');
 
         this.addTodo(id, itemText.innerText);
     }, // createNote
