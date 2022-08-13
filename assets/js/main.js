@@ -71,8 +71,9 @@ const appOOP = {
                 return `                
                 <li  style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
                     <up-down draggable="true">
-                        <i class="icon-up-down icon-up fa-solid fa-caret-up"></i>
-                        <i class="icon-up-down icon-down fa-solid fa-sort-down"></i>
+                    ${CheckOperatingSystem() === 'Linux' || CheckOperatingSystem() === 'Android' || CheckOperatingSystem() === 'iOS' ? 
+                        '<i class="icon-drag fa-solid fa-grip-vertical"></i>' :
+                        '<i class="icon-up-down icon-up fa-solid fa-caret-up"></i> <i class="icon-up-down icon-down fa-solid fa-sort-down"></i>'}
                     </up-down>
                     <input class="checkbox-hide" type="checkbox" ${item.status == 2 ? 'checked' : ''}>
                     <span style="border-color: ${item.color};" class="checkbox-complete"></span>
@@ -91,8 +92,9 @@ const appOOP = {
                 return `
                 <li      style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
                     <up-down draggable="true">
-                        <i class="icon-up-down icon-up fa-solid fa-caret-up"></i>
-                        <i class="icon-up-down icon-down fa-solid fa-sort-down"></i>
+                        ${CheckOperatingSystem() === 'Linux' || CheckOperatingSystem() === 'Android' || CheckOperatingSystem() === 'iOS' ? 
+                        '<i class="icon-drag fa-solid fa-grip-vertical"></i>' :
+                        '<i class="icon-up-down icon-up fa-solid fa-caret-up"></i> <i class="icon-up-down icon-down fa-solid fa-sort-down"></i>'}
                     </up-down>  
                     <input class="checkbox-hide" type="checkbox" ${item.status == 2 ? 'checked' : ''}>
                     <span style="border-color: ${item.color};" class="checkbox-complete"></span>
@@ -453,12 +455,6 @@ const appOOP = {
         appOOP.data = [...appOOP.dataTodos];
     }, // useMoveNote
 
-    get reRender() {
-        appOOP.render();
-        appOOP.handleEvents();
-        appOOP.localSet();
-    }, // reRender
-
     getElm: function (e) {
         const item = e.target.closest('.item-note');
         const text = item.querySelector('.item-text').textContent;
@@ -554,9 +550,6 @@ const appOOP = {
         elmDrag.classList.add('hide');
         item.classList.add('blur');
         foo.style.display = 'none';
-
-
-        c('From:', appOOP.fromIndex, '  To:', appOOP.toIndex);
 
         if (appOOP.toIndex < listPin.childElementCount - 1) {
             appOOP.dataTodos = appOOP.dataTodos.map(elm => {
@@ -673,6 +666,14 @@ const appOOP = {
             if (appOOP.inputValueLength() > 0) {
                 appOOP.createNote();
             }
+
+            if (CheckOperatingSystem() === 'Linux' || CheckOperatingSystem() === 'Android' || CheckOperatingSystem() === 'iOS') {
+                demo.innerText = CheckOperatingSystem()
+                app.querySelectorAll('up-down').forEach(item => {
+                    item.innerHTML = '<i class="icon-up-down fa-solid fa-grip-vertical"></i>'
+                });
+            }
+
         } // btnAddNote.onclick
 
         inputNote.onkeypress = function (e) {
@@ -902,4 +903,3 @@ const appOOP = {
 } // appOOP
 
 appOOP.start();
-
