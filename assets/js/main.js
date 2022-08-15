@@ -533,9 +533,8 @@ const appOOP = {
                         elm.classList.add('ondrag');
                 }
             } catch { }
-
-            if (appOOP.fromIndex < appOOP.listNotePin.length - 1 && index === appOOP.listNotePin.length && e.offsetY < appOOP.heightNote / 2) {
-
+            
+            if (appOOP.fromIndex < appOOP.listNotePin.length && index === appOOP.listNotePin.length && e.offsetY < appOOP.heightNote / 2) {
                 elm.classList.remove('ondrag');
                 foo2.style.display = 'block';
                 foo2.style.top = appOOP.topUnpin;
@@ -603,21 +602,24 @@ const appOOP = {
                 }
             }) // map
         }
-        let fromIndex2;
-        if (appOOP.itemMove === appOOP.listNotePin.at(-1) && appOOP.itemOffsetY > appOOP.heightNote / 2)
-            fromIndex2 = appOOP.fromIndex + 1;
-        else if (appOOP.fromIndex < appOOP.listNotePin.length - 1 && appOOP.itemOffsetY < appOOP.heightNote / 2)
-            fromIndex2 = appOOP.fromIndex - 1;
-        else fromIndex2 = appOOP.fromIndex;
-        c('df', appOOP.fromIndex)
-        c('if',fromIndex2)
-        moveItem(appOOP.dataTodos, fromIndex2, appOOP.toIndex);
+        let toIndex2;
+
+        if (appOOP.fromIndex > appOOP.listNotePin.length - 1 && appOOP.itemMove === appOOP.listNotePin.at(-1) && appOOP.itemOffsetY > appOOP.heightNote / 2)
+            toIndex2 = appOOP.fromIndex + 1;
+        else if (appOOP.fromIndex < appOOP.listNotePin.length && appOOP.itemOffsetY < appOOP.heightNote / 2)
+            toIndex2 = appOOP.toIndex - 1;
+        else toIndex2 = appOOP.toIndex;
+
+        if (toIndex2 === -1) {
+            toIndex2 = 1; // 0 ? magic
+        }
+
+        moveItem(appOOP.dataTodos, appOOP.fromIndex, toIndex2);
 
         appOOP.data = [...appOOP.dataTodos];
     }, // dropElm
 
     sortData: function () {
-
         const arrPin = appOOP.dataTodos.filter(elm => {
             return elm.pin == true;
         });
@@ -627,7 +629,6 @@ const appOOP = {
         });
 
         appOOP.dataTodos = arrPin.concat(arrUnpin);
-
     }, // sort
 
     sortDataDeadline: function () {
@@ -878,7 +879,7 @@ const appOOP = {
             appOOP.sortData();
             appOOP.localSet();
         } // inputDeadline
-        
+
         fullSetting.onclick = () => {
             tabColor.classList.remove('show');
         } // fullSetting
