@@ -442,13 +442,18 @@ deadline {
 
 up-down {
     position: absolute;
-    left: -28px;
-    height: 32px;
-    width: 23px;
-    display: flex;
+    left: -34px;
+    height: 22px;
+    width: 36px;
+    opacity: 0;
     justify-content: center;
     cursor: move;
     margin-top: 5px;
+}
+
+.item-note:hover up-down{  
+    display: flex;
+    opacity: 1;
 }
 
 .icon-up-down {

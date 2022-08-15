@@ -48,11 +48,13 @@ const appOOP = {
     toIndex: 0,
     mouseDownPageY: 0,
     hasChildListNote: false,
-    unpin: 0,
-    pin: 0,
+    topUnpin: 0,
+    topPin: 0,
     heightNote: 0,
     listNoteUnpin: [],
     listNotePin: [],
+    itemOffsetY: 0,
+    itemMove: [],
     //#endregion declare
 
     get data() {
@@ -71,14 +73,12 @@ const appOOP = {
     }, // setter
 
     render: function () {
-        const htmlsTodos = this.dataTodos.map((item, index) => {
+        const htmlsTodos = this.dataTodos.map((item) => {
             if (item.pin == false) {
                 return `                
                 <li  style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
                     <up-down draggable="true">
-                    ${CheckOperatingSystem() === 'Linux' || CheckOperatingSystem() === 'Android' || CheckOperatingSystem() === 'iOS' ?
-                        '<i class="icon-drag fa-solid fa-grip-vertical"></i>' :
-                        '<i class="icon-up-down icon-up fa-solid fa-caret-up"></i> <i class="icon-up-down icon-down fa-solid fa-sort-down"></i>'}
+                        <i class="icon-drag fa-solid fa-grip-vertical"></i>
                     </up-down>
                     <input class="checkbox-hide" type="checkbox" ${item.status == 2 ? 'checked' : ''}>
                     <span style="border-color: ${item.color};" class="checkbox-complete"></span>
@@ -92,14 +92,12 @@ const appOOP = {
             }
         }).join('');
 
-        const htmlPin = this.dataTodos.map((item, index) => {
+        const htmlPin = this.dataTodos.map((item) => {
             if (item.pin == true) {
                 return `
                 <li style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
                     <up-down draggable="true">
-                        ${CheckOperatingSystem() === 'Linux' || CheckOperatingSystem() === 'Android' || CheckOperatingSystem() === 'iOS' ?
-                        '<i class="icon-drag fa-solid fa-grip-vertical"></i>' :
-                        '<i class="icon-up-down icon-up fa-solid fa-caret-up"></i> <i class="icon-up-down icon-down fa-solid fa-sort-down"></i>'}
+                        <i class="icon-drag fa-solid fa-grip-vertical"></i>
                     </up-down>  
                     <input class="checkbox-hide" type="checkbox" ${item.status == 2 ? 'checked' : ''}>
                     <span style="border-color: ${item.color};" class="checkbox-complete"></span>
@@ -150,7 +148,7 @@ const appOOP = {
 
     createNote: function () {
         const id = `${Date.now()}`;
-        let item, itemText, checkboxHide, checkboxShow, btn, icon, fullIcon, upDown, upIcon, downIcon, dragIcon, indicatorDrag;
+        let item, itemText, checkboxHide, checkboxShow, btn, icon, fullIcon, upDown, dragIcon, indicatorDrag;
 
         // Create item
         item = document.createElement("li");
@@ -163,19 +161,9 @@ const appOOP = {
         icon = document.createElement('i');
         upDown = document.createElement('up-down');
 
-        if (CheckOperatingSystem() === 'Linux' || CheckOperatingSystem() === 'Android' || CheckOperatingSystem() === 'iOS') {
-            dragIcon = document.createElement('i');
-            dragIcon.setAttribute('class', 'icon-drag fa-solid fa-grip-vertical');
-            upDown.appendChild(dragIcon);
-        } else {
-            upIcon = document.createElement('i');
-            downIcon = document.createElement('i');
-            upIcon.setAttribute('class', 'icon-up-down icon-up fa-solid fa-caret-up');
-            downIcon.setAttribute('class', 'icon-up-down icon-down fa-solid fa-sort-down');
-            upDown.appendChild(upIcon);
-            upIcon.onclick = (e) => this.useMoveNote(e, 'UP');
-            downIcon.onclick = (e) => this.useMoveNote(e, 'DOWN'); upDown.appendChild(downIcon);
-        }
+        dragIcon = document.createElement('i');
+        dragIcon.setAttribute('class', 'icon-drag fa-solid fa-grip-vertical');
+        upDown.appendChild(dragIcon);
 
         // Add attribute
         item.className = 'item-note';
@@ -452,20 +440,6 @@ const appOOP = {
 
     }, // clickIconFull
 
-    useMoveNote: function (e, direction) { // UP || DOWN
-        const item = e.target.closest('.item-note');
-        const id = item.dataset.index;
-        const todo = appOOP.dataTodos.find(item => {
-            return item.id === id;
-        });
-        appOOP.fromIndex = appOOP.dataTodos.indexOf(todo);
-        const toIndex = direction === 'UP' ? appOOP.fromIndex - 1 : appOOP.fromIndex + 1;
-
-        moveItem(appOOP.dataTodos, appOOP.fromIndex, toIndex);
-
-        appOOP.data = [...appOOP.dataTodos];
-    }, // useMoveNote
-
     getElm: function (e) {
         const item = e.target.closest('.item-note');
         const text = item.querySelector('.item-text').textContent;
@@ -506,13 +480,12 @@ const appOOP = {
         const unpinFirstItem = Array.from(listNote.children)[0];
 
         appOOP.heightNote = item.offsetHeight;
-        appOOP.unpin = unpinFirstItem.getBoundingClientRect().y - item.offsetHeight + 5; // foo offsetHeight, item marginBottom
-        appOOP.pin = pinLastItem.getBoundingClientRect().y + 10;// foo offsetHeight
+        appOOP.topUnpin = unpinFirstItem.getBoundingClientRect().y - item.offsetHeight + 5; // foo offsetHeight, item marginBottom
+        appOOP.topPin = pinLastItem.getBoundingClientRect().y + 10;// foo offsetHeight
 
         return todo;
     }, // getElm
-    itemOffsetY: 0,
-    itemMove: [],
+
     indicatorDrag: function (e, index, device) {
         const item = e.target.closest('.item-note');
 
@@ -565,12 +538,12 @@ const appOOP = {
 
                 elm.classList.remove('ondrag');
                 foo2.style.display = 'block';
-                foo2.style.top = appOOP.unpin;
+                foo2.style.top = appOOP.topUnpin;
             }
             else if (item === appOOP.listNotePin.at(-1) && index === appOOP.listNotePin.length - 1 && e.offsetY > appOOP.heightNote / 2) {
                 elm.classList.remove('ondrag');
                 foo2.style.display = 'block';
-                foo2.style.top = appOOP.pin;
+                foo2.style.top = appOOP.topPin;
                 foo.style.display = 'none'
             } else {
                 foo2.style.display = 'none';
@@ -636,7 +609,8 @@ const appOOP = {
         else if (appOOP.fromIndex < appOOP.listNotePin.length - 1 && appOOP.itemOffsetY < appOOP.heightNote / 2)
             fromIndex2 = appOOP.fromIndex - 1;
         else fromIndex2 = appOOP.fromIndex;
-
+        c('df', appOOP.fromIndex)
+        c('if',fromIndex2)
         moveItem(appOOP.dataTodos, fromIndex2, appOOP.toIndex);
 
         appOOP.data = [...appOOP.dataTodos];
@@ -737,7 +711,6 @@ const appOOP = {
                     item.innerHTML = '<i class="icon-up-down fa-solid fa-grip-vertical"></i>'
                 });
             }
-
         } // btnAddNote.onclick
 
         inputNote.onkeypress = function (e) {
@@ -905,8 +878,7 @@ const appOOP = {
             appOOP.sortData();
             appOOP.localSet();
         } // inputDeadline
-
-
+        
         fullSetting.onclick = () => {
             tabColor.classList.remove('show');
         } // fullSetting
@@ -946,14 +918,6 @@ const appOOP = {
 
         app.querySelectorAll('#icon-full').forEach(icon => {
             icon.onclick = (e) => appOOP.clickIconFull(e);
-        });
-
-        app.querySelectorAll('.icon-up').forEach(icon => {
-            icon.onclick = (e) => appOOP.useMoveNote(e, 'UP');
-        });
-
-        app.querySelectorAll('.icon-down').forEach(icon => {
-            icon.onclick = (e) => appOOP.useMoveNote(e, 'DOWN');
         });
     }, // handleEvents
 
