@@ -494,13 +494,21 @@ up-down {
     overflow: hidden;
 }
 
-#foo {
+#foo{
     background-color: red;
     width: 86%;
     height: 5px;
     left: 32px;
     position: absolute;
     top: 69px;
+    display: none;
+}
+#foo2 {
+    background-color: red;
+    width: 86%;
+    height: 5px;
+    left: 32px;
+    position: absolute;
     display: none;
 }
 

@@ -19,7 +19,7 @@ function CheckOperatingSystem() {
         "Linux";
     if (navigator.userAgent.indexOf("like Mac") != -1) NameOperatingSystem =
         "iOS";
-    if (navigator.userAgent.indexOf("Android") != -1) Name =
+    if (navigator.userAgent.indexOf("Android") != -1) NameOperatingSystem =
         "Android";
 
     return NameOperatingSystem;

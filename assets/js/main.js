@@ -24,6 +24,7 @@ const btnOk = fullSetting.querySelector('.btn-ok');
 const inputDeadline = fullSetting.querySelector('.input-deadline');
 const foo = app.querySelector('#foo');
 const elmDrag = document.querySelector('.item-drag');
+const foo2 = document.querySelector('#foo2');
 
 const CONST_LS_KEY = 'TODO-LIST';
 
@@ -47,6 +48,11 @@ const appOOP = {
     toIndex: 0,
     mouseDownPageY: 0,
     hasChildListNote: false,
+    unpin: 0,
+    pin: 0,
+    heightNote: 0,
+    listNoteUnpin: [],
+    listNotePin: [],
     //#endregion declare
 
     get data() {
@@ -89,7 +95,7 @@ const appOOP = {
         const htmlPin = this.dataTodos.map((item, index) => {
             if (item.pin == true) {
                 return `
-                <li      style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
+                <li style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
                     <up-down draggable="true">
                         ${CheckOperatingSystem() === 'Linux' || CheckOperatingSystem() === 'Android' || CheckOperatingSystem() === 'iOS' ?
                         '<i class="icon-drag fa-solid fa-grip-vertical"></i>' :
@@ -467,6 +473,7 @@ const appOOP = {
         const todo = appOOP.dataTodos.find(item => {
             return item.id === id;
         });
+
         const dragItem = document.querySelector('.item-drag');
         const dragText = dragItem.querySelector('.text-drag');
         const checkboxDrag = dragItem.querySelector('.checkbox-hide');
@@ -494,15 +501,26 @@ const appOOP = {
         appOOP.hasChildListNote = listNote.contains(item);
         item.classList.add('blur');
 
+        // get height last child list pin and list unpin
+        const pinLastItem = Array.from(listPin.children).at(-1);
+        const unpinFirstItem = Array.from(listNote.children)[0];
+
+        appOOP.heightNote = item.offsetHeight;
+        appOOP.unpin = unpinFirstItem.getBoundingClientRect().y - item.offsetHeight + 5; // foo offsetHeight, item marginBottom
+        appOOP.pin = pinLastItem.getBoundingClientRect().y + 10;// foo offsetHeight
+
         return todo;
     }, // getElm
-
+    itemOffsetY: 0,
+    itemMove: [],
     indicatorDrag: function (e, index, device) {
+        const item = e.target.closest('.item-note');
+
         const titlePin = app.querySelector('.title-pin');
-        const listNotePin = Array.from(listPin.children);
-        listNotePin.shift();
-        const listNoteUnpin = Array.from(listNote.children);
-        const listAllNote = listNotePin.concat(listNoteUnpin);
+        appOOP.listNotePin = Array.from(listPin.children);
+        appOOP.listNotePin.shift();
+        appOOP.listNoteUnpin = Array.from(listNote.children);
+        const listAllNote = appOOP.listNotePin.concat(appOOP.listNoteUnpin);
         const computedAddNote = addNote.offsetHeight + Number(getComputedStyle(addNote).marginTop.replace('px', '')) - foo.offsetHeight;
         const computedPin = listPin.offsetHeight + Number(getComputedStyle(listPin).marginTop.replace('px', '')) + Number(getComputedStyle(listPin).marginBottom.replace('px', ''));
         const computedTitlePin = titlePin.offsetHeight + Number(getComputedStyle(titlePin).marginTop.replace('px', '')) + Number(getComputedStyle(titlePin).marginBottom.replace('px', '')) - foo.offsetHeight;
@@ -542,8 +560,25 @@ const appOOP = {
                         elm.classList.add('ondrag');
                 }
             } catch { }
-        });
 
+            if (appOOP.fromIndex < appOOP.listNotePin.length - 1 && index === appOOP.listNotePin.length && e.offsetY < appOOP.heightNote / 2) {
+
+                elm.classList.remove('ondrag');
+                foo2.style.display = 'block';
+                foo2.style.top = appOOP.unpin;
+            }
+            else if (item === appOOP.listNotePin.at(-1) && index === appOOP.listNotePin.length - 1 && e.offsetY > appOOP.heightNote / 2) {
+                elm.classList.remove('ondrag');
+                foo2.style.display = 'block';
+                foo2.style.top = appOOP.pin;
+                foo.style.display = 'none'
+            } else {
+                foo2.style.display = 'none';
+            }
+        }); // forEach
+
+        appOOP.itemMove = item;
+        appOOP.itemOffsetY = e.offsetY;
         elmDrag.style.top = checkDeviceY;
         elmDrag.style.left = checkDeviceX;
     }, // indicatorDrag
@@ -555,8 +590,26 @@ const appOOP = {
         elmDrag.classList.add('hide');
         item.classList.add('blur');
         foo.style.display = 'none';
+        foo2.style.display = 'none';
+
+        // appOOP.dataTodos = appOOP.dataTodos.map(elm => {
+        //         appOOP.toIndex < listPin.childElementCount - 1 ?
+        //         elm.id !== id ?
+        //             elm :
+        //             {
+        //                 ...elm,
+        //                 pin: true
+        //             } :
+        //         elm.id !== id ?
+        //             elm :
+        //             {
+        //                 ...elm,
+        //                 pin: false
+        //             }
+        //     }) // map
 
         if (appOOP.toIndex < listPin.childElementCount - 1) {
+
             appOOP.dataTodos = appOOP.dataTodos.map(elm => {
                 if (elm.id !== id)
                     return elm;
@@ -577,7 +630,14 @@ const appOOP = {
                 }
             }) // map
         }
-        moveItem(appOOP.dataTodos, appOOP.fromIndex, appOOP.toIndex);
+        let fromIndex2;
+        if (appOOP.itemMove === appOOP.listNotePin.at(-1) && appOOP.itemOffsetY > appOOP.heightNote / 2)
+            fromIndex2 = appOOP.fromIndex + 1;
+        else if (appOOP.fromIndex < appOOP.listNotePin.length - 1 && appOOP.itemOffsetY < appOOP.heightNote / 2)
+            fromIndex2 = appOOP.fromIndex - 1;
+        else fromIndex2 = appOOP.fromIndex;
+
+        moveItem(appOOP.dataTodos, fromIndex2, appOOP.toIndex);
 
         appOOP.data = [...appOOP.dataTodos];
     }, // dropElm
@@ -673,7 +733,6 @@ const appOOP = {
             }
 
             if (CheckOperatingSystem() === 'Linux' || CheckOperatingSystem() === 'Android' || CheckOperatingSystem() === 'iOS') {
-                demo.innerText = CheckOperatingSystem()
                 app.querySelectorAll('up-down').forEach(item => {
                     item.innerHTML = '<i class="icon-up-down fa-solid fa-grip-vertical"></i>'
                 });
@@ -719,9 +778,10 @@ const appOOP = {
                     pin: !todo.pin
                 }
             }) // map
-            appOOP.sortDataDeadline();
 
+            appOOP.sortDataDeadline();
             appOOP.data = [...appOOP.dataTodos];
+
         }, // iconPin
 
             iconCopy.onclick = (e) => {
@@ -863,7 +923,7 @@ const appOOP = {
             };
             item.ontouchmove = (e) => {
                 e.preventDefault();
-                appOOP.useIndicator(e, 'MOBILE')
+                appOOP.useIndicator(e, 'MOBILE');
             }
             item.ontouchend = (e) => appOOP.dropElm(e);
         });
