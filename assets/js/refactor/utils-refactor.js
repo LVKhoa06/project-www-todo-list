@@ -1,4 +1,35 @@
 
+function checkEnvironment() {
+    const { userAgent } = navigator;
+    // OS
+    let nameOS = '';
+    if (userAgent.includes("Win") != -1)
+        nameOS = "Windows";
+    else if (userAgent.includes("Mac") != -1)
+        nameOS = "Mac";
+    else if (userAgent.includes("Android") != -1)
+        nameOS = "Android";
+    else if (userAgent.includes("like Mac") != -1)
+        nameOS = "iOS";
+    else if (userAgent.includes("Linux") != -1)
+        nameOS = "Linux";
+    // Browser
+    let nameBrowser;
+    if (userAgent.includes('Firefox/')) {
+        nameBrowser = 'Firefox';
+    } else if (userAgent.includes('Edg/')) {
+        nameBrowser = 'Edg';
+    } else if (userAgent.includes('Chrome/')) {
+        nameBrowser = 'Chrome';
+    } else if (userAgent.includes('Safari/')) {
+        nameBrowser = 'Safari';
+    }
+
+    return {
+        os: nameOS,
+        browser: nameBrowser
+    }
+} // checkEnvironment
 
 function getTime() {
     const newTime = new Date();
