@@ -1,3 +1,13 @@
+function getWeekdayName(input = new Date) {
+    let dayName;
+    let time = new Date(input);
+
+    const day = time.getDay();
+
+    const weekDayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+    return dayName = weekDayNames[day];
+} // getWeekdayName
 
 function checkEnvironment() {
     const { userAgent } = navigator;
