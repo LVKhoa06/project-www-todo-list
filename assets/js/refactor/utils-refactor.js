@@ -1,3 +1,22 @@
+
+function formatTime(format, input = new Date) {
+    const rgexD_M_Y = /^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/i;
+
+    if (rgexD_M_Y.test(input)) {
+        input = input.split('/').reverse().join('/');
+    }
+
+    const time = new Date(input);
+    const year = time.getFullYear();
+    const monthString = (time.getMonth() + 1).toString().padStart(2, 0);
+    const dateString = time.getDate().toString().padStart(2, 0);
+
+    if (format === 'YYYY/MM/dd')
+        return `${year}/${monthString}/${dateString}`;
+    else if (format === 'dd/MM/YYYY')
+        return `${dateString}/${monthString}/${year}`;
+} // formatTime
+
 function getWeekdayName(input = new Date) {
     let dayName;
     let time = new Date(input);
