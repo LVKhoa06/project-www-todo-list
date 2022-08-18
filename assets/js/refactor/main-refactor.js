@@ -502,9 +502,9 @@ const appOOP = {
         const checkDeviceX = device == 'PC' ? e.pageX : e.targetTouches[0].pageX;
 
         if (listPin.className === 'hide') {
-            foo.style.top = computedAddNote + 10;  // foo.offsetHeight ?
+            foo.style.top = computedAddNote + 10 + window.scrollY;  // foo.offsetHeight ?
         } else {
-            foo.style.top = computedAddNote + computedPin;
+            foo.style.top = computedAddNote + computedPin + window.scrollY;
         }
 
         listAllNote.forEach(elm => {
@@ -523,7 +523,7 @@ const appOOP = {
 
                     else if (index == 0 && listPin.className !== 'hide') {
                         foo.style.display = 'block';
-                        foo.style.top = computedAddNote + computedTitlePin + foo.offsetHeight;
+                        foo.style.top = computedAddNote + computedTitlePin + foo.offsetHeight + window.scrollY;
                     }
                 } else {
                     elm.classList.remove('ondrag');
@@ -537,12 +537,12 @@ const appOOP = {
             if (appOOP.fromIndex < appOOP.listNotePin.length && index === appOOP.listNotePin.length && e.offsetY < appOOP.heightNote / 2) {
                 elm.classList.remove('ondrag');
                 foo2.style.display = 'block';
-                foo2.style.top = appOOP.topUnpin;
+                foo2.style.top = appOOP.topUnpin + window.scrollY;
             }
             else if (item === appOOP.listNotePin.at(-1) && index === appOOP.listNotePin.length - 1 && e.offsetY > appOOP.heightNote / 2) {
                 elm.classList.remove('ondrag');
                 foo2.style.display = 'block';
-                foo2.style.top = appOOP.topPin;
+                foo2.style.top = appOOP.topPin + window.scrollY;
                 foo.style.display = 'none'
             } else {
                 foo2.style.display = 'none';
