@@ -1,5 +1,5 @@
 
-const getM = ['DDMMYYYY', 'YYYYMMDD', 'YYMMDD', 'DDMMMYY', 'DMMMMYYYY', 'DDMMYY', 'YYMMMDD', 'YYYYMMMDD', 'DDMMMYYYY'];
+const getM = ['DDMMYYYY', 'YYYYMMDD', 'YYMMDD', 'DDMMMYY', 'DMMMMYYYY', 'DDMMYY', 'YYMMMDD', 'YYYYMMMDD', 'DDMMMYYYY', 'DDMMMMYYYY'];
 const getD = ['MDYYYY', 'MDYY', 'MMDDYY', 'MMDDYYYY', 'MMMMDYYYY', 'MMMDDYYYY', 'MMMDDYY']
 const weekDayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const monthM31 = [1, 3, 5, 7, 8, 10, 12];
@@ -33,7 +33,8 @@ function formatDate(format, input = new Date) {
 
         else if (input.includes(' '))
             input = input.split(' ').reverse().join('-');
-    } else {
+    }
+    else {
         if (input.includes('/'))
             input = input.split('/').join('-');
 
@@ -49,6 +50,7 @@ function formatDate(format, input = new Date) {
         else if (input.includes(' '))
             input = input.split(' ').join('-');
     }
+
 
     let index;
     let formatD = '';
@@ -237,7 +239,8 @@ function getCurrentTime_ISOformat() {
 
     const help = item => item.toString().padStart(2, '0');
 
-    return `${help(hours)}:${help(minutes)}.${help(date)}-${help(month)}-${year}`;
+    return `${help(year)}-${help(month)}-${date} ${help(hours)}:${help(minutes)}`;
+    // 
 } // getCurrentTime_ISOformat
 
 function getTodayDateParts() {
@@ -333,7 +336,7 @@ function getDeadline(arrTime) {
     } // if     
 
     const dayStrings = arrTime.reverse().toString().replace(/,/g, '-');
-    const totalDays = getTotalDaysDifferent(new Date(), dayStrings);
+    const totalDays = getTotalDaysDifferent(getCurrentTime_ISOformat(), dayStrings);
 
     const text =
         totalDays == -1 ?
@@ -343,7 +346,7 @@ function getDeadline(arrTime) {
                 totalDays == 1 ?
                     'Tomorrow' :
                     totalDays <= 6 ?
-                        `${getTotalDaysDifferent(new Date(), dayStrings)} day` :
+                        `${getTotalDaysDifferent(getCurrentTime_ISOformat(), dayStrings)} day` :
                         totalDays == 7 ?
                             `Next ${getWeekdayName()}` :
                             `${years <= 0 ? '' : `${years} year`} ${months <= 0 ? '' : `${months} month`} ${days <= 0 ? '' : `${days} day`}`

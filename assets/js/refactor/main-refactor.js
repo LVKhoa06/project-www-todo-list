@@ -841,7 +841,7 @@ const appOOP = {
                 } // else
             }) // map
 
-            if (getTotalDaysDifferent(new Date(), arrDeadlineNumber.toString()) < 0) {
+            if (getTotalDaysDifferent(getCurrentTime_ISOformat(), arrDeadlineNumber.toString()) < 0) {
                 appOOP.dataTodos.forEach(item => {
                     if (item.id == id) {
                         item.outOfDate = true;
