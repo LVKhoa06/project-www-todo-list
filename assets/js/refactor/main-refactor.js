@@ -252,7 +252,7 @@ const appOOP = {
         appOOP.dataTodos.push({
             id,
             text: todoText,
-            date: getTime(),
+            date: getCurrentTime_ISOformat(),
             pin: false,
             deadline: '',
             color: COLOR_DEFAULT,
@@ -632,7 +632,7 @@ const appOOP = {
     }, // sort
 
     sortDataDeadline: function () {
-        let time = getTimeToday();
+        let time = getTodayDateParts();
 
         time = [
             time[0].toString().padStart(2, 0),
@@ -705,7 +705,6 @@ const appOOP = {
         btnAddNote.onclick = () => {
             if (appOOP.inputValueLength() > 0) {
                 appOOP.createNote();
-                btnAddNote.innerText =  checkEnvironment().os
             }
 
             if (checkEnvironment().os === 'Linux' || checkEnvironment().os === 'Android' || checkEnvironment().os === 'iOS') {
@@ -767,7 +766,7 @@ const appOOP = {
                 dataCopy = {
                     ...dataCopy,
                     id: `${Date.now()}`,
-                    date: getTime()
+                    date: getCurrentTime_ISOformat()
                 }
                 appOOP.dataTodos.push(dataCopy);
 
@@ -842,7 +841,7 @@ const appOOP = {
                 } // else
             }) // map
 
-            if (totalDay(arrDeadlineNumber.toString()) < 0) {
+            if (getTotalDaysDifferent(new Date(), arrDeadlineNumber.toString()) < 0) {
                 appOOP.dataTodos.forEach(item => {
                     if (item.id == id) {
                         item.outOfDate = true;
@@ -863,7 +862,7 @@ const appOOP = {
                     }
                 }); // forEach
 
-                textItem.style.color = 'var(--color-white-1)';
+                textItem.style.color = 'var(--color-black-1)';
 
                 Array.from(listNote.children).forEach(item => {
                     if (item.dataset.index == id) {
