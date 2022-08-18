@@ -193,23 +193,23 @@ const appOOP = {
         item.appendChild(btn);
         item.appendChild(icon);
 
-
         // Add item to list
         listNote.appendChild(item);
 
-        // After creating item then delete input value
         inputNote.value = "";
-        item.ontouchstart = (e) => this.todo = this.getElm(e);
-        item.ontouchmove = (e) => {
+        upDown.ontouchstart = (e) => this.todo = this.getElm(e);
+        upDown.ontouchmove = (e) => {
             e.preventDefault();
             this.useIndicator(e, 'MOBILE');
         }
 
-        item.ontouchend = (e) => this.dropElm(e);
+        upDown.ontouchend = (e) => this.dropElm(e);
 
-        upDown.ondragstart = (e) => this.todo = this.getElm(e);
-        upDown.ondragenter = (e) => this.useIndicator(e, 'PC');
-        upDown.ondragend = (e) => this.dropElm(e);
+        item.ondragstart = (e) => this.todo = this.getElm(e);
+
+        item.ondragenter = (e) => this.useIndicator(e, 'PC');
+
+        item.ondragend = (e) => this.dropElm(e);
 
         btn.onclick = this.deleteTodo;
         checkboxHide.onclick = (e) => this.strikethroughItem(e.target);
@@ -533,7 +533,7 @@ const appOOP = {
                         elm.classList.add('ondrag');
                 }
             } catch { }
-            
+
             if (appOOP.fromIndex < appOOP.listNotePin.length && index === appOOP.listNotePin.length && e.offsetY < appOOP.heightNote / 2) {
                 elm.classList.remove('ondrag');
                 foo2.style.display = 'block';

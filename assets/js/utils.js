@@ -1,14 +1,21 @@
+// vercel: NextJS
+// matBao
 
-// formatDate('YYYY-MM-dd')
-// formatDate('dd/MM/YY') // 04/08/2022
-// formatDate('dd-MM-YY') // 04-08-22
-// function formatDate(format, input = today) {
-//     if (input == null)
-//         input = new Date();
+/* CONVENTIONS 🍀
+    [+] new
+    [*] modify
+    [-] remove
+    [!] fix bug
+*/
+// [+] formatTime(format: string, input = currentTime: string | DateTime): string
+// formatTime('YYYY-MM-dd')               => 2022-08-15
+// formatTime('dd/MM/YYYY', '2022-08-15') => 15/08/2022
 
-//     return 1;
-// }
+/* TODO 💪
 
+   
+
+*/
 function CheckOperatingSystem() {
     let NameOperatingSystem = '';
     if (navigator.userAgent.indexOf("Win") != -1) NameOperatingSystem =
@@ -37,7 +44,7 @@ function getTime() {
     const month = newTime.getMonth() + 1;
     const year = newTime.getFullYear();
 
-    return `${editTime(hours)}:${editTime(minutes)}.${editTime(date)}-${editTime(month)}-${year}`;
+    return `${editTime(hours )}:${editTime(minutes)}.${editTime(date)}-${editTime(month)}-${year}`;
 } // getTime
 
 function getTimeToday() {
