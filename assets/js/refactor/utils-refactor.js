@@ -33,18 +33,36 @@ function formatDate(format, input = new Date) {
 
         else if (input.includes(' '))
             input = input.split(' ').reverse().join('-');
-    } // if 
-    ///////////////////////////////////
+    } else {
+        if (input.includes('/'))
+            input = input.split('/').join('-');
+
+        else if (input.includes(','))
+            input = input.split(',').join('-');
+
+        else if (input.includes('.'))
+            input = input.split('.').join('-');
+
+        else if (input.includes('-'))
+            input = input.split('-').join('-');
+
+        else if (input.includes(' '))
+            input = input.split(' ').join('-');
+    }
+
     let index;
     let formatD = '';
     let formatM = '';
     let formatY = '';
+
     let resultD = '';
     let resultM = '';
     let resultY = '';
-    let numD = 0;
-    let numM = 0;
-    let numY = 0;
+
+    let numD;
+    let numM;
+    let numY;
+
     let arr1 = format.split('').map(item => {
         return item.toUpperCase();
     });
@@ -90,7 +108,7 @@ function formatDate(format, input = new Date) {
         return item === ' ' || item === '-' || item === '/' || item === ',' || item === '.';
     }).join('');
 
-    const time = new Date(input); // input in ISO dateformat
+    const time = new Date(input);
     const yearLong = time.getFullYear();
     const yearShort = yearLong.toString().slice(2);
     const month = time.getMonth() + 1;
@@ -235,16 +253,6 @@ function getTodayDateParts() {
     ];
 } // getTodayDateParts
 
-// getTotalDaysDifferent(fromDate, toDate)
-function getTotalDaysDifferent2(toDate) {
-    const secondsInADay = 24 * 60 * 60;
-    const stampOfToday = (new Date()).getTime();
-    const stampOfInput = (new Date(toDate)).getTime();
-    const deltaInSeconds = (stampOfInput - stampOfToday) / 1000;
-
-    return Math.ceil(deltaInSeconds / secondsInADay);
-} // getTotalDaysDifferent
-
 function getTotalDaysDifferent(fromDate, toDate) {
     const secondsInADay = 24 * 60 * 60;
     const stampOfToday = (new Date(formatDate('YYYY-MM-DD', fromDate))).getTime();
@@ -325,7 +333,7 @@ function getDeadline(arrTime) {
     } // if     
 
     const dayStrings = arrTime.reverse().toString().replace(/,/g, '-');
-    const totalDays = getTotalDaysDifferent( new Date(),dayStrings);
+    const totalDays = getTotalDaysDifferent(new Date(), dayStrings);
 
     const text =
         totalDays == -1 ?
