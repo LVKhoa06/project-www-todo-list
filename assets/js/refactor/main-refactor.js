@@ -8,7 +8,7 @@ const listNote = app.querySelector('list-note');
 const listPin = app.querySelector('list-pin');
 const inputNote = app.querySelector('.input-note');
 const btnAddNote = app.querySelector('.btn-add');
-const anvancedEditContent = overlay.querySelector('content');
+const contentAnvancedEdit = overlay.querySelector('content');
 const headerAnvanceEdit = overlay.querySelector('header');
 const iconPin = overlay.querySelector('.icon-pin');
 const timeCreate = overlay.querySelector('time-create');
@@ -39,11 +39,10 @@ const COLOR_DEFAULT = 'var(--app-color-1)';
 
 const appOOP = {
     //#region declare
-    todo: '',
+    itemDrop: '',
     onEdit: false, // Flag
     dataTodos: [],
     _data: [], // private property // accessed via GETTER / SETTER
-    arrTest: [],
     fromIndex: 0,
     toIndex: 0,
     mouseDownPageY: 0,
@@ -125,7 +124,7 @@ const appOOP = {
         const outerId = e.target.parentNode.dataset.index;
         const todo = this.dataTodos.find(entry => entry.id === outerId);
         const arrDeadline = todo.deadline.split('-');
-        const arrDeadlineNumber = `${Number(arrDeadline[2])}-${Number(arrDeadline[1])}-${Number(arrDeadline[0])}` ;
+        const arrDeadlineNumber = `${Number(arrDeadline[2])}-${Number(arrDeadline[1])}-${Number(arrDeadline[0])}`;
 
         const htmlContent = `
                 <li class="item-note bla ${todo.status == 2 ? 'strikethrough2' : ''}" data-index="${outerId}" >
@@ -138,7 +137,7 @@ const appOOP = {
         timeCreate.innerText = todo.date;
         timeDeadline.innerText = todo.deadline == '' ? '' : getDeadline(arrDeadlineNumber).text;
 
-        anvancedEditContent.innerHTML = htmlContent;
+        contentAnvancedEdit.innerHTML = htmlContent;
     }, // renderFullTodo
 
     inputValueLength: function () {
@@ -166,7 +165,7 @@ const appOOP = {
 
         // Add attribute
         item.className = 'item-note';
-        indicatorDrag.className = 'indicator-drag'
+        indicatorDrag.className = 'indicator-drag';
         fullIcon.className = 'fa-solid fa-expand';
         itemText.className = 'item-text';
         btn.className = 'btn-delete';
@@ -263,7 +262,7 @@ const appOOP = {
 
     // updateTodo('property', value)
     updateTodo: function (elm) {
-        const ElmText = elm.parentNode.querySelector('.item-text')
+        const ElmText = elm.parentNode.querySelector('.item-text');
         const newText = ElmText.textContent;
         const id = elm.parentNode.dataset.index;
 
@@ -493,17 +492,17 @@ const appOOP = {
         appOOP.listNotePin.shift();
         appOOP.listNoteUnpin = Array.from(listNote.children);
         const listAllNote = appOOP.listNotePin.concat(appOOP.listNoteUnpin);
-        const computedAddNote = addNote.offsetHeight + Number(getComputedStyle(addNote).marginTop.replace('px', '')) - indicator1.offsetHeight;
+        const computedAddNote = addNote.offsetHeight + Number(getComputedStyle(addNote).marginTop.replace('px', ''));
         const computedPin = listPin.offsetHeight + Number(getComputedStyle(listPin).marginTop.replace('px', '')) + Number(getComputedStyle(listPin).marginBottom.replace('px', ''));
-        const computedTitlePin = titlePin.offsetHeight + Number(getComputedStyle(titlePin).marginTop.replace('px', '')) + Number(getComputedStyle(titlePin).marginBottom.replace('px', '')) - indicator1.offsetHeight;
+        const computedTitlePin = titlePin.offsetHeight + Number(getComputedStyle(titlePin).marginTop.replace('px', '')) + Number(getComputedStyle(titlePin).marginBottom.replace('px', ''));
 
         const checkDeviceY = device == 'PC' ? e.pageY : e.targetTouches[0].pageY;
         const checkDeviceX = device == 'PC' ? e.pageX : e.targetTouches[0].pageX;
 
         if (listPin.className === 'hide') {
-            indicator1.style.top = computedAddNote + 10 + window.scrollY;  // indicator1.offsetHeight ?
+            indicator1.style.top = computedAddNote + 5;  // indicator1.offsetHeight ?
         } else {
-            indicator1.style.top = computedAddNote + computedPin + window.scrollY;
+            indicator1.style.top = computedAddNote + computedPin - 5;
         }
 
         listAllNote.forEach(elm => {
@@ -518,12 +517,11 @@ const appOOP = {
                         elm.classList.add('ondrag');
 
                     else if (index == listPin.childElementCount - 1)
-                        indicator1.style.display = 'block'
+                        indicator1.style.display = 'block';
 
                     else if (index == 0 && listPin.className !== 'hide') {
                         indicator1.style.display = 'block';
-                        c(computedAddNote + computedTitlePin + window.scrollY)
-                        indicator1.style.top = computedAddNote + computedTitlePin + window.scrollY;
+                        indicator1.style.top = computedAddNote + computedTitlePin - 5;
                     }
                 } else {
                     elm.classList.remove('ondrag');
@@ -543,7 +541,7 @@ const appOOP = {
                 elm.classList.remove('ondrag');
                 indicator2.style.display = 'block';
                 indicator2.style.top = appOOP.topPin + window.scrollY;
-                indicator1.style.display = 'none'
+                indicator1.style.display = 'none';
             } else {
                 indicator2.style.display = 'none';
             }
@@ -587,15 +585,20 @@ const appOOP = {
             }) // map
         }
         let toIndex2;
+        // if (appOOP.mouseDownPageY < e.pageY) {
+        //     toIndex2 = appOOP.toIndex;
+        // }
 
         if (appOOP.fromIndex > appOOP.listNotePin.length - 1 && appOOP.itemMove === appOOP.listNotePin.at(-1) && appOOP.itemOffsetY > appOOP.heightNote / 2)
             toIndex2 = appOOP.fromIndex + 1;
-        else if (appOOP.fromIndex < appOOP.listNotePin.length && appOOP.itemOffsetY < appOOP.heightNote / 2)
+        else if (appOOP.fromIndex <= appOOP.listNotePin.length && appOOP.itemMove === appOOP.listNoteUnpin.at(0) && appOOP.itemOffsetY < appOOP.heightNote / 2) {
+            c('hi')
             toIndex2 = appOOP.toIndex - 1;
+        }
         else toIndex2 = appOOP.toIndex;
 
         if (toIndex2 === -1) {
-            toIndex2 = 1; // 0 ? magic
+            toIndex2 = 0;
         }
 
         moveItem(appOOP.dataTodos, appOOP.fromIndex, toIndex2);
@@ -619,7 +622,7 @@ const appOOP = {
         let time = getDateParts();
 
         time = [
-            time.date.toString().padStart(2, 0),
+            time.day.toString().padStart(2, 0),
             time.month.toString().padStart(2, 0),
             time.year
         ];
@@ -660,18 +663,17 @@ const appOOP = {
     useIndicator: function (e, device) {
         // PC
         if (device === 'PC') {
-            const itemPc = e.target.closest('.item-note');
-            const idPc = itemPc.dataset.index;
-            const todoPc = appOOP.dataTodos.find(elm => {
-                return elm.id === idPc;
+            const itemPC = e.target.closest('.item-note');
+            const idPC = itemPC.dataset.index;
+            const todoPC = appOOP.dataTodos.find(elm => {
+                return elm.id === idPC;
             });
 
-            const indexTodoPc = appOOP.dataTodos.indexOf(todoPc);
+            const indexTodoPc = appOOP.dataTodos.indexOf(todoPC);
 
             appOOP.indicatorDrag(e, indexTodoPc, 'PC');
 
-            appOOP.toIndex = appOOP.dataTodos.indexOf(todoPc);
-
+            appOOP.toIndex = appOOP.dataTodos.indexOf(todoPC);
         } else {
             // Mobile
             const itemMb = document.elementFromPoint(e.targetTouches[0].pageX, e.targetTouches[0].pageY).closest('.item-note');
@@ -680,7 +682,7 @@ const appOOP = {
                 return elm.id === idMb;
             });
 
-            const indexTodoMb = appOOP.dataTodos.indexOf(todoMb);;
+            const indexTodoMb = appOOP.dataTodos.indexOf(todoMb);
             appOOP.indicatorDrag(e, indexTodoMb, 'MOBILE');
             appOOP.toIndex = appOOP.dataTodos.indexOf(todoMb);
         }
@@ -694,7 +696,7 @@ const appOOP = {
 
             if (checkEnvironment().os === 'Linux' || checkEnvironment().os === 'Android' || checkEnvironment().os === 'iOS') {
                 app.querySelectorAll('up-down').forEach(item => {
-                    item.innerHTML = '<i class="icon-up-down fa-solid fa-grip-vertical"></i>'
+                    item.innerHTML = '<i class="icon-up-down fa-solid fa-grip-vertical"></i>';
                 });
             }
         } // btnAddNote.onclick
@@ -860,14 +862,14 @@ const appOOP = {
         } // fullSetting
 
         app.querySelectorAll('.item-note').forEach(item => {
-            item.ondragstart = (e) => appOOP.todo = appOOP.getElm(e);
+            item.ondragstart = (e) => appOOP.itemDrop = appOOP.getElm(e);
             item.ondragenter = (e) => appOOP.useIndicator(e, 'PC');
             item.ondragend = (e) => appOOP.dropElm(e);
         }); // forEach
 
         app.querySelectorAll('up-down').forEach(item => {
             item.ontouchstart = (e) => {
-                appOOP.todo = appOOP.getElm(e);
+                appOOP.itemDrop = appOOP.getElm(e);
             };
             item.ontouchmove = (e) => {
                 e.preventDefault();

@@ -1,5 +1,3 @@
-
-// outOffDay  
 // todo.day ISO
 const getM = ['DDMMYYYY', 'YYYYMMDD', 'YYMMDD', 'DDMMMYY', 'DMMMMYYYY', 'DDMMYY', 'YYMMMDD', 'YYYYMMMDD', 'DDMMMYYYY', 'DDMMMMYYYY'];
 const getD = ['MDYYYY', 'MDYY', 'MMDDYY', 'MMDDYYYY', 'MMMMDYYYY', 'MMMDDYYYY', 'MMMDDYY']
@@ -243,52 +241,54 @@ function getTotalDaysDifferent(fromDate, toDate) {
 } // getTotalDaysDifferent
 
 function getDeadline(input) {
-    let datePartsOfInput = getDateParts(formatDate('YYYY-MM-DD', input));
-    const { inputY, inputM, inputD } = getDateParts(formatDate('YYYY-MM-DD', input));;
-    // const { todayY, todayM, todayD } = getDateParts();
 
-    let datePartsOfToday = getDateParts();//formatDate('YYYY-MM-DD', input));
+    const inputD = getDateParts(formatDate('YYYY-MM-DD', input)).day;
+    const inputM = getDateParts(formatDate('YYYY-MM-DD', input)).month;
+    const inputY = getDateParts(formatDate('YYYY-MM-DD', input)).year;
 
+    const todayD = getDateParts().day;
+    const todayM = getDateParts().month;
+    const todayY = getDateParts().year;
     // totalDaysDifferent
-    let diffYears; //
+    let diffYears;
     let diffMonths;
     let diffDays;
 
     //#region count year, month, day.
-    diffYears = (datePartsOfInput.year - getDateParts().year);
+    diffYears = (inputY - todayY);
 
-    if (datePartsOfInput.month >= (getDateParts().month))
-        diffMonths = datePartsOfInput.month - (getDateParts().month);
+    if (inputM >= (todayM))
+        diffMonths = inputM - (todayM);
     else {
-        diffMonths = 12 + datePartsOfInput.month - (getDateParts().month);
+        diffMonths = 12 + inputM - (todayM);
         diffYears -= 1;
     }
-    diffDays = datePartsOfInput.day - (getDateParts().day);
-    if (datePartsOfInput.day - (getDateParts().day) < 0 && datePartsOfInput.month == (getDateParts().month)) {
+    diffDays = inputD - (todayD);
+    if (inputD - (todayD) < 0 && inputM == (todayM)) {
         diffYears -= 1;
         diffMonths += 11;
 
         month31Day.forEach(item => {
-            if (datePartsOfInput.month == item)
+            if (inputM == item)
                 diffDays += 31;
 
-            else if (datePartsOfInput.month == month28Day) {
+            else if (inputM == month28Day) {
                 diffDays += 28;
-            } else if (datePartsOfInput.month !== item && datePartsOfInput.month !== month28Day) {
+            } else if (inputM !== item && inputM !== month28Day) {
                 diffDays += 30;
             }
         }); // forEach
 
-    } else if (datePartsOfInput.day - (getDateParts().day) >= 0)
-        diffDays = datePartsOfInput.day - (getDateParts().day);
+    } else if (inputD - (todayD) >= 0)
+        diffDays = inputD - (todayD);
     else {
         month31Day.forEach(item => {
-            if (getDateParts().month == item) {
+            if (todayM == item) {
                 diffDays += 31;
-            } else if (getDateParts().month == month28Day) {
+            } else if (todayM == month28Day) {
                 diffDays += 28;
                 diffMonths -= 1;
-            } else if (getDateParts().month !== item && getDateParts().month !== month28Day) {
+            } else if (todayM !== item && todayM !== month28Day) {
                 diffDays += 30;
                 diffMonths -= 1;
             }
@@ -299,11 +299,8 @@ function getDeadline(input) {
             } else
                 diffMonths -= 1;
         }); // forEach
-
-        
     } // else 
     // #endregion count year, month, day.
-
 
     const diffDaysTotal = getTotalDaysDifferent(getCurrentTime_ISOformat(), `${inputY}-${inputM}-${inputD}`);
 
