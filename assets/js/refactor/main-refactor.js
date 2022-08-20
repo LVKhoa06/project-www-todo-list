@@ -3,28 +3,28 @@ const c = console.log;
 //#region declare const 
 const app = document.querySelector('app');
 const addNote = app.querySelector('add-note');
-const fullSetting = document.querySelector('full');
+const overlay = document.querySelector('overlay');
 const listNote = app.querySelector('list-note');
 const listPin = app.querySelector('list-pin');
 const inputNote = app.querySelector('.input-note');
 const btnAddNote = app.querySelector('.btn-add');
-const fullSettingContent = fullSetting.querySelector('content');
-const headerFull = fullSetting.querySelector('header');
-const iconPin = fullSetting.querySelector('.icon-pin');
-const timeCreate = fullSetting.querySelector('time-create');
-const timeDeadline = fullSetting.querySelector('deadline');
-const fullSettingClose = fullSetting.querySelector('close');
-const iconRecycleBin = fullSetting.querySelector('.icon-recycle-bin');
-const iconListColor = fullSetting.querySelector('.icon-list-color');
-const iconCopy = fullSetting.querySelector('.icon-copy');
-const inputColor = fullSetting.querySelector('.input-color');
-const tabColor = fullSetting.querySelector('tab');
-const btnCancel = fullSetting.querySelector('.btn-cancel');
-const btnOk = fullSetting.querySelector('.btn-ok');
-const inputDeadline = fullSetting.querySelector('.input-deadline');
-const foo = app.querySelector('#foo');
+const anvancedEditContent = overlay.querySelector('content');
+const headerAnvanceEdit = overlay.querySelector('header');
+const iconPin = overlay.querySelector('.icon-pin');
+const timeCreate = overlay.querySelector('time-create');
+const timeDeadline = overlay.querySelector('deadline');
+const closeAnvanceEdit = overlay.querySelector('close');
+const iconRecycleBin = overlay.querySelector('.icon-recycle-bin');
+const iconChangeColor = overlay.querySelector('.icon-list-color');
+const iconCopy = overlay.querySelector('.icon-copy');
+const inputColor = overlay.querySelector('.input-color');
+const tabColor = overlay.querySelector('tab');
+const btnCancel = overlay.querySelector('.btn-cancel');
+const btnSubmitColor = overlay.querySelector('.btn-submit-color');
+const inputDeadline = overlay.querySelector('.input-deadline');
+const indicator1 = app.querySelector('#indicator1');
+const indicator2 = app.querySelector('#indicator2');
 const elmDrag = document.querySelector('.item-drag');
-const foo2 = document.querySelector('#foo2');
 
 const CONST_LS_KEY = 'TODO-LIST';
 
@@ -60,7 +60,6 @@ const appOOP = {
     get data() {
         return this._data
     }, // getter
-    // this.data = foo;
     set data(value) {
         this._data = value;
 
@@ -82,7 +81,7 @@ const appOOP = {
                     </up-down>
                     <input class="checkbox-hide" type="checkbox" ${item.status == 2 ? 'checked' : ''}>
                     <span style="border-color: ${item.color};" class="checkbox-complete"></span>
-                    <span ${item.outOfDate == true ? 'style="color:red;"' : ''} class="item-text">${item.text}</span>
+                    <span ${getTotalDaysDifferent(getCurrentTime_ISOformat(), item.date) < 0 ? 'style="color:red;"' : ''} class="item-text">${item.text}</span>
                     <button class="btn-delete">x</button>
                     <i class="icon-save"></i>
                     <i id="icon-full" class="fa-solid fa-expand"></i>
@@ -101,7 +100,7 @@ const appOOP = {
                     </up-down>  
                     <input class="checkbox-hide" type="checkbox" ${item.status == 2 ? 'checked' : ''}>
                     <span style="border-color: ${item.color};" class="checkbox-complete"></span>
-                    <span  ${item.outOfDate == true ? 'style="color:red;"' : ''} class="item-text">${item.text}</span>
+                    <span  ${getTotalDaysDifferent(getCurrentTime_ISOformat(), item.date) < 0 ? 'style="color:red;"' : ''} class="item-text">${item.text}</span>
                     <button class="btn-delete">x</button>
                     <i class="icon-save"></i>
                     <i id="icon-full" class="fa-solid fa-expand"></i>
@@ -126,20 +125,20 @@ const appOOP = {
         const outerId = e.target.parentNode.dataset.index;
         const todo = this.dataTodos.find(entry => entry.id === outerId);
         const arrDeadline = todo.deadline.split('-');
-        const arrDeadlineNumber = [Number(arrDeadline[0]), Number(arrDeadline[1]), Number(arrDeadline[2])];
+        const arrDeadlineNumber = `${Number(arrDeadline[2])}-${Number(arrDeadline[1])}-${Number(arrDeadline[0])}` ;
 
         const htmlContent = `
                 <li class="item-note bla ${todo.status == 2 ? 'strikethrough2' : ''}" data-index="${outerId}" >
                     <input class="checkbox-hide" type="checkbox" onclick="appOOP.strikethroughItem(this)" ${todo.status == 2 ? 'checked' : ''}>
                     <span style="border-color: ${todo.color};" class="checkbox-complete"></span>
-                    <span contenteditable="true" ${todo.outOfDate == true ? 'style="color:red;"' : ''} class="item-text">${todo.text}</span>
+                    <span contenteditable="true" ${getTotalDaysDifferent(getCurrentTime_ISOformat(), todo.date) < 0 ? 'style="color:red;"' : ''} class="item-text">${todo.text}</span>
                     <i class="show icon-save" id="icon-save-inner" onclick="appOOP.updateTodo(this)"></i>
                 </li>
                 `;
         timeCreate.innerText = todo.date;
         timeDeadline.innerText = todo.deadline == '' ? '' : getDeadline(arrDeadlineNumber).text;
 
-        fullSettingContent.innerHTML = htmlContent;
+        anvancedEditContent.innerHTML = htmlContent;
     }, // renderFullTodo
 
     inputValueLength: function () {
@@ -256,7 +255,7 @@ const appOOP = {
             pin: false,
             deadline: '',
             color: COLOR_DEFAULT,
-            outOfDate: false,
+            // outOfDate: false,
             status: CONST_TODO_STATUS.DOING,
         });
         appOOP.localSet();
@@ -425,7 +424,7 @@ const appOOP = {
 
         appOOP.dataTodos.forEach(item => {
             if (item.id == id) {
-                headerFull.style.background = `linear-gradient(to bottom, ${item.color},  white`;
+                headerAnvanceEdit.style.background = `linear-gradient(to bottom, ${item.color},  white`;
                 if (item.pin == true) {
                     iconPin.classList.add('pin-item');
                 } else {
@@ -434,7 +433,7 @@ const appOOP = {
             }
         })
 
-        fullSetting.classList.remove('hide');
+        overlay.classList.remove('hide');
         appOOP.updateTodo(e.target);
         appOOP.renderFullTodo(e);
 
@@ -480,8 +479,8 @@ const appOOP = {
         const unpinFirstItem = Array.from(listNote.children)[0];
 
         appOOP.heightNote = item.offsetHeight;
-        appOOP.topUnpin = unpinFirstItem.getBoundingClientRect().y - item.offsetHeight + 5; // foo offsetHeight, item marginBottom
-        appOOP.topPin = pinLastItem.getBoundingClientRect().y + 10;// foo offsetHeight
+        appOOP.topUnpin = unpinFirstItem.getBoundingClientRect().y - item.offsetHeight + 5; // indicator1 offsetHeight, item marginBottom
+        appOOP.topPin = pinLastItem.getBoundingClientRect().y + 10;// indicator1 offsetHeight
 
         return todo;
     }, // getElm
@@ -494,17 +493,17 @@ const appOOP = {
         appOOP.listNotePin.shift();
         appOOP.listNoteUnpin = Array.from(listNote.children);
         const listAllNote = appOOP.listNotePin.concat(appOOP.listNoteUnpin);
-        const computedAddNote = addNote.offsetHeight + Number(getComputedStyle(addNote).marginTop.replace('px', '')) - foo.offsetHeight;
+        const computedAddNote = addNote.offsetHeight + Number(getComputedStyle(addNote).marginTop.replace('px', '')) - indicator1.offsetHeight;
         const computedPin = listPin.offsetHeight + Number(getComputedStyle(listPin).marginTop.replace('px', '')) + Number(getComputedStyle(listPin).marginBottom.replace('px', ''));
-        const computedTitlePin = titlePin.offsetHeight + Number(getComputedStyle(titlePin).marginTop.replace('px', '')) + Number(getComputedStyle(titlePin).marginBottom.replace('px', '')) - foo.offsetHeight;
+        const computedTitlePin = titlePin.offsetHeight + Number(getComputedStyle(titlePin).marginTop.replace('px', '')) + Number(getComputedStyle(titlePin).marginBottom.replace('px', '')) - indicator1.offsetHeight;
 
         const checkDeviceY = device == 'PC' ? e.pageY : e.targetTouches[0].pageY;
         const checkDeviceX = device == 'PC' ? e.pageX : e.targetTouches[0].pageX;
 
         if (listPin.className === 'hide') {
-            foo.style.top = computedAddNote + 10 + window.scrollY;  // foo.offsetHeight ?
+            indicator1.style.top = computedAddNote + 10 + window.scrollY;  // indicator1.offsetHeight ?
         } else {
-            foo.style.top = computedAddNote + computedPin + window.scrollY;
+            indicator1.style.top = computedAddNote + computedPin + window.scrollY;
         }
 
         listAllNote.forEach(elm => {
@@ -513,21 +512,22 @@ const appOOP = {
                 const nodeIndicatorUp = listAllNote[index - 1];
                 if (checkDeviceY < appOOP.mouseDownPageY) {
                     elm.classList.remove('ondrag');
-                    foo.style.display = 'none';
+                    indicator1.style.display = 'none';
 
                     if (elm == nodeIndicatorUp && index !== listPin.childElementCount - 1)
                         elm.classList.add('ondrag');
 
                     else if (index == listPin.childElementCount - 1)
-                        foo.style.display = 'block'
+                        indicator1.style.display = 'block'
 
                     else if (index == 0 && listPin.className !== 'hide') {
-                        foo.style.display = 'block';
-                        foo.style.top = computedAddNote + computedTitlePin + foo.offsetHeight + window.scrollY;
+                        indicator1.style.display = 'block';
+                        c(computedAddNote + computedTitlePin + window.scrollY)
+                        indicator1.style.top = computedAddNote + computedTitlePin + window.scrollY;
                     }
                 } else {
                     elm.classList.remove('ondrag');
-                    foo.style.display = 'none';
+                    indicator1.style.display = 'none';
 
                     if (elm == nodeIndicatorDown)
                         elm.classList.add('ondrag');
@@ -536,16 +536,16 @@ const appOOP = {
 
             if (appOOP.fromIndex < appOOP.listNotePin.length && index === appOOP.listNotePin.length && e.offsetY < appOOP.heightNote / 2) {
                 elm.classList.remove('ondrag');
-                foo2.style.display = 'block';
-                foo2.style.top = appOOP.topUnpin + window.scrollY;
+                indicator2.style.display = 'block';
+                indicator2.style.top = appOOP.topUnpin + window.scrollY;
             }
             else if (item === appOOP.listNotePin.at(-1) && index === appOOP.listNotePin.length - 1 && e.offsetY > appOOP.heightNote / 2) {
                 elm.classList.remove('ondrag');
-                foo2.style.display = 'block';
-                foo2.style.top = appOOP.topPin + window.scrollY;
-                foo.style.display = 'none'
+                indicator2.style.display = 'block';
+                indicator2.style.top = appOOP.topPin + window.scrollY;
+                indicator1.style.display = 'none'
             } else {
-                foo2.style.display = 'none';
+                indicator2.style.display = 'none';
             }
         }); // forEach
 
@@ -561,24 +561,8 @@ const appOOP = {
 
         elmDrag.classList.add('hide');
         item.classList.add('blur');
-        foo.style.display = 'none';
-        foo2.style.display = 'none';
-
-        // appOOP.dataTodos = appOOP.dataTodos.map(elm => {
-        //         appOOP.toIndex < listPin.childElementCount - 1 ?
-        //         elm.id !== id ?
-        //             elm :
-        //             {
-        //                 ...elm,
-        //                 pin: true
-        //             } :
-        //         elm.id !== id ?
-        //             elm :
-        //             {
-        //                 ...elm,
-        //                 pin: false
-        //             }
-        //     }) // map
+        indicator1.style.display = 'none';
+        indicator2.style.display = 'none';
 
         if (appOOP.toIndex < listPin.childElementCount - 1) {
 
@@ -632,12 +616,12 @@ const appOOP = {
     }, // sort
 
     sortDataDeadline: function () {
-        let time = getTodayDateParts();
+        let time = getDateParts();
 
         time = [
-            time[0].toString().padStart(2, 0),
-            time[1].toString().padStart(2, 0),
-            time[2]
+            time.date.toString().padStart(2, 0),
+            time.month.toString().padStart(2, 0),
+            time.year
         ];
 
         const todayTxt = time.reverse().toString().replace(/,/g, '-');
@@ -686,7 +670,8 @@ const appOOP = {
 
             appOOP.indicatorDrag(e, indexTodoPc, 'PC');
 
-            appOOP.toIndex = getIndexItem(appOOP.dataTodos, todoPc);
+            appOOP.toIndex = appOOP.dataTodos.indexOf(todoPc);
+
         } else {
             // Mobile
             const itemMb = document.elementFromPoint(e.targetTouches[0].pageX, e.targetTouches[0].pageY).closest('.item-note');
@@ -697,7 +682,7 @@ const appOOP = {
 
             const indexTodoMb = appOOP.dataTodos.indexOf(todoMb);;
             appOOP.indicatorDrag(e, indexTodoMb, 'MOBILE');
-            appOOP.toIndex = getIndexItem(appOOP.dataTodos, todoMb);
+            appOOP.toIndex = appOOP.dataTodos.indexOf(todoMb);
         }
     },
 
@@ -720,8 +705,8 @@ const appOOP = {
             }
         } // enterKey
 
-        fullSettingClose.onclick = () => {
-            fullSetting.classList.add('hide');
+        closeAnvanceEdit.onclick = () => {
+            overlay.classList.add('hide');
         } // fullSettingClose.
 
         iconRecycleBin.onclick = (e) => {
@@ -730,7 +715,7 @@ const appOOP = {
             appOOP.dataTodos = appOOP.dataTodos.filter((item) => item.id !== id);
             appOOP.localSet();
 
-            fullSetting.classList.add('hide');
+            overlay.classList.add('hide');
 
             Array.from(listNote.children).forEach((item) => {
                 if (item.dataset.index === id) {
@@ -772,7 +757,7 @@ const appOOP = {
 
                 const dataCopyId = dataCopy.id;
 
-                fullSetting.classList.add('hide');
+                overlay.classList.add('hide');
 
                 appOOP.data = [...appOOP.dataTodos];
                 Array.from(listNote.children).forEach((item) => {
@@ -794,7 +779,7 @@ const appOOP = {
             tabColor.classList.remove('show');
         } // btnCancel
 
-        btnOk.onclick = (e) => {
+        btnSubmitColor.onclick = (e) => {
             const id = e.target.closest('advanced-edit').querySelector('.item-note').dataset.index;
 
             appOOP.dataTodos = appOOP.dataTodos.map(item => {
@@ -814,7 +799,7 @@ const appOOP = {
                 }
             });
 
-            headerFull.style.background = `linear-gradient(to bottom, ${inputColor.value}, white`;
+            headerAnvanceEdit.style.background = `linear-gradient(to bottom, ${inputColor.value}, white`;
             tabColor.classList.remove('show');
 
             appOOP.localSet();
@@ -825,7 +810,7 @@ const appOOP = {
             const textItem = wrapper.querySelector('.item-text');
             const id = wrapper.querySelector('.item-note').dataset.index;
             const arrDeadline = inputDeadline.value.split('-').reverse();
-            const arrDeadlineNumber = [Number(arrDeadline[0]), Number(arrDeadline[1]), Number(arrDeadline[2])];
+            const arrDeadlineNumber = `${Number(arrDeadline[2])}-${Number(arrDeadline[1])}-${Number(arrDeadline[0])}`;
             const { totalDays, text } = getDeadline(arrDeadlineNumber);
 
             timeDeadline.innerText = text;
@@ -841,12 +826,7 @@ const appOOP = {
                 } // else
             }) // map
 
-            if (getTotalDaysDifferent(getCurrentTime_ISOformat(), arrDeadlineNumber.toString()) < 0) {
-                appOOP.dataTodos.forEach(item => {
-                    if (item.id == id) {
-                        item.outOfDate = true;
-                    }
-                }); // forEach
+            if (getTotalDaysDifferent(getCurrentTime_ISOformat(), arrDeadlineNumber) < 0) {
 
                 textItem.style.color = 'red';
 
@@ -856,11 +836,6 @@ const appOOP = {
                     }
                 }); // Array.from
             } else {
-                appOOP.dataTodos.forEach(item => {
-                    if (item.id == id) {
-                        item.outOfDate = false;
-                    }
-                }); // forEach
 
                 textItem.style.color = 'var(--color-black-1)';
 
@@ -880,7 +855,7 @@ const appOOP = {
             appOOP.localSet();
         } // inputDeadline
 
-        fullSetting.onclick = () => {
+        overlay.onclick = () => {
             tabColor.classList.remove('show');
         } // fullSetting
 

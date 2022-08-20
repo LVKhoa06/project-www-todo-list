@@ -247,7 +247,7 @@ list-pin {
     z-index: 100;
 }
 
-full {
+overlay {
     position: absolute;
     display: flex;
     align-items: center;
@@ -499,7 +499,7 @@ up-down {
     overflow: hidden;
 }
 
-#foo{
+#indicator1{
     background-color: red;
     width: 86%;
     height: 5px;
@@ -508,7 +508,7 @@ up-down {
     top: 69px;
     display: none;
 }
-#foo2 {
+#indicator2 {
     background-color: red;
     width: 86%;
     height: 5px;

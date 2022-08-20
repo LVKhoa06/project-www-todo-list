@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css"
         integrity="sha512-1sCRPdkRXhBV2PBLUdRb4tMg1w2YPf37qatUFeS7zlBy7jJI8Lf4VHwWfZZfpXtYSLy85pkm9GaYVYMfw5BC1A=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script defer src="./assets/js/refactor/main-refactor.js"></script>
+    <script defer src="./assets/js/refactor/utils-refactor.js"></script>
 </head>
 
 <body>
@@ -21,8 +23,8 @@
         </add-note>
         <list-pin>
         </list-pin>
-        <div id="foo"></div>
-        <div id="foo2"></div>
+        <div id="indicator1"></div>
+        <div id="indicator2"></div>
         <list-note>
         </list-note>
     </app>
@@ -31,7 +33,7 @@
         <span class="checkbox-drag checkbox-complete"></span>
         <span class="text-drag"></span>
     </li>
-    <full class="hide">
+    <overlay class="hide">
         <advanced-edit>
             <header>
                 <i class="fa-solid fa-thumbtack icon-pin"></i>
@@ -51,12 +53,12 @@
                         <input value="#3ec6f7" class="input-color" type="color">
                         <tab>
                             <span class="tab-btn btn-cancel">Cancel</span>
-                            <span class="tab-btn btn-ok">Ok</span>
+                            <span class="tab-btn btn-submit-color">Ok</span>
                         </tab>
                     </color>
                     <deadline>
                         <i class="icon-deadline icon-setting fa-solid fa-hourglass-half"></i>
-                        <input class="input-deadline" type="date" min="2022-01-01" max="2050-12-30">
+                        <input class="input-deadline" type="date" min="2022-01-01" max="2030-12-30">
                     </deadline>
                     <i class="icon-copy icon-setting fa-solid fa-copy"></i>
                     <i class="icon-recycle-bin icon-setting fa-solid fa-trash-can"></i>
@@ -66,14 +68,7 @@
                 </close>
             </footer>
         </advanced-edit>
-    </full>
-
-    <style>
-
-    </style>
+    </overlay>
 </body>
-
-<script src="./assets/js/refactor/main-refactor.js"></script>
-<script src="./assets/js/refactor/utils-refactor.js"></script>
 
 </html>
