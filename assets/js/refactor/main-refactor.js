@@ -74,7 +74,7 @@ const appOOP = {
         const htmlsTodos = this.dataTodos.map((item) => {
             if (item.pin == false) {
                 return `                
-                <li  style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
+                <li style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
                     <up-down draggable="true">
                         <i class="icon-drag fa-solid fa-grip-vertical"></i>
                     </up-down>
@@ -120,11 +120,9 @@ const appOOP = {
         listNote.innerHTML = htmlsTodos;
     }, // render
 
-    renderFullTodo: function (e) {
+    renderAnvancedEdit: function (e) {
         const outerId = e.target.parentNode.dataset.index;
         const todo = this.dataTodos.find(entry => entry.id === outerId);
-        const arrDeadline = todo.deadline.split('-');
-        const arrDeadlineNumber = `${Number(arrDeadline[2])}-${Number(arrDeadline[1])}-${Number(arrDeadline[0])}`;
 
         const htmlContent = `
                 <li class="item-note bla ${todo.status == 2 ? 'strikethrough2' : ''}" data-index="${outerId}" >
@@ -135,7 +133,7 @@ const appOOP = {
                 </li>
                 `;
         timeCreate.innerText = todo.date;
-        timeDeadline.innerText = todo.deadline == '' ? '' : getDeadline(arrDeadlineNumber).text;
+        timeDeadline.innerText = todo.deadline == '' ? '' : getDeadline(todo.deadline).text;
 
         contentAnvancedEdit.innerHTML = htmlContent;
     }, // renderFullTodo
@@ -254,7 +252,6 @@ const appOOP = {
             pin: false,
             deadline: '',
             color: COLOR_DEFAULT,
-            // outOfDate: false,
             status: CONST_TODO_STATUS.DOING,
         });
         appOOP.localSet();
@@ -285,7 +282,7 @@ const appOOP = {
                 } // return
         }) // map
 
-        appOOP.data = [...appOOP.dataTodos]; // test setter
+        appOOP.data = [...appOOP.dataTodos];
     }, // updateTodo
 
     deleteTodo: function (e) {
@@ -294,16 +291,16 @@ const appOOP = {
             return;
 
         const listElement = e.target.parentNode;
-        const idDelete = listElement.dataset.index;
+        const id = listElement.dataset.index;
         listElement.parentNode.removeChild(listElement);
 
-        if (listPin.children.length < 2) {
+        if (listPin.children.length === 1) {
             listPin.classList.add('hide');
         } else {
             listPin.classList.remove('hide');
         }
 
-        appOOP.dataTodos = appOOP.dataTodos.filter(item => item.id !== idDelete);
+        appOOP.dataTodos = appOOP.dataTodos.filter(item => item.id !== id);
         appOOP.localSet();
     }, // deleteTodo
 
@@ -430,15 +427,15 @@ const appOOP = {
                     iconPin.classList.remove('pin-item');
                 }
             }
-        })
+        }); // forEach
 
         overlay.classList.remove('hide');
         appOOP.updateTodo(e.target);
-        appOOP.renderFullTodo(e);
+        appOOP.renderAnvancedEdit(e);
 
     }, // clickIconFull
 
-    getElm: function (e) {
+    getMouseDownElm: function (e) {
         const item = e.target.closest('.item-note');
         const text = item.querySelector('.item-text').textContent;
         const id = item.dataset.index;
@@ -477,14 +474,17 @@ const appOOP = {
         const pinLastItem = Array.from(listPin.children).at(-1);
         const unpinFirstItem = Array.from(listNote.children)[0];
 
+        if (listNote.childElementCount > 0) {
+            appOOP.topUnpin = unpinFirstItem.getBoundingClientRect().y - item.offsetHeight + 5;
+        }
+        // indicator1 offsetHeight
         appOOP.heightNote = item.offsetHeight;
-        appOOP.topUnpin = unpinFirstItem.getBoundingClientRect().y - item.offsetHeight + 5; // indicator1 offsetHeight, item marginBottom
-        appOOP.topPin = pinLastItem.getBoundingClientRect().y + 10;// indicator1 offsetHeight
+        appOOP.topPin = pinLastItem.getBoundingClientRect().y + 5;
 
         return todo;
     }, // getElm
 
-    indicatorDrag: function (e, index, device) {
+    displayIndicator: function (e, index, device) {
         const item = e.target.closest('.item-note');
 
         const titlePin = app.querySelector('.title-pin');
@@ -500,7 +500,7 @@ const appOOP = {
         const checkDeviceX = device == 'PC' ? e.pageX : e.targetTouches[0].pageX;
 
         if (listPin.className === 'hide') {
-            indicator1.style.top = computedAddNote + 5;  // indicator1.offsetHeight ?
+            indicator1.style.top = computedAddNote + 5;  // indicator1.offsetHeight 
         } else {
             indicator1.style.top = computedAddNote + computedPin - 5;
         }
@@ -585,14 +585,10 @@ const appOOP = {
             }) // map
         }
         let toIndex2;
-        // if (appOOP.mouseDownPageY < e.pageY) {
-        //     toIndex2 = appOOP.toIndex;
-        // }
 
         if (appOOP.fromIndex > appOOP.listNotePin.length - 1 && appOOP.itemMove === appOOP.listNotePin.at(-1) && appOOP.itemOffsetY > appOOP.heightNote / 2)
             toIndex2 = appOOP.fromIndex + 1;
         else if (appOOP.fromIndex <= appOOP.listNotePin.length && appOOP.itemMove === appOOP.listNoteUnpin.at(0) && appOOP.itemOffsetY < appOOP.heightNote / 2) {
-            c('hi')
             toIndex2 = appOOP.toIndex - 1;
         }
         else toIndex2 = appOOP.toIndex;
@@ -616,7 +612,7 @@ const appOOP = {
         });
 
         appOOP.dataTodos = arrPin.concat(arrUnpin);
-    }, // sort
+    }, // sortData
 
     sortDataDeadline: function () {
         let time = getDateParts();
@@ -629,8 +625,6 @@ const appOOP = {
 
         const todayTxt = time.reverse().toString().replace(/,/g, '-');
 
-        // primative: int, string <> object
-        // helping func.
         function compareDate(a, b) {
             const deadlineProcessedA = a.deadline.split('-').reverse().join('-');
             const deadlineProcessedB = b.deadline.split('-').reverse().join('-');
@@ -658,9 +652,9 @@ const appOOP = {
         appOOP.dataTodos = [...expiredTodosSorted, ...notExpiredTodos];
 
         appOOP.data = [...appOOP.dataTodos];
-    }, // sortData
+    }, // sortDataDeadline
 
-    useIndicator: function (e, device) {
+    useDisplayIndicator: function (e, device) {
         // PC
         if (device === 'PC') {
             const itemPC = e.target.closest('.item-note');
@@ -671,7 +665,7 @@ const appOOP = {
 
             const indexTodoPc = appOOP.dataTodos.indexOf(todoPC);
 
-            appOOP.indicatorDrag(e, indexTodoPc, 'PC');
+            appOOP.displayIndicator(e, indexTodoPc, 'PC');
 
             appOOP.toIndex = appOOP.dataTodos.indexOf(todoPC);
         } else {
@@ -683,18 +677,20 @@ const appOOP = {
             });
 
             const indexTodoMb = appOOP.dataTodos.indexOf(todoMb);
-            appOOP.indicatorDrag(e, indexTodoMb, 'MOBILE');
+            appOOP.displayIndicator(e, indexTodoMb, 'MOBILE');
             appOOP.toIndex = appOOP.dataTodos.indexOf(todoMb);
         }
     },
 
     handleEvents: function () {
+        const OS = checkEnvironment().os;
+
         btnAddNote.onclick = () => {
             if (appOOP.inputValueLength() > 0) {
                 appOOP.createNote();
             }
 
-            if (checkEnvironment().os === 'Linux' || checkEnvironment().os === 'Android' || checkEnvironment().os === 'iOS') {
+            if (OS === 'Linux' || OS === 'Android' || OS === 'iOS') {
                 app.querySelectorAll('up-down').forEach(item => {
                     item.innerHTML = '<i class="icon-up-down fa-solid fa-grip-vertical"></i>';
                 });
@@ -709,7 +705,7 @@ const appOOP = {
 
         closeAnvanceEdit.onclick = () => {
             overlay.classList.add('hide');
-        } // fullSettingClose.
+        } // closeAnvanceEdit.
 
         iconRecycleBin.onclick = (e) => {
             const id = e.target.closest('advanced-edit').querySelector('.item-note').dataset.index;
@@ -748,16 +744,16 @@ const appOOP = {
             iconCopy.onclick = (e) => {
                 const id = e.target.closest('advanced-edit').querySelector('.item-note').dataset.index;
 
-                let dataCopy = appOOP.dataTodos.find(item => item.id === id);
+                let todoCopy = appOOP.dataTodos.find(item => item.id === id);
+                const dataCopyId = todoCopy.id;
 
-                dataCopy = {
-                    ...dataCopy,
+                todoCopy = {
+                    ...todoCopy,
                     id: `${Date.now()}`,
                     date: getCurrentTime_ISOformat()
                 }
-                appOOP.dataTodos.push(dataCopy);
 
-                const dataCopyId = dataCopy.id;
+                appOOP.dataTodos.push(todoCopy);
 
                 overlay.classList.add('hide');
 
@@ -777,7 +773,7 @@ const appOOP = {
             tabColor.classList.add('show');
         } // inputColor
 
-        btnCancel.onclick = (e) => {
+        btnCancel.onclick = () => {
             tabColor.classList.remove('show');
         } // btnCancel
 
@@ -811,9 +807,7 @@ const appOOP = {
             const wrapper = e.target.closest('advanced-edit');
             const textItem = wrapper.querySelector('.item-text');
             const id = wrapper.querySelector('.item-note').dataset.index;
-            const arrDeadline = inputDeadline.value.split('-').reverse();
-            const arrDeadlineNumber = `${Number(arrDeadline[2])}-${Number(arrDeadline[1])}-${Number(arrDeadline[0])}`;
-            const { totalDays, text } = getDeadline(arrDeadlineNumber);
+            const { totalDays, text } = getDeadline(inputDeadline.value);
 
             timeDeadline.innerText = text;
 
@@ -823,12 +817,12 @@ const appOOP = {
                 } else {
                     return {
                         ...item,
-                        deadline: inputDeadline.value.split('-').reverse().toString().replace(/,/g, '-')
+                        deadline: inputDeadline.value
                     }
                 } // else
             }) // map
 
-            if (getTotalDaysDifferent(getCurrentTime_ISOformat(), arrDeadlineNumber) < 0) {
+            if (getTotalDaysDifferent(getCurrentTime_ISOformat(), inputDeadline.value) < 0) {
 
                 textItem.style.color = 'red';
 
@@ -848,8 +842,6 @@ const appOOP = {
                 }); // Array.from
             } // else
 
-            inputDeadline.value = arrDeadline.reverse().toString().replace(/,/g, '-');
-
             if (totalDays < 0)
                 appOOP.sortDataDeadline();
 
@@ -862,18 +854,18 @@ const appOOP = {
         } // fullSetting
 
         app.querySelectorAll('.item-note').forEach(item => {
-            item.ondragstart = (e) => appOOP.itemDrop = appOOP.getElm(e);
-            item.ondragenter = (e) => appOOP.useIndicator(e, 'PC');
+            item.ondragstart = (e) => appOOP.itemDrop = appOOP.getMouseDownElm(e);
+            item.ondragenter = (e) => appOOP.useDisplayIndicator(e, 'PC');
             item.ondragend = (e) => appOOP.dropElm(e);
         }); // forEach
 
         app.querySelectorAll('up-down').forEach(item => {
             item.ontouchstart = (e) => {
-                appOOP.itemDrop = appOOP.getElm(e);
+                appOOP.itemDrop = appOOP.getMouseDownElm(e);
             };
             item.ontouchmove = (e) => {
                 e.preventDefault();
-                appOOP.useIndicator(e, 'MOBILE');
+                appOOP.useDisplayIndicator(e, 'MOBILE');
             }
             item.ontouchend = (e) => appOOP.dropElm(e);
         });
