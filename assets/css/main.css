@@ -347,7 +347,7 @@ close:hover {
     color: var(--text-color-4);
 }
 
-#icon-full {
+#icon-details {
     position: absolute;
     right: -35px;
     display: none;
@@ -357,7 +357,7 @@ close:hover {
     justify-content: center;
 }
 
-.item-note:hover #icon-full {
+.item-note:hover #icon-details {
     display: block;
 }
 

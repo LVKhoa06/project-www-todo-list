@@ -164,11 +164,11 @@ const appOOP = {
         const dataUnPin = this.dataTodos.slice(dataPinLength);
         const htmlsTodos = dataUnPin.map((item) => {
             return `   
-                <li style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
+                <li style="border-color: ${item.color};" class="item-note ${item.status == CONST_TODO_STATUS.COMPLETED ? 'strikethrough' : ''}" data-index="${item.id}" >
                     <up-down draggable="true">
                         <i class="icon-drag fa-solid fa-grip-vertical"></i>
                     </up-down>
-                    <input class="checkbox-hide" type="checkbox" ${item.status == 2 ? 'checked' : ''}>
+                    <input class="checkbox-hide" type="checkbox" ${item.status == CONST_TODO_STATUS.COMPLETED ? 'checked' : ''}>
                     <span style="border-color: ${item.color};" class="checkbox-complete"></span>
                     <span ${getTotalDaysDifferent(getCurrentTime_ISOformat(), item.date) < 0 ? 'style="color:red;"' : ''} class="item-text">${item.text}</span>
                     <button class="btn-delete">x</button>
@@ -183,11 +183,11 @@ const appOOP = {
             listPin.classList.remove('hide');
             const htmlPin = dataPin.map((item) => {
                 return `
-                    <li style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
+                    <li style="border-color: ${item.color};" class="item-note ${item.status == CONST_TODO_STATUS.COMPLETED ? 'strikethrough' : ''}" data-index="${item.id}" >
                         <up-down draggable="true">
                             <i class="icon-drag fa-solid fa-grip-vertical"></i>
                         </up-down>
-                        <input class="checkbox-hide" type="checkbox" ${item.status == 2 ? 'checked' : ''}>
+                        <input class="checkbox-hide" type="checkbox" ${item.status == CONST_TODO_STATUS.COMPLETED ? 'checked' : ''}>
                         <span style="border-color: ${item.color};" class="checkbox-complete"></span>
                         <span  ${getTotalDaysDifferent(getCurrentTime_ISOformat(), item.date) < 0 ? 'style="color:red;"' : ''} class="item-text">${item.text}</span>
                         <button class="btn-delete">x</button>
@@ -212,8 +212,8 @@ const appOOP = {
         const todo = this.dataTodos.find(entry => entry.id === outerId);
 
         const htmlContent = `
-                <li class="item-note bla ${todo.status == 2 ? 'strikethrough2' : ''}" data-index="${outerId}" >
-                    <input class="checkbox-hide" type="checkbox" onclick="appOOP.strikethroughItem(this)" ${todo.status == 2 ? 'checked' : ''}>
+                <li class="item-note bla ${todo.status == CONST_TODO_STATUS.COMPLETED ? 'strikethrough2' : ''}" data-index="${outerId}" >
+                    <input class="checkbox-hide" type="checkbox" onclick="appOOP.strikethroughItem(this)" ${todo.status ==  CONST_TODO_STATUS.COMPLETED ? 'checked' : ''}>
                     <span style="border-color: ${todo.color};" class="checkbox-complete"></span>
                     <span contenteditable="true" ${getTotalDaysDifferent(getCurrentTime_ISOformat(), todo.date) < 0 ? 'style="color:red;"' : ''} class="item-text">${todo.text}</span>
                     <i class="show icon-save" id="icon-save-inner" onclick="appOOP.submitText(this)"></i>
@@ -339,15 +339,10 @@ const appOOP = {
     }, // submitText
 
     updateTodo: function (id, property, value) {
-        appOOP.dataTodos = appOOP.dataTodos.map((item) => {
-            if (item.id !== id)
-                return item;
-            else
-                return {
-                    ...item,
-                    [property]: value
-                } // return
-        }); // map
+
+        const updatedTodo = appOOP.dataTodos.find(item => item.id === id);
+
+        updatedTodo[property] = value;
     }, // updateTodo
 
     deleteTodo: function (e) {
@@ -505,7 +500,7 @@ const appOOP = {
         });
 
         dragText.innerText = text;
-        if (todo.status == 2) {
+        if (todo.status == CONST_TODO_STATUS.COMPLETED) {
             dragItem.classList.add('strikethrough');
             checkboxDrag.setAttribute('checked', '');
         }
