@@ -5,8 +5,8 @@ const devMode = true;
 module.exports = {
   mode: devMode ? 'development' : 'production',
   entry: [
-      './assets/js/refactor/main-refactor.js', // file nguồn Webpack làm việc
-    ],
+    './assets/js/refactor/main-refactor.js', // file nguồn Webpack làm việc
+  ],
 
   output: {
     filename: 'min.js',                 // tên file xuất ra
@@ -19,4 +19,15 @@ module.exports = {
     // We no not want to minimize our code.
     minimize: true
   },
+  module: {
+    rules: [
+      {
+        test: /\.css$/,
+        use: [
+          'style-loader',
+          'css-loader'
+        ]
+      }
+    ]
+  }
 };

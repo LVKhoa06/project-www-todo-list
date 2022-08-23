@@ -1,6 +1,19 @@
 import { checkEnvironment, getCurrentTime_ISOformat, getDateParts, getTotalDaysDifferent, moveItem, getDateDifferent } from "./utils-refactor.js";
+import "../../css/small.css";
+import "../../css/main.css" ;
 
+// if (window.innerWidth > 767) {
+//     import('./web.css').then(() => {
+//        console.log("Imported web css");
+//     });
+// }
+// else{
+//     import('./mob.css').then(() => {
+//        console.log("Imported mobile css");
+//     });
+// }
 
+ 
 //#region app node 
 const app = document.querySelector('app');
 const formAddNote = app.querySelector('add-note');
@@ -208,14 +221,14 @@ const appOOP = {
 
     renderDetails: function (e) {
         const outerId = e.target.parentNode.dataset.index;
-        const todo = this.dataTodos.find(entry => entry.id === outerId);
+        const todo = appOOP.dataTodos.find(entry => entry.id === outerId);
 
         const htmlContent = `
                 <li class="item-note bla ${todo.status == 2 ? 'strikethrough2' : ''}" data-index="${outerId}" >
-                    <input class="checkbox-hide" type="checkbox" onclick="appOOP.strikethroughItem(this)" ${todo.status == 2 ? 'checked' : ''}>
+                    <input class="checkbox-hide" type="checkbox" onclick="appOOP.strikethroughItem(appOOP)" ${todo.status == 2 ? 'checked' : ''}>
                     <span style="border-color: ${todo.color};" class="checkbox-complete"></span>
                     <span contenteditable="true" ${getTotalDaysDifferent(getCurrentTime_ISOformat(), todo.date) < 0 ? 'style="color:red;"' : ''} class="item-text">${todo.text}</span>
-                    <i class="show icon-save" id="icon-save-inner" onclick="appOOP.submitText(this)"></i>
+                    <i class="show icon-save" id="icon-save-inner" onclick="appOOP.submitText(appOOP)"></i>
                 </li>
                 `;
         detailsTimeCreate.innerText = todo.date;
@@ -274,25 +287,24 @@ const appOOP = {
         listNote.appendChild(item);
 
         formInputNote.value = "";
-        upDown.ontouchstart = (e) => this.todo = this.getMouseDownElm(e);
+        upDown.ontouchstart = (e) => appOOP.todo = appOOP.getElmWhenMouseDown(e);
         upDown.ontouchmove = (e) => {
             e.preventDefault();
-            this.useDisplayIndicator(e, 'MOBILE');
+            appOOP.useDisplayIndicator(e, 'MOBILE');
         }
+        upDown.ontouchend = (e) => appOOP.dropElm(e);
+        item.ondragstart = (e) => appOOP.todo = appOOP.getElmWhenMouseDown(e);
+        item.ondragenter = (e) => appOOP.useDisplayIndicator(e, 'PC');
+        item.ondragend = (e) => appOOP.dropElm(e);
 
-        upDown.ontouchend = (e) => this.dropElm(e);
-        item.ondragstart = (e) => this.todo = this.getMouseDownElm(e);
-        item.ondragenter = (e) => this.useDisplayIndicator(e, 'PC');
-        item.ondragend = (e) => this.dropElm(e);
+        btnDelete.onclick = appOOP.deleteTodo;
+        checkboxHide.onclick = (e) => appOOP.strikethroughItem(e.target);
+        iconSave.onclick = (e) => appOOP.updateText(e.target);
+        iconSave.onclick = appOOP.clickIconTick;
+        itemText.onclick = appOOP.clickItem;
+        fullIcon.onclick = appOOP.clickIconFull;
 
-        btnDelete.onclick = this.deleteTodo;
-        checkboxHide.onclick = (e) => this.strikethroughItem(e.target);
-        iconSave.onclick = (e) => this.updateText(e.target);
-        iconSave.onclick = this.clickIconTick;
-        itemText.onclick = this.clickItem;
-        fullIcon.onclick = this.clickIconFull;
-
-        this.addTodo(id, itemText.innerText);
+        appOOP.addTodo(id, itemText.innerText);
     }, // createNote
 
     statusOnEdit: function (boolean) {
@@ -529,7 +541,7 @@ const appOOP = {
         appOOP.topPin = pinLastItem.getBoundingClientRect().y + 5;
 
         return todo;
-    }, // getMouseDownElm
+    }, // getElmWhenMouseDown
 
     displayIndicator: function (e, index, device) {
         const item = e.target.closest('.item-note');
