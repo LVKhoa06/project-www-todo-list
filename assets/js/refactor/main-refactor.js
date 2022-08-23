@@ -34,17 +34,13 @@ const detailsEditClose = overlay.querySelector('close');
 //#endregion anvanced edit node
 
 const cloneElmDrag = document.querySelector('.item-drag');
-
 const CONST_LS_KEY = 'TODO-LIST';
-
-// enumeration
-const CONST_TODO_STATUS = {
+const CONST_TODO_STATUS = { // enumeration
     PENDING: 0,
     DOING: 1,
     COMPLETED: 2,
     CANCELED: -1,
 }
-
 const COLOR_DEFAULT = 'var(--app-color-1)';
 
 //#endregion declare const
@@ -106,7 +102,7 @@ const appOOP = {
     }, // localGet
     // #endregion localStorage
 
-    //#region Helping func
+    //#region helping func
     inputValueLength: function () {
         return formInputNote.value.length;
     }, // inputValueLength
@@ -127,13 +123,11 @@ const appOOP = {
 
     sortDataDeadline: function () {
         let time = getDateParts();
-
         time = [
             time.day.toString().padStart(2, 0),
             time.month.toString().padStart(2, 0),
             time.year
         ];
-
         const todayTxt = time.reverse().toString().replace(/,/g, '-');
 
         function compareDate(a, b) {
@@ -146,11 +140,10 @@ const appOOP = {
                     deadlineProcessedA > deadlineProcessedB ?
                         1 :
                         0
-            )
+            );
         } // compare
 
         let expiredTodos = [], notExpiredTodos = [];
-
         appOOP.dataTodos.forEach(item => {
             const deadlineProcessed = item.deadline.split('-').reverse();
 
@@ -159,9 +152,7 @@ const appOOP = {
         }); // forEach
 
         const expiredTodosSorted = expiredTodos.sort(compareDate);
-
         appOOP.dataTodos = [...expiredTodosSorted, ...notExpiredTodos];
-
         appOOP.data = [...appOOP.dataTodos];
     }, // sortDataDeadline
     //#endregion sort data
@@ -171,9 +162,8 @@ const appOOP = {
         const dataPin = this.dataTodos.filter(item => item.pin);
         const dataPinLength = dataPin.length;
         const dataUnPin = this.dataTodos.slice(dataPinLength);
-
         const htmlsTodos = dataUnPin.map((item) => {
-            return `                
+            return `   
                 <li style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
                     <up-down draggable="true">
                         <i class="icon-drag fa-solid fa-grip-vertical"></i>
@@ -183,7 +173,7 @@ const appOOP = {
                     <span ${getTotalDaysDifferent(getCurrentTime_ISOformat(), item.date) < 0 ? 'style="color:red;"' : ''} class="item-text">${item.text}</span>
                     <button class="btn-delete">x</button>
                     <i class="icon-save"></i>
-                    <i id="icon-full" class="fa-solid fa-expand"></i>
+                    <i id="icon-details" class="fa-solid fa-expand"></i>
                     <div class="indicator-drag"></div>
                 </li>
                     `;
@@ -196,13 +186,13 @@ const appOOP = {
                     <li style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
                         <up-down draggable="true">
                             <i class="icon-drag fa-solid fa-grip-vertical"></i>
-                        </up-down>  
+                        </up-down>
                         <input class="checkbox-hide" type="checkbox" ${item.status == 2 ? 'checked' : ''}>
                         <span style="border-color: ${item.color};" class="checkbox-complete"></span>
                         <span  ${getTotalDaysDifferent(getCurrentTime_ISOformat(), item.date) < 0 ? 'style="color:red;"' : ''} class="item-text">${item.text}</span>
                         <button class="btn-delete">x</button>
                         <i class="icon-save"></i>
-                        <i id="icon-full" class="fa-solid fa-expand"></i>
+                        <i id="icon-details" class="fa-solid fa-expand"></i>
                         <div class="indicator-drag"></div>
                     </li>
                         `;
@@ -211,14 +201,13 @@ const appOOP = {
                 <h3 class="title-pin">List Pin Note</h3>
             ${htmlPin}
             `;
-        } else {
+        } else
             listPin.classList.add('hide');
-        }
 
         listNote.innerHTML = htmlsTodos;
     }, // render
 
-    renderAnvancedEdit: function (e) {
+    renderDetails: function (e) {
         const outerId = e.target.parentNode.dataset.index;
         const todo = this.dataTodos.find(entry => entry.id === outerId);
 
@@ -227,20 +216,20 @@ const appOOP = {
                     <input class="checkbox-hide" type="checkbox" onclick="appOOP.strikethroughItem(this)" ${todo.status == 2 ? 'checked' : ''}>
                     <span style="border-color: ${todo.color};" class="checkbox-complete"></span>
                     <span contenteditable="true" ${getTotalDaysDifferent(getCurrentTime_ISOformat(), todo.date) < 0 ? 'style="color:red;"' : ''} class="item-text">${todo.text}</span>
-                    <i class="show icon-save" id="icon-save-inner" onclick="appOOP.updateTodo(this)"></i>
+                    <i class="show icon-save" id="icon-save-inner" onclick="appOOP.submitText(this)"></i>
                 </li>
                 `;
         detailsTimeCreate.innerText = todo.date;
         detailsTimeDeadline.innerText = todo.deadline == '' ? '' : getDateDifferent(todo.deadline).text;
 
         detailsEditText.innerHTML = htmlContent;
-    }, // renderAnvancedEdit
+    }, // renderDetails
     //#endregion render
 
     //#region add/edit/delete note
     createNote: function () {
         const id = `${Date.now()}`;
-        let item, itemText, checkboxHide, checkboxShow, btn, icon, fullIcon, upDown, dragIcon, indicatorDrag;
+        let item, itemText, checkboxHide, checkboxShow, btnDelete, iconSave, fullIcon, upDown, dragIcon, indicatorDrag;
 
         // Create item
         item = document.createElement("li");
@@ -249,10 +238,9 @@ const appOOP = {
         itemText = document.createElement("span");
         checkboxHide = document.createElement("input");
         checkboxShow = document.createElement("span");
-        btn = document.createElement("button");
-        icon = document.createElement('i');
+        btnDelete = document.createElement("button");
+        iconSave = document.createElement('i');
         upDown = document.createElement('up-down');
-
         dragIcon = document.createElement('i');
         dragIcon.setAttribute('class', 'icon-drag fa-solid fa-grip-vertical');
         upDown.appendChild(dragIcon);
@@ -262,18 +250,18 @@ const appOOP = {
         indicatorDrag.className = 'indicator-drag';
         fullIcon.className = 'fa-solid fa-expand';
         itemText.className = 'item-text';
-        btn.className = 'btn-delete';
+        btnDelete.className = 'btn-delete';
         checkboxHide.className = 'checkbox-hide';
         checkboxShow.className = 'checkbox-complete';
-        icon.className = 'icon-save';
+        iconSave.className = 'icon-save';
         item.setAttribute("draggable", "true");
         checkboxHide.setAttribute("type", "checkbox");
         item.setAttribute("data-index", id);
-        fullIcon.setAttribute('id', 'icon-full');
+        fullIcon.setAttribute('id', 'icon-details');
 
         // Add text
         itemText.innerText = formInputNote.value;
-        btn.appendChild(document.createTextNode("x"));
+        btnDelete.appendChild(document.createTextNode("x"));
 
         // Assign element to item
         item.appendChild(checkboxHide);
@@ -282,10 +270,8 @@ const appOOP = {
         item.appendChild(indicatorDrag);
         item.appendChild(upDown);
         item.appendChild(itemText);
-        item.appendChild(btn);
-        item.appendChild(icon);
-
-        // Add item to list
+        item.appendChild(btnDelete);
+        item.appendChild(iconSave);
         listNote.appendChild(item);
 
         formInputNote.value = "";
@@ -296,39 +282,33 @@ const appOOP = {
         }
 
         upDown.ontouchend = (e) => this.dropElm(e);
-
         item.ondragstart = (e) => this.todo = this.getMouseDownElm(e);
-
         item.ondragenter = (e) => this.useDisplayIndicator(e, 'PC');
-
         item.ondragend = (e) => this.dropElm(e);
 
-        btn.onclick = this.deleteTodo;
+        btnDelete.onclick = this.deleteTodo;
         checkboxHide.onclick = (e) => this.strikethroughItem(e.target);
-        icon.onclick = (e) => this.updateTodo(e.target);
-        icon.onclick = this.clickIconTick;
+        iconSave.onclick = (e) => this.updateText(e.target);
+        iconSave.onclick = this.clickIconTick;
         itemText.onclick = this.clickItem;
         fullIcon.onclick = this.clickIconFull;
 
         this.addTodo(id, itemText.innerText);
     }, // createNote
 
-    updateOnEdit: function (boolean) {
+    statusOnEdit: function (boolean) {
         if (boolean) {
             appOOP.onEdit = true;
-
             formInputNote.setAttribute('disabled', true);
             formBtnAddNote.setAttribute('disabled', true);
         } else {
             appOOP.onEdit = false;
-
             formInputNote.removeAttribute('disabled');
             formBtnAddNote.removeAttribute('disabled');
         }
-    }, // updateOnEdit
+    }, // statusOnEdit
 
     addTodo: function (id, todoText) {
-
         appOOP.dataTodos.push({
             id,
             text: todoText,
@@ -341,8 +321,7 @@ const appOOP = {
         appOOP.localSet();
     }, // addTodo
 
-    // updateTodo('property', value)
-    updateTodo: function (elm) {
+    submitText: function (elm) {
         const ElmText = elm.parentNode.querySelector('.item-text');
         const newText = ElmText.textContent;
         const id = elm.parentNode.dataset.index;
@@ -354,23 +333,24 @@ const appOOP = {
             }, 100);
         }
 
-        appOOP.updateOnEdit(false);
+        appOOP.statusOnEdit(false);
+        appOOP.updateTodo(id, 'text', newText);
+        appOOP.data = [...appOOP.dataTodos];
+    }, // submitText
 
+    updateTodo: function (id, property, value) {
         appOOP.dataTodos = appOOP.dataTodos.map((item) => {
-            if (item.id != id)
+            if (item.id !== id)
                 return item;
             else
                 return {
                     ...item,
-                    text: newText
+                    [property]: value
                 } // return
-        }) // map
-
-        appOOP.data = [...appOOP.dataTodos];
+        }); // map
     }, // updateTodo
 
     deleteTodo: function (e) {
-
         if (appOOP.onEdit)
             return;
 
@@ -378,20 +358,18 @@ const appOOP = {
         const id = listElement.dataset.index;
         listElement.parentNode.removeChild(listElement);
 
-        if (listPin.children.length === 1) {
+        if (listPin.children.length === 1)
             listPin.classList.add('hide');
-        } else {
+        else
             listPin.classList.remove('hide');
-        }
 
         appOOP.dataTodos = appOOP.dataTodos.filter(item => item.id !== id);
         appOOP.localSet();
     }, // deleteTodo
     //#endregion add/edit/delete note
 
-    //#region 
+    //#region work with notes
     strikethroughItem: function (elm) {
-
         if (elm.hasAttribute('checked')) {
             elm.parentNode.classList.remove('strikethrough');
             elm.removeAttribute('checked');
@@ -407,28 +385,12 @@ const appOOP = {
         const id = elm.parentNode.dataset.index;
         const hasAtr = elm.parentNode.querySelector('.checkbox-hide').hasAttribute('checked');
 
-        if (hasAtr) {
-            appOOP.dataTodos = appOOP.dataTodos.map((item) => {
-                if (item.id != id) {
-                    return item;
-                }
-                return {
-                    ...item,
-                    status: CONST_TODO_STATUS.COMPLETED
-                }
-            });
-        } else {
-            appOOP.dataTodos = appOOP.dataTodos.map((item) => {
-                if (item.id != id) {
-                    return item;
-                }
-                return {
-                    ...item,
-                    status: CONST_TODO_STATUS.DOING
-                }
-            });
-        }
-        appOOP.updateTodo(elm);
+        if (hasAtr)
+            appOOP.updateTodo(id, 'status', CONST_TODO_STATUS.COMPLETED);
+        else
+            appOOP.updateTodo(id, 'status', CONST_TODO_STATUS.DOING);
+
+        appOOP.submitText(elm);
         appOOP.localSet();
     }, // todoStatus
 
@@ -444,7 +406,7 @@ const appOOP = {
             const btnDelete = item.querySelector('.btn-delete');
             const tick = item.querySelector('.checkbox-complete');
             const idInner = item.dataset.index;
-            const fullIcon = item.querySelector('#icon-full');
+            const fullIcon = item.querySelector('#icon-details');
             const upDown = item.querySelector('up-down');
 
             if (idInner !== idOuter) {
@@ -453,9 +415,9 @@ const appOOP = {
                 fullIcon.classList.add('hide');
                 upDown.classList.add('hide');
             }
-        })
+        });
 
-        appOOP.updateOnEdit(true);
+        appOOP.statusOnEdit(true);
 
         e.target.setAttribute('contenteditable', true);
 
@@ -469,7 +431,7 @@ const appOOP = {
 
     }, // clickItem
 
-    clickIconTick: function (e) {
+    clickIconSave: function (e) {
         const listElement = e.target.parentNode;
         const idOuter = e.target.parentNode.dataset.index;
         const btnDelete = listElement.querySelector('.btn-delete');
@@ -481,13 +443,13 @@ const appOOP = {
         listElement.classList.remove('focus-item');
         btnDelete.classList.remove('hide');
 
-        appOOP.updateTodo(e.target);
+        appOOP.submitText(e.target);
         iconSave.classList.remove('show');
 
         Array.from(listNote.children).forEach((item) => {
             const btnDelete = item.querySelector('.btn-delete');
             const checkboxShow = item.querySelector('.checkbox-complete');
-            const fullIcon = item.querySelector('#icon-full');
+            const fullIcon = item.querySelector('#icon-details');
             const idInner = item.dataset.index;
 
             if (idInner !== idOuter) {
@@ -495,12 +457,12 @@ const appOOP = {
                 btnDelete.classList.remove('hide');
                 fullIcon.classList.remove('hide');
             }
-        })
+        });
 
         appOOP.onEdit = false;
-    }, // clickIconTick
+    }, // clickIconSave
 
-    clickIconFull: function (e) {
+    showDetails: function (e) {
         const note = e.target.parentNode;
         const id = note.dataset.index;
 
@@ -516,14 +478,13 @@ const appOOP = {
         }); // forEach
 
         overlay.classList.remove('hide');
-        appOOP.updateTodo(e.target);
-        appOOP.renderAnvancedEdit(e);
-
-    }, // clickIconFull
-    //#endregion 
+        appOOP.submitText(e.target);
+        appOOP.renderDetails(e);
+    }, // showDetails
+    //#endregion work with notes
 
     //#region event drag drop
-    getMouseDownElm: function (e) {
+    getElmWhenMouseDown: function (e) {
         const item = e.target.closest('.item-note');
         const text = item.querySelector('.item-text').textContent;
         const id = item.dataset.index;
@@ -573,7 +534,6 @@ const appOOP = {
 
     displayIndicator: function (e, index, device) {
         const item = e.target.closest('.item-note');
-
         const titlePin = app.querySelector('.title-pin');
         appOOP.listNotePin = Array.from(listPin.children);
         appOOP.listNotePin.shift();
@@ -582,7 +542,6 @@ const appOOP = {
         const computedAddNote = formAddNote.offsetHeight + Number(getComputedStyle(formAddNote).marginTop.replace('px', ''));
         const computedPin = listPin.offsetHeight + Number(getComputedStyle(listPin).marginTop.replace('px', '')) + Number(getComputedStyle(listPin).marginBottom.replace('px', ''));
         const computedTitlePin = titlePin.offsetHeight + Number(getComputedStyle(titlePin).marginTop.replace('px', '')) + Number(getComputedStyle(titlePin).marginBottom.replace('px', ''));
-
         const checkDeviceY = device == 'PC' ? e.pageY : e.targetTouches[0].pageY;
         const checkDeviceX = device == 'PC' ? e.pageX : e.targetTouches[0].pageX;
 
@@ -650,7 +609,6 @@ const appOOP = {
         indicator2.style.display = 'none';
 
         if (appOOP.toIndex < listPin.childElementCount - 1) {
-
             appOOP.dataTodos = appOOP.dataTodos.map(elm => {
                 if (elm.id !== id)
                     return elm;
@@ -719,8 +677,7 @@ const appOOP = {
     //#endregion event drag drop
 
     handleEvents: function () {
-
-        //#region event has a component
+        //#region event form add note
         formBtnAddNote.onclick = () => {
             const OS = checkEnvironment().os;
 
@@ -740,7 +697,9 @@ const appOOP = {
                 appOOP.createNote();
             }
         } // enterKey
+        //#endregion event form add note
 
+        //#region event details
         detailsEditClose.onclick = () => {
             overlay.classList.add('hide');
         } // closeAnvanceEdit.
@@ -776,12 +735,10 @@ const appOOP = {
 
             appOOP.sortDataDeadline();
             appOOP.data = [...appOOP.dataTodos];
-
         } // iconPin
 
         detailsIconCopy.onclick = (e) => {
             const id = e.target.closest('advanced-edit').querySelector('.item-note').dataset.index;
-
             let todoCopy = appOOP.dataTodos.find(item => item.id === id);
             const dataCopyId = todoCopy.id;
 
@@ -818,15 +775,7 @@ const appOOP = {
         detailsSubmitColor.onclick = (e) => {
             const id = e.target.closest('advanced-edit').querySelector('.item-note').dataset.index;
 
-            appOOP.dataTodos = appOOP.dataTodos.map(item => {
-                if (item.id !== id)
-                    return item;
-                else
-                    return {
-                        ...item,
-                        color: detailsInputColor.value
-                    }
-            });
+            appOOP.updateTodo(id, 'color', detailsInputColor.value);
 
             app.querySelectorAll('.item-note').forEach(item => {
                 if (item.dataset.index == id) {
@@ -849,19 +798,9 @@ const appOOP = {
 
             detailsTimeDeadline.innerText = text;
 
-            appOOP.dataTodos = appOOP.dataTodos.map(item => {
-                if (item.id !== id) {
-                    return item;
-                } else {
-                    return {
-                        ...item,
-                        deadline: detailsInputDeadline.value
-                    }
-                } // else
-            }) // map
+            appOOP.updateTodo(id, 'deadline', detailsInputDeadline.value);
 
             if (getTotalDaysDifferent(getCurrentTime_ISOformat(), detailsInputDeadline.value) < 0) {
-
                 textItem.style.color = 'red';
 
                 Array.from(listNote.children).forEach(item => {
@@ -870,7 +809,6 @@ const appOOP = {
                     }
                 }); // Array.from
             } else {
-
                 textItem.style.color = 'var(--color-black-1)';
 
                 Array.from(listNote.children).forEach(item => {
@@ -890,18 +828,18 @@ const appOOP = {
         overlay.onclick = () => {
             detailsTabColor.classList.remove('show');
         } // overlay
-        //#endregion event has a component
+        //#endregion event details
 
-        //#region event has many components
+        //#region event notes
         app.querySelectorAll('.item-note').forEach(item => {
-            item.ondragstart = (e) => appOOP.getMouseDownElm(e);
+            item.ondragstart = (e) => appOOP.getElmWhenMouseDown(e);
             item.ondragenter = (e) => appOOP.useDisplayIndicator(e, 'PC');
             item.ondragend = (e) => appOOP.dropElm(e);
         });
 
         app.querySelectorAll('up-down').forEach(item => {
             item.ontouchstart = (e) => {
-                appOOP.getMouseDownElm(e);
+                appOOP.getElmWhenMouseDown(e);
             };
             item.ontouchmove = (e) => {
                 e.preventDefault();
@@ -923,14 +861,13 @@ const appOOP = {
         });
 
         app.querySelectorAll('.icon-save').forEach(icon => {
-            icon.onclick = (e) => appOOP.clickIconTick(e);
+            icon.onclick = (e) => appOOP.clickIconSave(e);
         });
 
-        app.querySelectorAll('#icon-full').forEach(icon => {
-            icon.onclick = (e) => appOOP.clickIconFull(e);
+        app.querySelectorAll('#icon-details').forEach(icon => {
+            icon.onclick = (e) => appOOP.showDetails(e);
         });
-        //#endregion event has many components
-
+        //#endregion event notes
     }, // handleEvents
 
     start() {
