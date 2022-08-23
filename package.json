@@ -1,5 +1,41 @@
 {
+  "name": "todo-list",
+  "version": "1.0.0",
+  "description": "- [x] **📅 Timestamps**:      \r Start = 2022.07.20  \r End = YYYY.MM.DD\r - [x] **🔗 Git repo**: https://github.com/KhoaPC/project-www-todo-list\r - [x] **🔗Production website:** https://khoapc.github.io/project-www-todo-list/\r - [x] **🔗References:** https://keep.google.com/",
+  "main": "index.js",
+  "watch": {
+    "build": "{src,othersrc}/js/*.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack",
+    "watch": "npm-watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KhoaPC/project-www-todo-list.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KhoaPC/project-www-todo-list/issues"
+  },
+  "homepage": "https://github.com/KhoaPC/project-www-todo-list#readme",
+  "devDependencies": {
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0"
+  },
   "dependencies": {
-    "webpack": "^5.74.0"
+    "cross-env": "^7.0.3",
+    "css-loader": "^6.7.1",
+    "cssnano": "^5.1.13",
+    "file-loader": "^6.2.0",
+    "mini-css-extract-plugin": "^2.6.1",
+    "node-sass": "^7.0.1",
+    "npm-watch": "^0.11.0",
+    "postcss-loader": "^7.0.1",
+    "postcss-preset-env": "^7.8.0",
+    "sass-loader": "^13.0.2"
   }
 }

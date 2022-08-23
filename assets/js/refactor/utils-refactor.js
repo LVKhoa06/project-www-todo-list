@@ -1,3 +1,5 @@
+export { checkEnvironment, getCurrentTime_ISOformat, getDateParts, getTotalDaysDifferent, moveItem, getDateDifferent};
+
 // todo.day ISO
 const CONST_GET_M = ['DDMMYYYY', 'YYYYMMDD', 'YYMMDD', 'DDMMMYY', 'DMMMMYYYY', 'DDMMYY', 'YYMMMDD', 'YYYYMMMDD', 'DDMMMYYYY', 'DDMMMMYYYY'];
 const CONST_GET_D = ['MDYYYY', 'MDYY', 'MMDDYY', 'MMDDYYYY', 'MMMMDYYYY', 'MMMDDYYYY', 'MMMDDYY']
@@ -234,14 +236,6 @@ function getTotalDaysDifferent(fromDate, toDate) {
     return Math.ceil(deltaInSeconds / secondsInADay);
 } // getTotalDaysDifferent
 
-function getDateDifferent(date1, date2 = new Date) {
-    return {
-        diffDayTotals: 400,
-        diffYears: 1,
-        diffMonths: 2,
-        diffDays: 0,
-    }
-}
 
 // getDeadline = getDateDifferent(input)
 // moment, date-fns
@@ -378,3 +372,12 @@ function moveItem(arr, fromIndex, toIndex) {
     return arr;
 } // moveItem
 
+
+// function getDateDifferent(date1, date2 = new Date) {
+//     return {
+//         diffDayTotals: 400,
+//         diffYears: 1,
+//         diffMonths: 2,
+//         diffDays: 0,
+//     }
+// }

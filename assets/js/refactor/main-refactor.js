@@ -1,6 +1,5 @@
+import { checkEnvironment, getCurrentTime_ISOformat, getDateParts, getTotalDaysDifferent, moveItem, getDateDifferent } from "./utils-refactor.js";
 
-const c = console.log;
-//#region declare const 
 
 //#region app node 
 const app = document.querySelector('app');
