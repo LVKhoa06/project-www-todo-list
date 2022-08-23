@@ -1,16 +1,11 @@
 // todo.day ISO
-const getM = ['DDMMYYYY', 'YYYYMMDD', 'YYMMDD', 'DDMMMYY', 'DMMMMYYYY', 'DDMMYY', 'YYMMMDD', 'YYYYMMMDD', 'DDMMMYYYY', 'DDMMMMYYYY'];
-const getD = ['MDYYYY', 'MDYY', 'MMDDYY', 'MMDDYYYY', 'MMMMDYYYY', 'MMMDDYYYY', 'MMMDDYY']
-const weekDayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-const month31Day = [1, 3, 5, 7, 8, 10, 12];
-const month28Day = 2;
-const month30Day = [4, 6, 9, 11];
+const CONST_GET_M = ['DDMMYYYY', 'YYYYMMDD', 'YYMMDD', 'DDMMMYY', 'DMMMMYYYY', 'DDMMYY', 'YYMMMDD', 'YYYYMMMDD', 'DDMMMYYYY', 'DDMMMMYYYY'];
+const CONST_GET_D = ['MDYYYY', 'MDYY', 'MMDDYY', 'MMDDYYYY', 'MMMMDYYYY', 'MMMDDYYYY', 'MMMDDYY']
+const CONST_WEEK_DAY_NAME = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const CONST_MONTH_31DAY = [1, 3, 5, 7, 8, 10, 12];
+const CONST_MONTH_28DAY = 2;
+const CONST_MONTH_30DAY = [4, 6, 9, 11];
 const CONST_DAYS_OF_MONTHS = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]; // NOT leap year
-
-// ISO timeformat 
-
-// d vs dd vs ddd (julian day) vs dddd (day name)
-
 // get time zone (date.getTimezoneOffset() / -60)
 
 function formatDate(format, input = new Date) {
@@ -88,15 +83,15 @@ function formatDate(format, input = new Date) {
         return item !== '/' && item !== '.' && item !== ',' && item !== '-' && item !== ' ';
     }).join('').toUpperCase();
 
-    const mLength = getM.length;
-    const dLength = getD.length;
+    const mLength = CONST_GET_M.length;
+    const dLength = CONST_GET_D.length;
 
     for (let i = 0; i < mLength; i++) {
-        if (format === getM[i])
+        if (format === CONST_GET_M[i])
             index = arr1.indexOf('M');
     }
     for (let i = 0; i < dLength; i++) {
-        if (format === getD[i])
+        if (format === CONST_GET_D[i])
             index = arr1.indexOf('D');
     }
 
@@ -164,7 +159,7 @@ function getWeekdayName(input = new Date) {
     const time = new Date(input);
     const day = time.getDay();
 
-    return weekDayNames[day];
+    return CONST_WEEK_DAY_NAME[day];
 } // getWeekdayName
 
 function checkEnvironment() {
@@ -213,7 +208,6 @@ function getCurrentTime_ISOformat() {
     const help = item => item.toString().padStart(2, '0');
 
     return `${help(year)}-${help(month)}-${date}T${help(hours)}:${help(minutes)}:${help(second)}`;
-    // 
 } // getCurrentTime_ISOformat
 
 // getDateParts
@@ -240,14 +234,54 @@ function getTotalDaysDifferent(fromDate, toDate) {
     return Math.ceil(deltaInSeconds / secondsInADay);
 } // getTotalDaysDifferent
 
-function getDeadline(input) {
-    const inputD = getDateParts(formatDate('YYYY-MM-DD', input)).day;
-    const inputM = getDateParts(formatDate('YYYY-MM-DD', input)).month;
-    const inputY = getDateParts(formatDate('YYYY-MM-DD', input)).year;
+function getDateDifferent(date1, date2 = new Date) {
+    return {
+        diffDayTotals: 400,
+        diffYears: 1,
+        diffMonths: 2,
+        diffDays: 0,
+    }
+}
 
-    const todayD = getDateParts().day;
-    const todayM = getDateParts().month;
-    const todayY = getDateParts().year;
+// getDeadline = getDateDifferent(input)
+// moment, date-fns
+
+function foo(date1, date2) {
+    const { year: y1, month: m1, day: d1 } = date1;
+    const { year: y2, month: m2, day: d2 } = date2;
+
+    const diffTeller = (part, diff) => (
+        diff > 1 ?
+            `${diff}${part}s` :
+            diff === 1 ?
+                `${diff}${part}` :
+                ''
+    ) // diffTeller
+
+    let diffY = y2 - y1;
+    let diffM = m2 - m1;
+    let diffD = d2 - d1;
+
+    if (m2 < m1 || d2 < d1) {
+        diffY = Math.max(0, diffy - 1);
+        diffM = m2 + 12 - m1;
+    } // if
+
+    return `${diffTeller('year', diffY)} ${diffTeller('month', diffM)} ${diffTeller('day', diffD)}`;
+}
+
+function getDateDifferent(input) {
+    // { age, name } = user; // obj destructor
+    // arr = [1, 2, 3, 4, 5, 6]
+    // const [a, b, c] = arr; // arr destructor
+    // a = arr[0]
+    // b = arr[1]
+    // c= arr[2]
+    // a = 1, b = 2
+
+    const { day: inputD, month: inputM, year: inputY } = getDateParts(formatDate('YYYY-MM-DD', input));
+    const { day: todayD, month: todayM, year: todayY } = getDateParts(); // property alias
+
     // totalDaysDifferent
     let diffYears;
     let diffMonths;
@@ -269,17 +303,17 @@ function getDeadline(input) {
         diffYears -= 1;
         diffMonths += 11;
 
-        month31Day.forEach(item => {
+        CONST_MONTH_31DAY.forEach(item => {
 
             if (inputM == item)
                 diffDays += 31;
 
-            else if (inputM == month28Day) {
+            else if (inputM == CONST_MONTH_28DAY) {
                 diffDays += 28;
             }
         }); // forEach
 
-        month30Day.forEach(item => {
+        CONST_MONTH_30DAY.forEach(item => {
             if (inputM == item) {
                 diffDays += 30;
             }
@@ -288,7 +322,7 @@ function getDeadline(input) {
     } else if (inputD - todayD >= 0)
         diffDays = inputD - todayD;
     else {
-        month31Day.forEach(item => {
+        CONST_MONTH_31DAY.forEach(item => {
             if (todayM == item) {
                 diffDays += 31;
 
@@ -297,13 +331,13 @@ function getDeadline(input) {
                     diffYears -= 1;
                 } else
                     diffMonths -= 1;
-                    
-            } else if (todayM == month28Day) {
+
+            } else if (todayM == CONST_MONTH_28DAY) {
                 diffDays += 28;
                 diffMonths -= 1;
-            } 
+            }
         }); // forEach
-        month30Day.forEach(item => {
+        CONST_MONTH_30DAY.forEach(item => {
             if (todayM == item) {
                 diffDays += 30;
                 diffMonths -= 1;

@@ -1,61 +1,83 @@
 
 const c = console.log;
 //#region declare const 
+
+//#region app node 
 const app = document.querySelector('app');
-const addNote = app.querySelector('add-note');
-const overlay = document.querySelector('overlay');
-const listNote = app.querySelector('list-note');
+const formAddNote = app.querySelector('add-note');
+const formInputNote = app.querySelector('.input-note');
+const formBtnAddNote = app.querySelector('.btn-add');
 const listPin = app.querySelector('list-pin');
-const inputNote = app.querySelector('.input-note');
-const btnAddNote = app.querySelector('.btn-add');
-const contentAnvancedEdit = overlay.querySelector('content');
-const headerAnvanceEdit = overlay.querySelector('header');
-const iconPin = overlay.querySelector('.icon-pin');
-const timeCreate = overlay.querySelector('time-create');
-const timeDeadline = overlay.querySelector('deadline');
-const closeAnvanceEdit = overlay.querySelector('close');
-const iconRecycleBin = overlay.querySelector('.icon-recycle-bin');
-const iconChangeColor = overlay.querySelector('.icon-list-color');
-const iconCopy = overlay.querySelector('.icon-copy');
-const inputColor = overlay.querySelector('.input-color');
-const tabColor = overlay.querySelector('tab');
-const btnCancel = overlay.querySelector('.btn-cancel');
-const btnSubmitColor = overlay.querySelector('.btn-submit-color');
-const inputDeadline = overlay.querySelector('.input-deadline');
+const listNote = app.querySelector('list-note');
+//#endregion app node 
+
+//#region Secondary indicator
 const indicator1 = app.querySelector('#indicator1');
 const indicator2 = app.querySelector('#indicator2');
-const elmDrag = document.querySelector('.item-drag');
+//#endregion Secondary indicator
+
+//#region anvanced edit node
+const overlay = document.querySelector('overlay');
+const detailsEditHeader = overlay.querySelector('header');
+const detailsEditPinIcon = overlay.querySelector('.icon-pin');
+const detailsEditText = overlay.querySelector('content');
+const detailsTimeDeadline = overlay.querySelector('deadline');
+const detailsTimeCreate = overlay.querySelector('time-create');
+const detailsInputDeadline = overlay.querySelector('.input-deadline');
+const detailsInputColor = overlay.querySelector('.input-color');
+const detailsTabColor = overlay.querySelector('tab');
+const detailsBtnCancel = overlay.querySelector('.btn-cancel');
+const detailsSubmitColor = overlay.querySelector('.btn-submit-color');
+const detailsIconCopy = overlay.querySelector('.icon-copy');
+const detailsIconRecycleBin = overlay.querySelector('.icon-recycle-bin');
+const detailsEditClose = overlay.querySelector('close');
+//#endregion anvanced edit node
+
+const cloneElmDrag = document.querySelector('.item-drag');
 
 const CONST_LS_KEY = 'TODO-LIST';
 
+// enumeration
 const CONST_TODO_STATUS = {
     PENDING: 0,
     DOING: 1,
     COMPLETED: 2,
     CANCELED: -1,
 }
+
 const COLOR_DEFAULT = 'var(--app-color-1)';
+
 //#endregion declare const
 
 const appOOP = {
     //#region declare
-    itemDrop: '',
     onEdit: false, // Flag
+
+    // Data note 
     dataTodos: [],
     _data: [], // private property // accessed via GETTER / SETTER
-    fromIndex: 0,
+
+    //#region DOM collection
+    listNoteUnpin: [],
+    listNotePin: [],
+    itemMove: [],
+    //#endregion DOM collection
+
+    //#region from & to index note
     toIndex: 0,
-    mouseDownPageY: 0,
-    hasChildListNote: false,
+    fromIndex: 0,
+    //#endregion from & to index note
+
+    //#region coordinate & size
     topUnpin: 0,
     topPin: 0,
     heightNote: 0,
-    listNoteUnpin: [],
-    listNotePin: [],
     itemOffsetY: 0,
-    itemMove: [],
+    mouseDownPageY: 0,
+    //#endregion coordinate & size
     //#endregion declare
 
+    //#region getter, setter
     get data() {
         return this._data
     }, // getter
@@ -66,14 +88,92 @@ const appOOP = {
         this.sortData();
         this.render();
         this.handleEvents();
-
         this.localSet();
     }, // setter
+    //#endregion getter, setter
 
+    //#region localStorage
+    localSet: function () {
+        localStorage.setItem(CONST_LS_KEY, JSON.stringify(appOOP.dataTodos));
+    }, // localSet
+
+    localGet: function () {
+        const cached = localStorage.getItem(CONST_LS_KEY);
+        if (cached)
+            return JSON.parse(cached);
+
+        return [];
+    }, // localGet
+    // #endregion localStorage
+
+    //#region Helping func
+    inputValueLength: function () {
+        return formInputNote.value.length;
+    }, // inputValueLength
+    //#endregion Helping func
+
+    //#region sort data
+    sortData: function () {
+        const arrPin = appOOP.dataTodos.filter(elm => {
+            return elm.pin == true;
+        });
+
+        const arrUnpin = appOOP.dataTodos.filter(elm => {
+            return elm.pin == false;
+        });
+
+        appOOP.dataTodos = arrPin.concat(arrUnpin);
+    }, // sortData
+
+    sortDataDeadline: function () {
+        let time = getDateParts();
+
+        time = [
+            time.day.toString().padStart(2, 0),
+            time.month.toString().padStart(2, 0),
+            time.year
+        ];
+
+        const todayTxt = time.reverse().toString().replace(/,/g, '-');
+
+        function compareDate(a, b) {
+            const deadlineProcessedA = a.deadline.split('-').reverse().join('-');
+            const deadlineProcessedB = b.deadline.split('-').reverse().join('-');
+
+            return (
+                deadlineProcessedA < deadlineProcessedB ?
+                    -1 :
+                    deadlineProcessedA > deadlineProcessedB ?
+                        1 :
+                        0
+            )
+        } // compare
+
+        let expiredTodos = [], notExpiredTodos = [];
+
+        appOOP.dataTodos.forEach(item => {
+            const deadlineProcessed = item.deadline.split('-').reverse();
+
+            if (item.deadline == '' || deadlineProcessed.join('-') >= todayTxt) notExpiredTodos.push(item);
+            else expiredTodos.push(item);
+        }); // forEach
+
+        const expiredTodosSorted = expiredTodos.sort(compareDate);
+
+        appOOP.dataTodos = [...expiredTodosSorted, ...notExpiredTodos];
+
+        appOOP.data = [...appOOP.dataTodos];
+    }, // sortDataDeadline
+    //#endregion sort data
+
+    //#region render
     render: function () {
-        const htmlsTodos = this.dataTodos.map((item) => {
-            if (item.pin == false) {
-                return `                
+        const dataPin = this.dataTodos.filter(item => item.pin);
+        const dataPinLength = dataPin.length;
+        const dataUnPin = this.dataTodos.slice(dataPinLength);
+
+        const htmlsTodos = dataUnPin.map((item) => {
+            return `                
                 <li style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
                     <up-down draggable="true">
                         <i class="icon-drag fa-solid fa-grip-vertical"></i>
@@ -87,36 +187,34 @@ const appOOP = {
                     <div class="indicator-drag"></div>
                 </li>
                     `;
-            }
         }).join('');
 
-        const htmlPin = this.dataTodos.map((item) => {
-            if (item.pin == true) {
-                return `
-                <li style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
-                    <up-down draggable="true">
-                        <i class="icon-drag fa-solid fa-grip-vertical"></i>
-                    </up-down>  
-                    <input class="checkbox-hide" type="checkbox" ${item.status == 2 ? 'checked' : ''}>
-                    <span style="border-color: ${item.color};" class="checkbox-complete"></span>
-                    <span  ${getTotalDaysDifferent(getCurrentTime_ISOformat(), item.date) < 0 ? 'style="color:red;"' : ''} class="item-text">${item.text}</span>
-                    <button class="btn-delete">x</button>
-                    <i class="icon-save"></i>
-                    <i id="icon-full" class="fa-solid fa-expand"></i>
-                    <div class="indicator-drag"></div>
-                </li>
-                    `;
-            }
-        }).join('');
-        listPin.innerHTML = `
-            <h3 class="title-pin">List Pin Note</h3>
-        ${htmlPin}
-        `;
-        if (listPin.children.length < 2) {
-            listPin.classList.add('hide');
-        } else {
+        if (dataPinLength > 0) {
             listPin.classList.remove('hide');
+            const htmlPin = dataPin.map((item) => {
+                return `
+                    <li style="border-color: ${item.color};" class="item-note ${item.status == 2 ? 'strikethrough' : ''}" data-index="${item.id}" >
+                        <up-down draggable="true">
+                            <i class="icon-drag fa-solid fa-grip-vertical"></i>
+                        </up-down>  
+                        <input class="checkbox-hide" type="checkbox" ${item.status == 2 ? 'checked' : ''}>
+                        <span style="border-color: ${item.color};" class="checkbox-complete"></span>
+                        <span  ${getTotalDaysDifferent(getCurrentTime_ISOformat(), item.date) < 0 ? 'style="color:red;"' : ''} class="item-text">${item.text}</span>
+                        <button class="btn-delete">x</button>
+                        <i class="icon-save"></i>
+                        <i id="icon-full" class="fa-solid fa-expand"></i>
+                        <div class="indicator-drag"></div>
+                    </li>
+                        `;
+            }).join('');
+            listPin.innerHTML = `
+                <h3 class="title-pin">List Pin Note</h3>
+            ${htmlPin}
+            `;
+        } else {
+            listPin.classList.add('hide');
         }
+
         listNote.innerHTML = htmlsTodos;
     }, // render
 
@@ -132,16 +230,14 @@ const appOOP = {
                     <i class="show icon-save" id="icon-save-inner" onclick="appOOP.updateTodo(this)"></i>
                 </li>
                 `;
-        timeCreate.innerText = todo.date;
-        timeDeadline.innerText = todo.deadline == '' ? '' : getDeadline(todo.deadline).text;
+        detailsTimeCreate.innerText = todo.date;
+        detailsTimeDeadline.innerText = todo.deadline == '' ? '' : getDateDifferent(todo.deadline).text;
 
-        contentAnvancedEdit.innerHTML = htmlContent;
-    }, // renderFullTodo
+        detailsEditText.innerHTML = htmlContent;
+    }, // renderAnvancedEdit
+    //#endregion render
 
-    inputValueLength: function () {
-        return inputNote.value.length;
-    }, // inputValueLength
-
+    //#region add/edit/delete note
     createNote: function () {
         const id = `${Date.now()}`;
         let item, itemText, checkboxHide, checkboxShow, btn, icon, fullIcon, upDown, dragIcon, indicatorDrag;
@@ -176,7 +272,7 @@ const appOOP = {
         fullIcon.setAttribute('id', 'icon-full');
 
         // Add text
-        itemText.innerText = inputNote.value;
+        itemText.innerText = formInputNote.value;
         btn.appendChild(document.createTextNode("x"));
 
         // Assign element to item
@@ -192,18 +288,18 @@ const appOOP = {
         // Add item to list
         listNote.appendChild(item);
 
-        inputNote.value = "";
-        upDown.ontouchstart = (e) => this.todo = this.getElm(e);
+        formInputNote.value = "";
+        upDown.ontouchstart = (e) => this.todo = this.getMouseDownElm(e);
         upDown.ontouchmove = (e) => {
             e.preventDefault();
-            this.useIndicator(e, 'MOBILE');
+            this.useDisplayIndicator(e, 'MOBILE');
         }
 
         upDown.ontouchend = (e) => this.dropElm(e);
 
-        item.ondragstart = (e) => this.todo = this.getElm(e);
+        item.ondragstart = (e) => this.todo = this.getMouseDownElm(e);
 
-        item.ondragenter = (e) => this.useIndicator(e, 'PC');
+        item.ondragenter = (e) => this.useDisplayIndicator(e, 'PC');
 
         item.ondragend = (e) => this.dropElm(e);
 
@@ -221,27 +317,15 @@ const appOOP = {
         if (boolean) {
             appOOP.onEdit = true;
 
-            inputNote.setAttribute('disabled', true);
-            btnAddNote.setAttribute('disabled', true);
+            formInputNote.setAttribute('disabled', true);
+            formBtnAddNote.setAttribute('disabled', true);
         } else {
             appOOP.onEdit = false;
 
-            inputNote.removeAttribute('disabled');
-            btnAddNote.removeAttribute('disabled');
+            formInputNote.removeAttribute('disabled');
+            formBtnAddNote.removeAttribute('disabled');
         }
     }, // updateOnEdit
-
-    localSet: function () {
-        localStorage.setItem(CONST_LS_KEY, JSON.stringify(appOOP.dataTodos));
-    }, // localSet
-
-    localGet: function () {
-        const cached = localStorage.getItem(CONST_LS_KEY);
-        if (cached)
-            return JSON.parse(cached);
-
-        return [];
-    }, // localGet
 
     addTodo: function (id, todoText) {
 
@@ -303,7 +387,9 @@ const appOOP = {
         appOOP.dataTodos = appOOP.dataTodos.filter(item => item.id !== id);
         appOOP.localSet();
     }, // deleteTodo
+    //#endregion add/edit/delete note
 
+    //#region 
     strikethroughItem: function (elm) {
 
         if (elm.hasAttribute('checked')) {
@@ -330,7 +416,7 @@ const appOOP = {
                     ...item,
                     status: CONST_TODO_STATUS.COMPLETED
                 }
-            })
+            });
         } else {
             appOOP.dataTodos = appOOP.dataTodos.map((item) => {
                 if (item.id != id) {
@@ -340,13 +426,13 @@ const appOOP = {
                     ...item,
                     status: CONST_TODO_STATUS.DOING
                 }
-            })
+            });
         }
         appOOP.updateTodo(elm);
         appOOP.localSet();
     }, // todoStatus
 
-    clickItem: function (e) {
+    focusNote: function (e) {
         const btnDelete = e.target.parentNode.querySelector('.btn-delete');
         const btnSave = e.target.parentNode.querySelector('.icon-save');
         const idOuter = e.target.parentNode.dataset.index;
@@ -420,11 +506,11 @@ const appOOP = {
 
         appOOP.dataTodos.forEach(item => {
             if (item.id == id) {
-                headerAnvanceEdit.style.background = `linear-gradient(to bottom, ${item.color},  white`;
+                detailsEditHeader.style.background = `linear-gradient(to bottom, ${item.color},  white`;
                 if (item.pin == true) {
-                    iconPin.classList.add('pin-item');
+                    detailsEditPinIcon.classList.add('pin-item');
                 } else {
-                    iconPin.classList.remove('pin-item');
+                    detailsEditPinIcon.classList.remove('pin-item');
                 }
             }
         }); // forEach
@@ -434,7 +520,9 @@ const appOOP = {
         appOOP.renderAnvancedEdit(e);
 
     }, // clickIconFull
+    //#endregion 
 
+    //#region event drag drop
     getMouseDownElm: function (e) {
         const item = e.target.closest('.item-note');
         const text = item.querySelector('.item-text').textContent;
@@ -465,9 +553,8 @@ const appOOP = {
             checkboxDrag.removeAttribute('checked');
         }
         appOOP.fromIndex = appOOP.dataTodos.indexOf(todo);
-        elmDrag.classList.remove('hide');
+        cloneElmDrag.classList.remove('hide');
         appOOP.mouseDownPageY = e.pageY || e.targetTouches[0].pageY;
-        appOOP.hasChildListNote = listNote.contains(item);
         item.classList.add('blur');
 
         // get height last child list pin and list unpin
@@ -482,7 +569,7 @@ const appOOP = {
         appOOP.topPin = pinLastItem.getBoundingClientRect().y + 5;
 
         return todo;
-    }, // getElm
+    }, // getMouseDownElm
 
     displayIndicator: function (e, index, device) {
         const item = e.target.closest('.item-note');
@@ -492,7 +579,7 @@ const appOOP = {
         appOOP.listNotePin.shift();
         appOOP.listNoteUnpin = Array.from(listNote.children);
         const listAllNote = appOOP.listNotePin.concat(appOOP.listNoteUnpin);
-        const computedAddNote = addNote.offsetHeight + Number(getComputedStyle(addNote).marginTop.replace('px', ''));
+        const computedAddNote = formAddNote.offsetHeight + Number(getComputedStyle(formAddNote).marginTop.replace('px', ''));
         const computedPin = listPin.offsetHeight + Number(getComputedStyle(listPin).marginTop.replace('px', '')) + Number(getComputedStyle(listPin).marginBottom.replace('px', ''));
         const computedTitlePin = titlePin.offsetHeight + Number(getComputedStyle(titlePin).marginTop.replace('px', '')) + Number(getComputedStyle(titlePin).marginBottom.replace('px', ''));
 
@@ -549,15 +636,15 @@ const appOOP = {
 
         appOOP.itemMove = item;
         appOOP.itemOffsetY = e.offsetY;
-        elmDrag.style.top = checkDeviceY;
-        elmDrag.style.left = checkDeviceX;
+        cloneElmDrag.style.top = checkDeviceY;
+        cloneElmDrag.style.left = checkDeviceX;
     }, // indicatorDrag
 
     dropElm: function (e) {
         const item = e.target.closest('.item-note');
         const id = item.dataset.index;
 
-        elmDrag.classList.add('hide');
+        cloneElmDrag.classList.add('hide');
         item.classList.add('blur');
         indicator1.style.display = 'none';
         indicator2.style.display = 'none';
@@ -602,58 +689,6 @@ const appOOP = {
         appOOP.data = [...appOOP.dataTodos];
     }, // dropElm
 
-    sortData: function () {
-        const arrPin = appOOP.dataTodos.filter(elm => {
-            return elm.pin == true;
-        });
-
-        const arrUnpin = appOOP.dataTodos.filter(elm => {
-            return elm.pin == false;
-        });
-
-        appOOP.dataTodos = arrPin.concat(arrUnpin);
-    }, // sortData
-
-    sortDataDeadline: function () {
-        let time = getDateParts();
-
-        time = [
-            time.day.toString().padStart(2, 0),
-            time.month.toString().padStart(2, 0),
-            time.year
-        ];
-
-        const todayTxt = time.reverse().toString().replace(/,/g, '-');
-
-        function compareDate(a, b) {
-            const deadlineProcessedA = a.deadline.split('-').reverse().join('-');
-            const deadlineProcessedB = b.deadline.split('-').reverse().join('-');
-
-            return (
-                deadlineProcessedA < deadlineProcessedB ?
-                    -1 :
-                    deadlineProcessedA > deadlineProcessedB ?
-                        1 :
-                        0
-            )
-        } // compare
-
-        let expiredTodos = [], notExpiredTodos = [];
-
-        appOOP.dataTodos.forEach(item => {
-            const deadlineProcessed = item.deadline.split('-').reverse();
-
-            if (item.deadline == '' || deadlineProcessed.join('-') >= todayTxt) notExpiredTodos.push(item);
-            else expiredTodos.push(item);
-        }); // forEach
-
-        const expiredTodosSorted = expiredTodos.sort(compareDate);
-
-        appOOP.dataTodos = [...expiredTodosSorted, ...notExpiredTodos];
-
-        appOOP.data = [...appOOP.dataTodos];
-    }, // sortDataDeadline
-
     useDisplayIndicator: function (e, device) {
         // PC
         if (device === 'PC') {
@@ -680,12 +715,15 @@ const appOOP = {
             appOOP.displayIndicator(e, indexTodoMb, 'MOBILE');
             appOOP.toIndex = appOOP.dataTodos.indexOf(todoMb);
         }
-    },
+    }, // useDisplayIndicator
+    //#endregion event drag drop
 
     handleEvents: function () {
-        const OS = checkEnvironment().os;
 
-        btnAddNote.onclick = () => {
+        //#region event has a component
+        formBtnAddNote.onclick = () => {
+            const OS = checkEnvironment().os;
+
             if (appOOP.inputValueLength() > 0) {
                 appOOP.createNote();
             }
@@ -697,17 +735,17 @@ const appOOP = {
             }
         } // btnAddNote.onclick
 
-        inputNote.onkeypress = function (e) {
+        formInputNote.onkeypress = function (e) {
             if (appOOP.inputValueLength() > 0 && e.charCode === 13) {
                 appOOP.createNote();
             }
         } // enterKey
 
-        closeAnvanceEdit.onclick = () => {
+        detailsEditClose.onclick = () => {
             overlay.classList.add('hide');
         } // closeAnvanceEdit.
 
-        iconRecycleBin.onclick = (e) => {
+        detailsIconRecycleBin.onclick = (e) => {
             const id = e.target.closest('advanced-edit').querySelector('.item-note').dataset.index;
 
             appOOP.dataTodos = appOOP.dataTodos.filter((item) => item.id !== id);
@@ -722,10 +760,10 @@ const appOOP = {
             });
         } // iconRecycleBin
 
-        iconPin.onclick = (e) => {
+        detailsEditPinIcon.onclick = (e) => {
             const id = e.target.closest('advanced-edit').querySelector('.item-note').dataset.index;
 
-            iconPin.classList.toggle('pin-item');
+            detailsEditPinIcon.classList.toggle('pin-item');
 
             appOOP.dataTodos = appOOP.dataTodos.map(todo => {
                 if (todo.id !== id)
@@ -739,45 +777,45 @@ const appOOP = {
             appOOP.sortDataDeadline();
             appOOP.data = [...appOOP.dataTodos];
 
-        }, // iconPin
+        } // iconPin
 
-            iconCopy.onclick = (e) => {
-                const id = e.target.closest('advanced-edit').querySelector('.item-note').dataset.index;
+        detailsIconCopy.onclick = (e) => {
+            const id = e.target.closest('advanced-edit').querySelector('.item-note').dataset.index;
 
-                let todoCopy = appOOP.dataTodos.find(item => item.id === id);
-                const dataCopyId = todoCopy.id;
+            let todoCopy = appOOP.dataTodos.find(item => item.id === id);
+            const dataCopyId = todoCopy.id;
 
-                todoCopy = {
-                    ...todoCopy,
-                    id: `${Date.now()}`,
-                    date: getCurrentTime_ISOformat()
+            todoCopy = {
+                ...todoCopy,
+                id: `${Date.now()}`,
+                date: getCurrentTime_ISOformat()
+            }
+
+            appOOP.dataTodos.push(todoCopy);
+
+            overlay.classList.add('hide');
+
+            appOOP.data = [...appOOP.dataTodos];
+            Array.from(listNote.children).forEach((item) => {
+                const textItem = item.querySelector('.item-text');
+
+                if (dataCopyId == item.dataset.index) {
+                    textItem.click();
                 }
+            });
+            appOOP.sortData();
+        } // iconCopy
 
-                appOOP.dataTodos.push(todoCopy);
-
-                overlay.classList.add('hide');
-
-                appOOP.data = [...appOOP.dataTodos];
-                Array.from(listNote.children).forEach((item) => {
-                    const textItem = item.querySelector('.item-text');
-
-                    if (dataCopyId == item.dataset.index) {
-                        textItem.click();
-                    }
-                });
-                appOOP.sortData();
-            } // iconCopy
-
-        inputColor.onclick = (e) => {
+        detailsInputColor.onclick = (e) => {
             e.stopPropagation();
-            tabColor.classList.add('show');
+            detailsTabColor.classList.add('show');
         } // inputColor
 
-        btnCancel.onclick = () => {
-            tabColor.classList.remove('show');
-        } // btnCancel
+        detailsBtnCancel.onclick = () => {
+            detailsTabColor.classList.remove('show');
+        } // tabBtnCancel
 
-        btnSubmitColor.onclick = (e) => {
+        detailsSubmitColor.onclick = (e) => {
             const id = e.target.closest('advanced-edit').querySelector('.item-note').dataset.index;
 
             appOOP.dataTodos = appOOP.dataTodos.map(item => {
@@ -786,30 +824,30 @@ const appOOP = {
                 else
                     return {
                         ...item,
-                        color: inputColor.value
+                        color: detailsInputColor.value
                     }
             });
 
             app.querySelectorAll('.item-note').forEach(item => {
                 if (item.dataset.index == id) {
-                    item.querySelector('.checkbox-complete').style.borderColor = inputColor.value;
-                    item.style.borderColor = inputColor.value;
+                    item.querySelector('.checkbox-complete').style.borderColor = detailsInputColor.value;
+                    item.style.borderColor = detailsInputColor.value;
                 }
             });
 
-            headerAnvanceEdit.style.background = `linear-gradient(to bottom, ${inputColor.value}, white`;
-            tabColor.classList.remove('show');
+            detailsEditHeader.style.background = `linear-gradient(to bottom, ${detailsInputColor.value}, white`;
+            detailsTabColor.classList.remove('show');
 
             appOOP.localSet();
-        } // btnOk
+        } // tabBtnSubmitColor
 
-        inputDeadline.onchange = (e) => {
+        detailsInputDeadline.onchange = (e) => {
             const wrapper = e.target.closest('advanced-edit');
             const textItem = wrapper.querySelector('.item-text');
             const id = wrapper.querySelector('.item-note').dataset.index;
-            const { totalDays, text } = getDeadline(inputDeadline.value);
+            const { totalDays, text } = getDateDifferent(detailsInputDeadline.value);
 
-            timeDeadline.innerText = text;
+            detailsTimeDeadline.innerText = text;
 
             appOOP.dataTodos = appOOP.dataTodos.map(item => {
                 if (item.id !== id) {
@@ -817,12 +855,12 @@ const appOOP = {
                 } else {
                     return {
                         ...item,
-                        deadline: inputDeadline.value
+                        deadline: detailsInputDeadline.value
                     }
                 } // else
             }) // map
 
-            if (getTotalDaysDifferent(getCurrentTime_ISOformat(), inputDeadline.value) < 0) {
+            if (getTotalDaysDifferent(getCurrentTime_ISOformat(), detailsInputDeadline.value) < 0) {
 
                 textItem.style.color = 'red';
 
@@ -850,18 +888,20 @@ const appOOP = {
         } // inputDeadline
 
         overlay.onclick = () => {
-            tabColor.classList.remove('show');
-        } // fullSetting
+            detailsTabColor.classList.remove('show');
+        } // overlay
+        //#endregion event has a component
 
+        //#region event has many components
         app.querySelectorAll('.item-note').forEach(item => {
-            item.ondragstart = (e) => appOOP.itemDrop = appOOP.getMouseDownElm(e);
+            item.ondragstart = (e) => appOOP.getMouseDownElm(e);
             item.ondragenter = (e) => appOOP.useDisplayIndicator(e, 'PC');
             item.ondragend = (e) => appOOP.dropElm(e);
-        }); // forEach
+        });
 
         app.querySelectorAll('up-down').forEach(item => {
             item.ontouchstart = (e) => {
-                appOOP.itemDrop = appOOP.getMouseDownElm(e);
+                appOOP.getMouseDownElm(e);
             };
             item.ontouchmove = (e) => {
                 e.preventDefault();
@@ -879,7 +919,7 @@ const appOOP = {
         });
 
         app.querySelectorAll('.item-text').forEach(text => {
-            text.onclick = (e) => appOOP.clickItem(e);
+            text.onclick = (e) => appOOP.focusNote(e);
         });
 
         app.querySelectorAll('.icon-save').forEach(icon => {
@@ -889,6 +929,8 @@ const appOOP = {
         app.querySelectorAll('#icon-full').forEach(icon => {
             icon.onclick = (e) => appOOP.clickIconFull(e);
         });
+        //#endregion event has many components
+
     }, // handleEvents
 
     start() {
