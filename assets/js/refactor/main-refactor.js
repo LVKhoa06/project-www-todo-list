@@ -1,19 +1,8 @@
 import { checkEnvironment, getCurrentTime_ISOformat, getDateParts, getTotalDaysDifferent, moveItem, getDateDifferent } from "./utils-refactor.js";
-import "../../css/small.css";
-import "../../css/main.css" ;
+import('../../css/main.css')
 
-// if (window.innerWidth > 767) {
-//     import('./web.css').then(() => {
-//        console.log("Imported web css");
-//     });
-// }
-// else{
-//     import('./mob.css').then(() => {
-//        console.log("Imported mobile css");
-//     });
-// }
+// console.log(window.matchMedia('(max-width: 500px)').matches)
 
- 
 //#region app node 
 const app = document.querySelector('app');
 const formAddNote = app.querySelector('add-note');
