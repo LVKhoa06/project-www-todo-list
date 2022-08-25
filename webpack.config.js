@@ -4,20 +4,19 @@ const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
 module.exports = {
   entry: [
-    './assets/js/refactor/main-refactor.js', // file nguồn Webpack làm việc
+    './assets/js/refactor/main-refactor.js',
   ],
 
   output: {
-    filename: '[name].js',                 // tên file xuất ra
-    path: path.resolve(__dirname, 'dist'),  // thư mục lưu
+    filename: 'mini.js',
+    path: path.resolve(__dirname, 'dist'),
   },
 
   plugins: [
-    new MiniCssExtractPlugin({ filename: '[name].css' }),
+    new MiniCssExtractPlugin({ filename: 'mini.css' }),
+    new OptimizeCssAssetsPlugin()
   ],
-  optimization: {
-    minimizer: [new OptimizeCssAssetsPlugin()],
-  },
+  
   module: {
     rules: [
       {
