@@ -5,7 +5,9 @@ const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 module.exports = {
   entry: [
     './assets/js/refactor/main-refactor.js',
+    './assets/css/main.css',
   ],
+  
 
   output: {
     filename: 'mini.js',

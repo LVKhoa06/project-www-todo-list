@@ -1,5 +1,5 @@
-
-import { checkEnvironment, getCurrentTime_ISOformat, getDateParts, getTotalDaysDifferent, moveItem, getDateDifferent } from "./utils-refactor.js";
+import {formatDate, checkEnvironment, getCurrentTime_ISOformat, getDateParts, getTotalDaysDifferent, moveItem, getDateDifferent } from "./utils-refactor.js";
+console.log(formatDate('YY,MM,DD'))
 
 //#region app node 
 const app = document.querySelector('app');
