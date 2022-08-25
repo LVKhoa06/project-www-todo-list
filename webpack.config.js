@@ -1,30 +1,29 @@
 const path = require('path');
-
-const devMode = true;
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
 module.exports = {
-  mode: devMode ? 'development' : 'production',
   entry: [
     './assets/js/refactor/main-refactor.js', // file nguồn Webpack làm việc
   ],
 
   output: {
-    filename: 'min.js',                 // tên file xuất ra
+    filename: '[name].js',                 // tên file xuất ra
     path: path.resolve(__dirname, 'dist'),  // thư mục lưu
-    library: 'mylib',                       // tên thư viện (tự đặt)
-    libraryTarget: 'var',
   },
 
+  plugins: [
+    new MiniCssExtractPlugin({ filename: '[name].css' }),
+  ],
   optimization: {
-    // We no not want to minimize our code.
-    minimize: true
+    minimizer: [new OptimizeCssAssetsPlugin()],
   },
   module: {
     rules: [
       {
         test: /\.css$/,
         use: [
-          'style-loader',
+          MiniCssExtractPlugin.loader, // extract css into files
           'css-loader'
         ]
       }

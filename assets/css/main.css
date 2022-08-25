@@ -434,9 +434,10 @@ deadline {
 
 .input-deadline {
     position: absolute;
-    width: 30px;
     height: 30px;
-    left: -5px;
+    top: -1px;
+    left: -4px;
+    width: 30px;
     opacity: 0;
 }
 
