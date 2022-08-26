@@ -1,10 +1,11 @@
 // todo.day ISO
-const CONST_GET_M = ['DDMMYYYY', 'YYYYMMDD', 'YYMMDD', 'DDMMMYY', 'DMMMMYYYY', 'DDMMYY', 'YYMMMDD', 'YYYYMMMDD','YYYYMMMMDD', 'DDMMMYYYY', 'DDMMMMYYYY'];
-const CONST_GET_D = ['MDYYYY', 'MDYY', 'MMDDYY', 'MMDDYYYY', 'MMMMDYYYY', 'MMMDDYYYY', 'MMMDDYY']
+const CONST_GET_M = ['DDMMMMYY','YYMMMMDD','DDMMYYYY', 'YYYYMMDD', 'YYMMDD', 'DDMMMYY', 'DMMMMYYYY', 'DDMMYY', 'YYMMMDD', 'YYYYMMMMD', 'YYYYMMMDD','YYYYMMMMDD', 'DDMMMYYYY', 'DDMMMMYYYY'];
+const CONST_GET_D = ['MMMMDDYY','MMMMDDYYYY','MDYYYY', 'MDYY', 'MMDDYY', 'MMDDYYYY', 'MMMMDYYYY', 'MMMDDYYYY', 'MMMDDYY']
 const CONST_WEEK_DAY_NAME = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const CONST_MONTH_31DAY = [1, 3, 5, 7, 8, 10, 12];
 const CONST_MONTH_28DAY = 2;
 const CONST_MONTH_30DAY = [4, 6, 9, 11];
+
 const CONST_DAYS_OF_MONTHS = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]; // NOT leap year
 // get time zone (date.getTimezoneOffset() / -60)
 
@@ -210,7 +211,6 @@ function getCurrentTime_ISOformat() {
     return `${help(year)}-${help(month)}-${date}T${help(hours)}:${help(minutes)}:${help(second)}`;
 } // getCurrentTime_ISOformat
 
-// getDateParts
 function getDateParts(input = new Date()) {
     const newTime = new Date(input);
     const day = newTime.getDate();
@@ -234,15 +234,7 @@ function getTotalDaysDifferent(fromDate, toDate) {
     return Math.ceil(deltaInSeconds / secondsInADay);
 } // getTotalDaysDifferent
 
-function getDateDifferent(date1, date2 = new Date) {
-    return {
-        diffDayTotals: 400,
-        diffYears: 1,
-        diffMonths: 2,
-        diffDays: 0,
-    }
-}
-
+//#region
 // getDeadline = getDateDifferent(input)
 // moment, date-fns
 
@@ -269,16 +261,9 @@ function foo(date1, date2) {
 
     return `${diffTeller('year', diffY)} ${diffTeller('month', diffM)} ${diffTeller('day', diffD)}`;
 }
+//#endregion
 
 function getDateDifferent(input) {
-    // { age, name } = user; // obj destructor
-    // arr = [1, 2, 3, 4, 5, 6]
-    // const [a, b, c] = arr; // arr destructor
-    // a = arr[0]
-    // b = arr[1]
-    // c= arr[2]
-    // a = 1, b = 2
-
     const { day: inputD, month: inputM, year: inputY } = getDateParts(formatDate('YYYY-MM-DD', input));
     const { day: todayD, month: todayM, year: todayY } = getDateParts(); // property alias
 
@@ -345,12 +330,12 @@ function getDateDifferent(input) {
         }); //forEach
     } // else 
 
+    // leap year
     for (let i = todayY; i <= inputY; i++) {
         if (i % 4 == 0) {
             diffYears += 1;
         }
     } // for
-
     // #endregion count year, month, day.
 
     const diffDaysTotal = getTotalDaysDifferent(getCurrentTime_ISOformat(), `${inputY}-${inputM}-${inputD}`);

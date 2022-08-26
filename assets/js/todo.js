@@ -8,4 +8,6 @@
     💻 string comparasion
     💻 sort() helper
     💻 getter/ setter: this._data // appOOP.data
+testing(formatDay)
+
 */

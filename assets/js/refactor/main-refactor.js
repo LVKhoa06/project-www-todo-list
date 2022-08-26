@@ -229,12 +229,12 @@ const appOOP = {
     //#region add/edit/delete note
     createNote: function () {
         const id = `${Date.now()}`;
-        let item, itemText, checkboxHide, checkboxShow, btnDelete, iconSave, fullIcon, upDown, dragIcon, indicatorDrag;
+        let item, itemText, checkboxHide, checkboxShow, btnDelete, iconSave, iconDetails, upDown, dragIcon, indicatorDrag;
 
         // Create item
         item = document.createElement("li");
         indicatorDrag = document.createElement("div");
-        fullIcon = document.createElement("i");
+        iconDetails = document.createElement("i");
         itemText = document.createElement("span");
         checkboxHide = document.createElement("input");
         checkboxShow = document.createElement("span");
@@ -248,7 +248,7 @@ const appOOP = {
         // Add attribute
         item.className = 'item-note';
         indicatorDrag.className = 'indicator-drag';
-        fullIcon.className = 'fa-solid fa-expand';
+        iconDetails.className = 'fa-solid fa-expand';
         itemText.className = 'item-text';
         btnDelete.className = 'btn-delete';
         checkboxHide.className = 'checkbox-hide';
@@ -257,7 +257,7 @@ const appOOP = {
         item.setAttribute("draggable", "true");
         checkboxHide.setAttribute("type", "checkbox");
         item.setAttribute("data-index", id);
-        fullIcon.setAttribute('id', 'icon-details');
+        iconDetails.setAttribute('id', 'icon-details');
 
         // Add text
         itemText.innerText = formInputNote.value;
@@ -266,7 +266,7 @@ const appOOP = {
         // Assign element to item
         item.appendChild(checkboxHide);
         item.appendChild(checkboxShow);
-        item.appendChild(fullIcon);
+        item.appendChild(iconDetails);
         item.appendChild(indicatorDrag);
         item.appendChild(upDown);
         item.appendChild(itemText);
@@ -291,7 +291,7 @@ const appOOP = {
         iconSave.onclick = (e) => this.updateText(e.target);
         iconSave.onclick = this.clickIconTick;
         itemText.onclick = this.clickItem;
-        fullIcon.onclick = this.clickIconFull;
+        iconDetails.onclick = this.showDetails;
 
         this.addTodo(id, itemText.innerText);
     }, // createNote
