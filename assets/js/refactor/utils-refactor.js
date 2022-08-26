@@ -1,5 +1,5 @@
 // todo.day ISO
-const CONST_GET_M = ['DDMMYYYY', 'YYYYMMDD', 'YYMMDD', 'DDMMMYY', 'DMMMMYYYY', 'DDMMYY', 'YYMMMDD', 'YYYYMMMDD', 'DDMMMYYYY', 'DDMMMMYYYY'];
+const CONST_GET_M = ['DDMMYYYY', 'YYYYMMDD', 'YYMMDD', 'DDMMMYY', 'DMMMMYYYY', 'DDMMYY', 'YYMMMDD', 'YYYYMMMDD','YYYYMMMMDD', 'DDMMMYYYY', 'DDMMMMYYYY'];
 const CONST_GET_D = ['MDYYYY', 'MDYY', 'MMDDYY', 'MMDDYYYY', 'MMMMDYYYY', 'MMMDDYYYY', 'MMMDDYY']
 const CONST_WEEK_DAY_NAME = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const CONST_MONTH_31DAY = [1, 3, 5, 7, 8, 10, 12];
@@ -344,6 +344,13 @@ function getDateDifferent(input) {
             }
         }); //forEach
     } // else 
+
+    for (let i = todayY; i <= inputY; i++) {
+        if (i % 4 == 0) {
+            diffYears += 1;
+        }
+    } // for
+
     // #endregion count year, month, day.
 
     const diffDaysTotal = getTotalDaysDifferent(getCurrentTime_ISOformat(), `${inputY}-${inputM}-${inputD}`);
