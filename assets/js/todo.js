@@ -1,20 +1,3 @@
-// 
-
-// status, text, deadline, color
-function updateTodo_v2 (elm, property, value) {
-    const id = elm.parentNode.dataset.index;
-
-    appOOP.dataTodos = appOOP.dataTodos.map((item) => {
-        if (item.id != id)
-            return item;
-        else
-            return {
-                ...item,
-                [property]: value
-            } // return
-    }) // map
-} // updateTodo_v2
-
 /* GOODIES/ RECIPES/ NOTES
     💻 CONST_, declaration by domain
     💻 flag
@@ -25,4 +8,6 @@ function updateTodo_v2 (elm, property, value) {
     💻 string comparasion
     💻 sort() helper
     💻 getter/ setter: this._data // appOOP.data
+testing(formatDay)
+
 */
